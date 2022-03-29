@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>openGL入门笔记 - bobh&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="bobh" /><meta name="description" content="本文介绍了openGL渲染管线、视图和实例化等知识，随后实现了一个绘制立方体的程序" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.96.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/openGL%E7%AC%94%E8%AE%B0/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="openGL入门笔记" />
+<meta property="og:description" content="本文介绍了openGL渲染管线、视图和实例化等知识，随后实现了一个绘制立方体的程序" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/openGL%E7%AC%94%E8%AE%B0/" /><meta property="article:section" content="post" />
+
+
+
+<meta itemprop="name" content="openGL入门笔记">
+<meta itemprop="description" content="本文介绍了openGL渲染管线、视图和实例化等知识，随后实现了一个绘制立方体的程序">
+
+<meta itemprop="wordCount" content="2911">
+<meta itemprop="keywords" content="openGL,计算机图形学," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="openGL入门笔记"/>
+<meta name="twitter:description" content="本文介绍了openGL渲染管线、视图和实例化等知识，随后实现了一个绘制立方体的程序"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">bobh&#39;s blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">bobh&#39;s blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">openGL入门笔记</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 0001-01-01 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#opengl管线">openGL管线</a></li>
+        <li><a href="#视图">视图</a>
+          <ul>
+            <li><a href="#模型变换">模型变换</a></li>
+            <li><a href="#视图变换">视图变换</a></li>
+            <li><a href="#投影变换">投影变换</a></li>
+          </ul>
+        </li>
+        <li><a href="#3d立方体程序">3D立方体程序</a>
+          <ul>
+            <li><a href="#实例化">实例化</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="opengl管线">openGL管线</h2>
+<p>绝大多数openGL实现都有着相似的操作顺序，这一系列相关的处理阶段称为openGL渲染管线。我们可以把openGL看做是一些列机器的组合，它的输入是我们提供的数据，这些数据就像在流水线上一样依次被不同的机器进行处理，在一个执行完前一个阶段的操作后就被送入到后一个阶段进行下一次操作，最终成为在屏幕上显示的像素点。我们无法改变这些操作进行的顺序，只能通过openGL提供的API改变它的状态从而改变每个阶段对数据进行的操作来得到不同的效果。下图展示了openGL管线简化后的概览。其中，蓝色阴影的部分可以通过GLSL进行编程。</p>
+<div style="text-align:center;">
+<img src="/imgs/openGlpipeline.png" style="zoom:50%;" />
+</div>
+<blockquote>
+<p>在openGL 3.1之前，openGL为我们提供了固定功能的管线，在openGL 3.1之后，固定功能的管线被废弃并删除了，我们至少需要提供顶点着色器和片段着色器的GLSL代码。</p>
+</blockquote>
+<h2 id="视图">视图</h2>
+<h3 id="模型变换">模型变换</h3>
+<p>模型变换的目的是设置模型的位置和方向，模型上的点一般以该模型的局部坐标系为参考系，通过将模型变换矩阵$\pmb{M}$作用在这些点上从而实现对模型进行旋转、移动和缩放。</p>
+<h3 id="视图变换">视图变换</h3>
+<div style="text-align:center;">
+    <img src="\imgs\stableCamera.png" width="300"/>
+     <img src="\imgs\cameraview.png" width="300"/>
+</div>
+<p>视图变换相当于把照相机固定在三脚架上并将它对准场景。openGL有一个固定在原点并看向Z轴负方向的相机，为了应用相机，我们要做的是模拟将它模拟移动的合适的位置和方向。如果我们移动相机，首先需要将它在原点处<strong>旋转</strong>到合适的方向，然后再<strong>平移</strong>到对应的位置。但openGL中的相机永远固定在原点处，所以我们需要通过变换将世界坐标系中的点$P_w$转换成相机坐标系空间中的对应的点$P_c$。需要做的变换和上面描述的过程刚好相反，用矩阵描述如下：</p>
+<div style="text-align:center;">
+<img src="\imgs\modelview.png" style="zoom:50%;" />
+</div>
+<p>通常，我们将视图矩阵$\pmb{V}$与模型矩阵$\pmb{M}$合成一个模型视图矩阵$MV=\pmb{V}\cdot \pmb{M}$，这样点$P_w$在自己的模型空间下可以一步转换至相机空间
+$$
+P_c=MVP_w
+$$
+复杂模型和场景通常是由简单的小模型分层组合构建的，我们通常只知道一个模型相对于另一个特定模型的位置，于是这形成了一种树形依赖关系，利用矩阵堆栈可以轻松完成这种分层构建的操作。</p>
+<h3 id="投影变换">投影变换</h3>
+<p>投影变换就好像是为照相机选择镜头，它的目的是确定视野，并因此决定哪些物体位域视野之内以及他们能被看到的程度。除了考虑视野外，投影变换还决定了物体是如何投影到屏幕上的，一种类型是透视投影，它类似于我们在生活中看到的景象。另一种是正射投影，一般用于CAD软件中。</p>
+<p>我们通过纵横比、视场、近剪裁平面(投影平面)和远剪裁平面这四个参数来生成透视投影的变换矩阵。处于远近剪裁平面之间的物体被投影到近剪裁平面上。</p>
+<div style="text-align:center;">
+    <img src="\imgs\viewvolume.png" width="500"/>
+     <img src="\imgs\perspectivematrix.png" width="200" />
+</div>
+<h2 id="3d立方体程序">3D立方体程序</h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">//main.cpp
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#include</span> <span class="cpf">&lt;GL\glew.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;GLFW\glfw3.h&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;string&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;fstream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;cmath&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;glm\glm.hpp&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;glm\gtc\type_ptr.hpp&gt; // glm::value_ptr</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;glm\gtc\matrix_transform.hpp&gt; // glm::translate, glm::rotate, glm::scale, glm::perspective</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&#34;Utils.h&#34;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="cp">#define numVAOs 1
+</span></span></span><span class="line"><span class="cl"><span class="cp">#define numVBOs 2
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="n">Utils</span> <span class="n">util</span> <span class="o">=</span> <span class="n">Utils</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="kt">float</span> <span class="n">cameraX</span><span class="p">,</span> <span class="n">cameraY</span><span class="p">,</span> <span class="n">cameraZ</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">float</span> <span class="n">cubeLocX</span><span class="p">,</span> <span class="n">cubeLocY</span><span class="p">,</span> <span class="n">cubeLocZ</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">GLuint</span> <span class="n">renderingProgram</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">GLuint</span> <span class="n">vao</span><span class="p">[</span><span class="n">numVAOs</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl"><span class="n">GLuint</span> <span class="n">vbo</span><span class="p">[</span><span class="n">numVBOs</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// variable allocation for display
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">GLuint</span> <span class="n">mvLoc</span><span class="p">,</span> <span class="n">projLoc</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">float</span> <span class="n">aspect</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">glm</span><span class="o">::</span><span class="n">mat4</span> <span class="n">pMat</span><span class="p">,</span> <span class="n">vMat</span><span class="p">,</span> <span class="n">mMat</span><span class="p">,</span> <span class="n">mvMat</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">setupVertices</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">float</span> <span class="n">vertexPositions</span><span class="p">[</span><span class="mi">108</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span> <span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span><span class="p">,</span>  <span class="mf">1.0f</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0f</span>
+</span></span><span class="line"><span class="cl">	<span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">glGenVertexArrays</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">vao</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">glBindVertexArray</span><span class="p">(</span><span class="n">vao</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">glGenBuffers</span><span class="p">(</span><span class="n">numVBOs</span><span class="p">,</span> <span class="n">vbo</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">glBindBuffer</span><span class="p">(</span><span class="n">GL_ARRAY_BUFFER</span><span class="p">,</span> <span class="n">vbo</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span><span class="c1">//激活缓冲区
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">glBufferData</span><span class="p">(</span><span class="n">GL_ARRAY_BUFFER</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">vertexPositions</span><span class="p">),</span> <span class="n">vertexPositions</span><span class="p">,</span> <span class="n">GL_STATIC_DRAW</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//将数据复制到缓冲区
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">init</span><span class="p">(</span><span class="n">GLFWwindow</span><span class="o">*</span> <span class="n">window</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">renderingProgram</span> <span class="o">=</span> <span class="n">Utils</span><span class="o">::</span><span class="n">createShaderProgram</span><span class="p">(</span><span class="s">&#34;vertShader.glsl&#34;</span><span class="p">,</span> <span class="s">&#34;fragShader.glsl&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">cameraX</span> <span class="o">=</span> <span class="mf">0.0f</span><span class="p">;</span> <span class="n">cameraY</span> <span class="o">=</span> <span class="mf">0.0f</span><span class="p">;</span> <span class="n">cameraZ</span> <span class="o">=</span> <span class="mf">8.0f</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">cubeLocX</span> <span class="o">=</span> <span class="mf">0.0f</span><span class="p">;</span> <span class="n">cubeLocY</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.0f</span><span class="p">;</span> <span class="n">cubeLocZ</span> <span class="o">=</span> <span class="mf">0.0f</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">setupVertices</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">display</span><span class="p">(</span><span class="n">GLFWwindow</span><span class="o">*</span> <span class="n">window</span><span class="p">,</span> <span class="kt">double</span> <span class="n">currentTime</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">glClear</span><span class="p">(</span><span class="n">GL_DEPTH_BUFFER_BIT</span><span class="p">);</span><span class="c1">//清除深度缓冲区
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">glUseProgram</span><span class="p">(</span><span class="n">renderingProgram</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//获取MV矩阵和投影矩阵的统一变量
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">mvLoc</span> <span class="o">=</span> <span class="n">glGetUniformLocation</span><span class="p">(</span><span class="n">renderingProgram</span><span class="p">,</span> <span class="s">&#34;mv_matrix&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">projLoc</span> <span class="o">=</span> <span class="n">glGetUniformLocation</span><span class="p">(</span><span class="n">renderingProgram</span><span class="p">,</span> <span class="s">&#34;proj_matrix&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//构建透视投影矩阵
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">glfwGetFramebufferSize</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">width</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">height</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">aspect</span> <span class="o">=</span> <span class="p">(</span><span class="kt">float</span><span class="p">)</span><span class="n">width</span> <span class="o">/</span> <span class="p">(</span><span class="kt">float</span><span class="p">)</span><span class="n">height</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">pMat</span> <span class="o">=</span> <span class="n">glm</span><span class="o">::</span><span class="n">perspective</span><span class="p">(</span><span class="mf">1.0472f</span><span class="p">,</span> <span class="n">aspect</span><span class="p">,</span> <span class="mf">0.1f</span><span class="p">,</span> <span class="mf">1000.0f</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//构建视图矩阵
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">vMat</span> <span class="o">=</span> <span class="n">glm</span><span class="o">::</span><span class="n">translate</span><span class="p">(</span><span class="n">glm</span><span class="o">::</span><span class="n">mat4</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">),</span> <span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="o">-</span><span class="n">cameraX</span><span class="p">,</span> <span class="o">-</span><span class="n">cameraY</span><span class="p">,</span> <span class="o">-</span><span class="n">cameraZ</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="n">mMat</span> <span class="o">=</span> <span class="n">glm</span><span class="o">::</span><span class="n">translate</span><span class="p">(</span><span class="n">glm</span><span class="o">::</span><span class="n">mat4</span><span class="p">(</span><span class="mf">1.0f</span><span class="p">),</span> <span class="n">glm</span><span class="o">::</span><span class="n">vec3</span><span class="p">(</span><span class="n">cubeLocX</span><span class="p">,</span> <span class="n">cubeLocY</span><span class="p">,</span> <span class="n">cubeLocZ</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="n">mvMat</span> <span class="o">=</span> <span class="n">vMat</span> <span class="o">*</span> <span class="n">mMat</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//将MV矩阵和透视投影矩阵复制给统一变量
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">glUniformMatrix4fv</span><span class="p">(</span><span class="n">mvLoc</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">GL_FALSE</span><span class="p">,</span> <span class="n">glm</span><span class="o">::</span><span class="n">value_ptr</span><span class="p">(</span><span class="n">mvMat</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="n">glUniformMatrix4fv</span><span class="p">(</span><span class="n">projLoc</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">GL_FALSE</span><span class="p">,</span> <span class="n">glm</span><span class="o">::</span><span class="n">value_ptr</span><span class="p">(</span><span class="n">pMat</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">glBindBuffer</span><span class="p">(</span><span class="n">GL_ARRAY_BUFFER</span><span class="p">,</span> <span class="n">vbo</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span><span class="c1">//激活缓冲区
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">glVertexAttribPointer</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">GL_FLOAT</span><span class="p">,</span> <span class="nb">false</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span><span class="c1">//将0号属性关联到缓冲区
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">glEnableVertexAttribArray</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="c1">//启用点的0号属性
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">	<span class="n">glEnable</span><span class="p">(</span><span class="n">GL_DEPTH_TEST</span><span class="p">);</span><span class="c1">//开启深度检测
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">glDepthFunc</span><span class="p">(</span><span class="n">GL_LEQUAL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">glDrawArrays</span><span class="p">(</span><span class="n">GL_TRIANGLES</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">36</span><span class="p">);</span><span class="c1">//以三角形方式绘制
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">glfwInit</span><span class="p">())</span> <span class="p">{</span> <span class="n">exit</span><span class="p">(</span><span class="n">EXIT_FAILURE</span><span class="p">);</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="n">glfwWindowHint</span><span class="p">(</span><span class="n">GLFW_CONTEXT_VERSION_MAJOR</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">glfwWindowHint</span><span class="p">(</span><span class="n">GLFW_CONTEXT_VERSION_MINOR</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">GLFWwindow</span><span class="o">*</span> <span class="n">window</span> <span class="o">=</span> <span class="n">glfwCreateWindow</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">600</span><span class="p">,</span> <span class="s">&#34;cubes&#34;</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">glfwMakeContextCurrent</span><span class="p">(</span><span class="n">window</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">glewInit</span><span class="p">()</span> <span class="o">!=</span> <span class="n">GLEW_OK</span><span class="p">)</span> <span class="p">{</span> <span class="n">exit</span><span class="p">(</span><span class="n">EXIT_FAILURE</span><span class="p">);</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="n">glfwSwapInterval</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">init</span><span class="p">(</span><span class="n">window</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">glfwWindowShouldClose</span><span class="p">(</span><span class="n">window</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">display</span><span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="n">glfwGetTime</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">		<span class="n">glfwSwapBuffers</span><span class="p">(</span><span class="n">window</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">glfwPollEvents</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">glfwDestroyWindow</span><span class="p">(</span><span class="n">window</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">glfwTerminate</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="n">exit</span><span class="p">(</span><span class="n">EXIT_SUCCESS</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>着色器代码如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-glsl" data-lang="glsl"><span class="line"><span class="cl"><span class="c1">//vertShader.glsl</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#version 430</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//关联顶点属性和特定缓冲区</span>
+</span></span><span class="line"><span class="cl"><span class="n">layout</span> <span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="mo">0</span><span class="p">)</span> <span class="k">in</span> <span class="k">vec3</span> <span class="n">position</span><span class="p">;</span><span class="c1">//该顶点属性的识别号为0</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">uniform</span> <span class="n">mat4</span> <span class="n">mv_matrix</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">uniform</span> <span class="n">mat4</span> <span class="n">proj_matrix</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">out</span> <span class="k">vec4</span> <span class="n">varyingColor</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">void</span> <span class="n">main</span><span class="p">(</span><span class="k">void</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">	<span class="n">gl_Position</span> <span class="o">=</span> <span class="n">proj_matrix</span> <span class="o">*</span> <span class="n">mv_matrix</span> <span class="o">*</span> <span class="k">vec4</span><span class="p">(</span><span class="n">position</span><span class="p">,</span><span class="mf">1.0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">varyingColor</span> <span class="o">=</span> <span class="k">vec4</span><span class="p">(</span><span class="n">position</span><span class="p">,</span><span class="mf">1.0</span><span class="p">)</span><span class="o">*</span><span class="mf">0.5</span> <span class="o">+</span> <span class="k">vec4</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-glsl" data-lang="glsl"><span class="line"><span class="cl"><span class="c1">//vertShader.glsl</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#version 430</span>
+</span></span><span class="line"><span class="cl"><span class="k">in</span> <span class="k">vec4</span> <span class="n">varyingColor</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">out</span> <span class="k">vec4</span> <span class="n">color</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">uniform</span> <span class="n">mat4</span> <span class="n">mv_matrix</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">uniform</span> <span class="n">mat4</span> <span class="n">proj_matrix</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">void</span> <span class="n">main</span><span class="p">(</span><span class="k">void</span><span class="p">){</span>	
+</span></span><span class="line"><span class="cl">    <span class="n">color</span> <span class="o">=</span> <span class="n">varyingColor</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>上面程序的数据流如下</p>
+<div style="text-align:center;">
+<img src="\imgs\datastream.png" style="zoom:50%;" />
+</div>
+在`setupVertices()`中，我们用由36个点组成的12个三角形来构建正方体，并将这些顶点坐标加载进`VBO`的的0个缓冲区中。
+<p><code>display()</code>函数中，首先启用着色器，在GPU上安装GLSL代码。接下来获取统一变量的位置并构建MV矩阵然后发送给统一变量。接下来，它启用了了包晗正方体顶点坐标数据的缓冲区，并将其附加到顶点的0号属性，以准备将顶点数据发送到着色器。之后，它启用特定的深度测试仪消除隐藏面。最后，它通过<code>glDrawArrays(GL_TRIANGLES, 0, 36)</code>来制定模型由三角形组成且共有36个顶点</p>
+<p>顶点着色器利用MV矩阵将传入的顶点转换到相机空间，这个值被放入内置变量<code>gl_Postion</code>中，然后继续通过管线并由光栅着色器进行插值。同时根据点的位置定义了它的颜色，由于颜色是从顶点着色器发出的，所以他们也在光栅化着色器中进行插值。同时，片段着色器接收传入的颜色(由光栅化着色器中插值)并用它来设置输出像素的颜色。</p>
+<p>效果如下</p>
+<div style="text-align:center;">
+<img src="\imgs\result1.png" style="zoom: 67%;" />
+</div>
+<h3 id="实例化">实例化</h3>
+<p>当我们个渲染同一个对象的多个副本时，可以使用openGL的实例化绘制。使用实例化时，顶点着色器可以访问内置变量<code>gl_InstanceID</code>，它表示正在处理对象的第几个实例。为了使用实例化来绘制立方体，我们需要将构建不同模型矩阵的计算移到顶点着色器中。修改后的顶点着色器代码如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-glsl" data-lang="glsl"><span class="line"><span class="cl"><span class="cp">#version 430</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">layout</span> <span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="mo">0</span><span class="p">)</span> <span class="k">in</span> <span class="k">vec3</span> <span class="n">position</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">uniform</span> <span class="n">mat4</span> <span class="n">v_matrix</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">uniform</span> <span class="n">mat4</span> <span class="n">proj_matrix</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">uniform</span> <span class="k">float</span> <span class="n">tf</span><span class="p">;</span><span class="c1">//时间因子</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">out</span> <span class="k">vec4</span> <span class="n">varyingColor</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//声明矩阵变换工具函数</span>
+</span></span><span class="line"><span class="cl"><span class="n">mat4</span> <span class="n">buildRotateX</span><span class="p">(</span><span class="k">float</span> <span class="n">rad</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">mat4</span> <span class="n">buildRotateY</span><span class="p">(</span><span class="k">float</span> <span class="n">rad</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">mat4</span> <span class="n">buildRotateZ</span><span class="p">(</span><span class="k">float</span> <span class="n">rad</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">mat4</span> <span class="n">buildTranslate</span><span class="p">(</span><span class="k">float</span> <span class="n">x</span><span class="p">,</span> <span class="k">float</span> <span class="n">y</span><span class="p">,</span> <span class="k">float</span> <span class="n">z</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">void</span> <span class="n">main</span><span class="p">(</span><span class="k">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>	<span class="k">float</span> <span class="n">x</span> <span class="o">=</span> <span class="n">gl_InstanceID</span> <span class="o">+</span> <span class="n">tf</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"> 	<span class="c1">//对每个实例随机生成旋转和平移变换矩阵</span>
+</span></span><span class="line"><span class="cl">	<span class="k">float</span> <span class="n">a</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="mf">203.0</span> <span class="o">*</span> <span class="n">x</span><span class="o">/</span><span class="mf">8000.0</span><span class="p">)</span> <span class="o">*</span> <span class="mf">403.0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">float</span> <span class="n">b</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="mf">301.0</span> <span class="o">*</span> <span class="n">x</span><span class="o">/</span><span class="mf">4001.0</span><span class="p">)</span> <span class="o">*</span> <span class="mf">401.0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">float</span> <span class="n">c</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="mf">400.0</span> <span class="o">*</span> <span class="n">x</span><span class="o">/</span><span class="mf">6003.0</span><span class="p">)</span> <span class="o">*</span> <span class="mf">405.0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl">	<span class="n">mat4</span> <span class="n">localRotX</span> <span class="o">=</span> <span class="n">buildRotateX</span><span class="p">(</span><span class="mf">1.75</span><span class="o">*</span><span class="n">x</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">mat4</span> <span class="n">localRotY</span> <span class="o">=</span> <span class="n">buildRotateY</span><span class="p">(</span><span class="mf">1.75</span><span class="o">*</span><span class="n">x</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">mat4</span> <span class="n">localRotZ</span> <span class="o">=</span> <span class="n">buildRotateZ</span><span class="p">(</span><span class="mf">1.75</span><span class="o">*</span><span class="n">x</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">mat4</span> <span class="n">localTrans</span> <span class="o">=</span> <span class="n">buildTranslate</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">mat4</span> <span class="n">newM_matrix</span> <span class="o">=</span> <span class="n">localTrans</span> <span class="o">*</span> <span class="n">localRotX</span> <span class="o">*</span> <span class="n">localRotY</span> <span class="o">*</span> <span class="n">localRotZ</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">mat4</span> <span class="n">mv_matrix</span> <span class="o">=</span> <span class="n">v_matrix</span> <span class="o">*</span> <span class="n">newM_matrix</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">gl_Position</span> <span class="o">=</span> <span class="n">proj_matrix</span> <span class="o">*</span> <span class="n">mv_matrix</span> <span class="o">*</span> <span class="k">vec4</span><span class="p">(</span><span class="n">position</span><span class="p">,</span><span class="mf">1.0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">varyingColor</span> <span class="o">=</span> <span class="k">vec4</span><span class="p">(</span><span class="n">position</span><span class="p">,</span><span class="mf">1.0</span><span class="p">)</span><span class="o">*</span><span class="mf">0.5</span> <span class="o">+</span> <span class="k">vec4</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">mat4</span> <span class="n">buildTranslate</span><span class="p">(</span><span class="k">float</span> <span class="n">x</span><span class="p">,</span> <span class="k">float</span> <span class="n">y</span><span class="p">,</span> <span class="k">float</span> <span class="n">z</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>	<span class="n">mat4</span> <span class="n">trans</span> <span class="o">=</span> <span class="n">mat4</span><span class="p">(</span>	<span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="mf">1.0</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">trans</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//  rotation around the X axis</span>
+</span></span><span class="line"><span class="cl"><span class="n">mat4</span> <span class="n">buildRotateX</span><span class="p">(</span><span class="k">float</span> <span class="n">rad</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>	<span class="n">mat4</span> <span class="n">xrot</span> <span class="o">=</span> <span class="n">mat4</span><span class="p">(</span>	<span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="mf">0.0</span><span class="p">,</span> <span class="n">cos</span><span class="p">(</span><span class="n">rad</span><span class="p">),</span> <span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">rad</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="mf">0.0</span><span class="p">,</span> <span class="n">sin</span><span class="p">(</span><span class="n">rad</span><span class="p">),</span> <span class="n">cos</span><span class="p">(</span><span class="n">rad</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">xrot</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//  rotation around the Y axis</span>
+</span></span><span class="line"><span class="cl"><span class="n">mat4</span> <span class="n">buildRotateY</span><span class="p">(</span><span class="k">float</span> <span class="n">rad</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>	<span class="n">mat4</span> <span class="n">yrot</span> <span class="o">=</span> <span class="n">mat4</span><span class="p">(</span>	<span class="n">cos</span><span class="p">(</span><span class="n">rad</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">sin</span><span class="p">(</span><span class="n">rad</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">rad</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">cos</span><span class="p">(</span><span class="n">rad</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">yrot</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">//  rotation around the Z axis</span>
+</span></span><span class="line"><span class="cl"><span class="n">mat4</span> <span class="n">buildRotateZ</span><span class="p">(</span><span class="k">float</span> <span class="n">rad</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>	<span class="n">mat4</span> <span class="n">zrot</span> <span class="o">=</span> <span class="n">mat4</span><span class="p">(</span>	<span class="n">cos</span><span class="p">(</span><span class="n">rad</span><span class="p">),</span> <span class="n">sin</span><span class="p">(</span><span class="n">rad</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="o">-</span><span class="n">sin</span><span class="p">(</span><span class="n">rad</span><span class="p">),</span> <span class="n">cos</span><span class="p">(</span><span class="n">rad</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">zrot</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>主程序中作如下修改：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">init</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">cameraZ</span><span class="o">=</span><span class="mf">500.0f</span><span class="p">;</span><span class="c1">//拉远镜头以看到更多正方体
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">//...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">dislay</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">glUniformMatrix4fv</span><span class="p">(</span><span class="n">vLoc</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">GL_FALSE</span><span class="p">,</span> <span class="n">glm</span><span class="o">::</span><span class="n">value_ptr</span><span class="p">(</span><span class="n">vMat</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="n">glUniformMatrix4fv</span><span class="p">(</span><span class="n">projLoc</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">GL_FALSE</span><span class="p">,</span> <span class="n">glm</span><span class="o">::</span><span class="n">value_ptr</span><span class="p">(</span><span class="n">pMat</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl">	<span class="c1">//得到并传递时间因子
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">timeFactor</span> <span class="o">=</span> <span class="p">((</span><span class="kt">float</span><span class="p">)</span><span class="n">currentTime</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">tfLoc</span> <span class="o">=</span> <span class="n">glGetUniformLocation</span><span class="p">(</span><span class="n">renderingProgram</span><span class="p">,</span> <span class="s">&#34;tf&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">glUniform1f</span><span class="p">(</span><span class="n">tfLoc</span><span class="p">,</span> <span class="p">(</span><span class="kt">float</span><span class="p">)</span><span class="n">timeFactor</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">//...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	
+</span></span><span class="line"><span class="cl">	<span class="n">glDrawArraysInstanced</span><span class="p">(</span><span class="n">GL_TRIANGLES</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">36</span><span class="p">,</span> <span class="mi">100000</span><span class="p">);</span><span class="c1">//绘制实例
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>最终效果如下：</p>
+<div style="text-align:center;">
+<img src="\imgs\result3.gif" style="zoom: 100%" />
+</div>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">bobh</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        0001-01-01
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/openGL/">openGL</a>
+          <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/">计算机图形学</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/C&#43;&#43;%E4%B8%AD%E7%9A%84%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">C&#43;&#43;中的内存对齐</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/struct_layout_pretty_printer/">
+            <span class="next-text nav-default">一个利用Boost::pfr展示结构体内存布局的pretty printer</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
+      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
+      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
+      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
+      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
+      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
+      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
+      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
+      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
+      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

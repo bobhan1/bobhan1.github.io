@@ -1,0 +1,1821 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Boost.SML使用指南 - bobh&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="bobh" /><meta name="description" content="[Boost::ext].SML是一个轻量级的，header only且高性能的状态机语言库，它使得我们可以用十分清晰简洁的代码去构建一个状态" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.96.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/Boostsml%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="Boost.SML使用指南" />
+<meta property="og:description" content="[Boost::ext].SML是一个轻量级的，header only且高性能的状态机语言库，它使得我们可以用十分清晰简洁的代码去构建一个状态" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/Boostsml%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/" /><meta property="article:section" content="post" />
+
+
+
+<meta itemprop="name" content="Boost.SML使用指南">
+<meta itemprop="description" content="[Boost::ext].SML是一个轻量级的，header only且高性能的状态机语言库，它使得我们可以用十分清晰简洁的代码去构建一个状态">
+
+<meta itemprop="wordCount" content="5337">
+<meta itemprop="keywords" content="C&#43;&#43;," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Boost.SML使用指南"/>
+<meta name="twitter:description" content="[Boost::ext].SML是一个轻量级的，header only且高性能的状态机语言库，它使得我们可以用十分清晰简洁的代码去构建一个状态"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">bobh&#39;s blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">bobh&#39;s blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Boost.SML使用指南</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 0001-01-01 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#states-events-transitions-and-state-machines">States, Events, Transitions and State Machines</a></li>
+        <li><a href="#actions-and-guards">Actions and Guards</a></li>
+        <li><a href="#data">Data</a></li>
+        <li><a href="#deferprocess">Defer/Process</a></li>
+        <li><a href="#orthogonal-regions">Orthogonal Regions</a></li>
+        <li><a href="#history">History</a></li>
+        <li><a href="#runtime-dispatcher">Runtime Dispatcher</a></li>
+        <li><a href="#error-handling">Error Handling</a></li>
+        <li><a href="#testing">Testing</a></li>
+        <li><a href="#logging">Logging</a></li>
+        <li><a href="#policy">Policy</a></li>
+        <li><a href="#应用一个模拟服务器demo的实现">应用：一个模拟服务器demo的实现</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p><a href="https://github.com/boost-ext/sml"><code>[Boost::ext].SML</code></a>是一个轻量级的，header only且高性能的状态机语言库，它使得我们可以用十分清晰简洁的代码去构建一个状态机。</p>
+<!-- more -->
+<p>相比于<a href="https://www.boost.org/doc/libs/1_77_0/libs/msm/doc/HTML/index.html"><code>Boost::MSM</code></a>和<a href="https://www.boost.org/doc/libs/1_77_0/libs/statechart/doc/index.html"><code>Boost::statechart</code></a>，它更为轻量和高效，从作者给出的<a href="https://boost-ext.github.io/sml/benchmarks.html">benchmark</a>来看，在编译时间，执行时间，可执行文件大小，代码长度等方面<code>[Boost::ext].SML</code>都完胜后者。而相比于传统的<code>if/else</code>和<code>enum+switch/case</code>的方式，它有着更好的拓展性和可读性。关于这几种方式之间更详细的benchmark对比可以参考作者在cppcon2018上的<a href="https://www.bilibili.com/video/BV1kW41117uw?p=5">presentation</a>。</p>
+<p>本文将结合例子展示<code>[Boost::ext].SML</code>的基本用法。</p>
+<p>本文中的例子来自官方<a href="https://boost-ext.github.io/sml/tutorial.html">tutorial</a>/<a href="https://boost-ext.github.io/sml/examples.html">example</a>和作者的presentation。状态图中基本概念的详细定义可以参考<a href="https://www.boost.org/doc/libs/1_60_0/libs/msm/doc/HTML/ch02s02.html">UML Short Guide</a>，关于<code>[Boost::ext]/SML</code>中各个概念更详细的语义约束(concept)，可以参考<a href="https://boost-ext.github.io/sml/user_guide.html">user guide</a>。</p>
+<h2 id="states-events-transitions-and-state-machines">States, Events, Transitions and State Machines</h2>
+<p>事件是状态机状态转移的条件之一，在SML中，事件与状态都是用特定的类型来标识的。用<code>*&quot;sinit_state&quot;_s</code>表示一个状态机的起始状态。转移可以写成前缀式或后缀式。</p>
+<blockquote>
+<p>GCC/Clang中的非标准拓展功能使得我们可以使用<code>&quot;state&quot;_s,&quot;state&quot;_e</code>这种方式来标识状态和事件，而在MSVC中则只能使用<code>sml::state&lt;class state&gt;,sml::event&lt;my_event&gt;</code>来标识。</p>
+</blockquote>
+<p>状态机自身也可以作为一个状态出现在另一个状态中。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;boost/sml.hpp&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;cassert&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="k">namespace</span> <span class="n">sml</span> <span class="o">=</span> <span class="n">boost</span><span class="o">::</span><span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">namespace</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">e1</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">e2</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">e3</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">transitions</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="nf">operator</span><span class="p">()()</span> <span class="k">const</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">using</span> <span class="k">namespace</span> <span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">make_transition_table</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">       <span class="o">*</span><span class="s">&#34;idle&#34;</span><span class="n">_s</span>                  <span class="o">/</span> <span class="p">[]</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;anonymous transition&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span> <span class="o">=</span> <span class="s">&#34;s1&#34;</span><span class="n">_s</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="s">&#34;s1&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e1</span><span class="o">&gt;</span>        <span class="o">/</span> <span class="p">[]</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;internal transition&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="s">&#34;s1&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e2</span><span class="o">&gt;</span>        <span class="o">/</span> <span class="p">[]</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;self transition&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span> <span class="o">=</span> <span class="s">&#34;s1&#34;</span><span class="n">_s</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="s">&#34;s1&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">sml</span><span class="o">::</span><span class="n">on_entry</span><span class="o">&lt;</span><span class="n">_</span><span class="o">&gt;</span> <span class="o">/</span> <span class="p">[]</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;s1 entry&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="s">&#34;s1&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">sml</span><span class="o">::</span><span class="n">on_exit</span><span class="o">&lt;</span><span class="n">_</span><span class="o">&gt;</span>  <span class="o">/</span> <span class="p">[]</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;s1 exit&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="s">&#34;s1&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e3</span><span class="o">&gt;</span>        <span class="o">/</span> <span class="p">[]</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;external transition&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span> <span class="o">=</span> <span class="n">X</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>  <span class="c1">// namespace
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sml</span><span class="o">::</span><span class="n">sm</span><span class="o">&lt;</span><span class="n">transitions</span><span class="o">&gt;</span> <span class="n">sm</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">e1</span><span class="p">{});</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">//anonymous transition
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">//s1 entry
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">e2</span><span class="p">{});</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">//internal transition
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">e3</span><span class="p">{});</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">//s1 exit
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">//self transition
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">//s1 entry
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">assert</span><span class="p">(</span><span class="n">sm</span><span class="p">.</span><span class="n">is</span><span class="p">(</span><span class="n">sml</span><span class="o">::</span><span class="n">X</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">//s1 exit
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">//external transition
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>除了像上面这样定义结构体来构建状态机，我们还可以利用lambda表达式来构建状态机。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;boost/sml.hpp&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;cassert&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#if defined(__cpp_deduction_guides)
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>  <span class="k">namespace</span> <span class="n">sml</span> <span class="o">=</span> <span class="n">boost</span><span class="o">::</span><span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="nc">start</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sml</span><span class="o">::</span><span class="n">front</span><span class="o">::</span><span class="n">sm</span> <span class="n">sm</span> <span class="o">=</span> <span class="p">[]</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">using</span> <span class="k">namespace</span> <span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">make_transition_table</span><span class="p">(</span><span class="o">*</span><span class="s">&#34;idle&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">start</span><span class="o">&gt;</span> <span class="o">/</span> <span class="p">[]</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;action</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span> <span class="p">}</span> <span class="o">=</span> <span class="n">X</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">start</span><span class="p">{});</span>
+</span></span><span class="line"><span class="cl">  <span class="n">assert</span><span class="p">(</span><span class="n">sm</span><span class="p">.</span><span class="n">is</span><span class="p">(</span><span class="n">sml</span><span class="o">::</span><span class="n">X</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#endif
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="actions-and-guards">Actions and Guards</h2>
+<p>guard可以用来限制状态机的状态转移，只有当guard中的布尔表达式为真时，才会发生相应的状态转移。action相当于触发器，当状态机沿某条转移边转移时，会执行相应的动作。我们还可以用括号和逗号将多个事件串联起来。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span><span class="lnt">80
+</span><span class="lnt">81
+</span><span class="lnt">82
+</span><span class="lnt">83
+</span><span class="lnt">84
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;boost/sml.hpp&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;cassert&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;typeinfo&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="k">namespace</span> <span class="n">sml</span> <span class="o">=</span> <span class="n">boost</span><span class="o">::</span><span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">namespace</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">e1</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">e2</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">e3</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">e4</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">e5</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="kt">bool</span> <span class="nf">guard2_impl</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">actions_guards</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">using</span> <span class="n">self</span> <span class="o">=</span> <span class="n">actions_guards</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="nf">operator</span><span class="p">()()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">using</span> <span class="k">namespace</span> <span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">guard1</span> <span class="o">=</span> <span class="p">[]</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;guard1&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">guard2</span> <span class="o">=</span> <span class="n">wrap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">guard2_impl</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">action1</span> <span class="o">=</span> <span class="p">[](</span><span class="k">auto</span> <span class="n">e</span><span class="p">)</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;action1: &#34;</span> <span class="o">&lt;&lt;</span> <span class="k">typeid</span><span class="p">(</span><span class="n">e</span><span class="p">).</span><span class="n">name</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="nc">action2</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="kt">void</span> <span class="k">operator</span><span class="p">()(</span><span class="kt">int</span> <span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">assert</span><span class="p">(</span><span class="mi">42</span> <span class="o">==</span> <span class="n">i</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;action2&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">make_transition_table</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">       <span class="o">*</span><span class="s">&#34;idle&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e1</span><span class="o">&gt;</span> <span class="o">=</span> <span class="s">&#34;s1&#34;</span><span class="n">_s</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="s">&#34;s1&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e2</span><span class="o">&gt;</span> <span class="p">[</span> <span class="n">guard1</span> <span class="p">]</span> <span class="o">/</span> <span class="n">action1</span> <span class="o">=</span> <span class="s">&#34;s2&#34;</span><span class="n">_s</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="s">&#34;s2&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e3</span><span class="o">&gt;</span> <span class="p">[</span> <span class="n">guard1</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="p">[]</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">false</span><span class="p">;}</span> <span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">action1</span><span class="p">,</span> <span class="n">action2</span><span class="p">{})</span> <span class="o">=</span> <span class="s">&#34;s3&#34;</span><span class="n">_s</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="s">&#34;s3&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e4</span><span class="o">&gt;</span> <span class="p">[</span> <span class="o">!</span><span class="n">guard1</span> <span class="o">||</span> <span class="n">guard2</span> <span class="p">]</span> <span class="o">/</span> <span class="p">(</span><span class="n">action1</span><span class="p">,</span> <span class="p">[]</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;action3&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">})</span> <span class="o">=</span> <span class="s">&#34;s4&#34;</span><span class="n">_s</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="s">&#34;s3&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e4</span><span class="o">&gt;</span> <span class="p">[</span> <span class="n">guard1</span> <span class="p">]</span> <span class="o">/</span> <span class="p">([]</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;action4&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">},</span> <span class="p">[</span><span class="k">this</span><span class="p">]</span> <span class="p">{</span> <span class="n">action4</span><span class="p">();</span> <span class="p">}</span> <span class="p">)</span> <span class="o">=</span> <span class="s">&#34;s5&#34;</span><span class="n">_s</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="s">&#34;s5&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e5</span><span class="o">&gt;</span> <span class="p">[</span> <span class="o">&amp;</span><span class="n">self</span><span class="o">::</span><span class="n">guard3</span> <span class="p">]</span> <span class="o">/</span> <span class="o">&amp;</span><span class="n">self</span><span class="o">::</span><span class="n">action5</span> <span class="o">=</span> <span class="n">X</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="nf">guard3</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">)</span> <span class="k">const</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">assert</span><span class="p">(</span><span class="mi">42</span> <span class="o">==</span> <span class="n">i</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;guard3&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">action4</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;action4&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">action5</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">,</span> <span class="k">const</span> <span class="n">e5</span><span class="o">&amp;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">assert</span><span class="p">(</span><span class="mi">42</span> <span class="o">==</span> <span class="n">i</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;action5&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="kt">bool</span> <span class="nf">guard2_impl</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">assert</span><span class="p">(</span><span class="mi">42</span> <span class="o">==</span> <span class="n">i</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;guard2&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">actions_guards</span> <span class="n">ag</span><span class="p">{};</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sml</span><span class="o">::</span><span class="n">sm</span><span class="o">&lt;</span><span class="n">actions_guards</span><span class="o">&gt;</span> <span class="n">sm</span><span class="p">{</span><span class="n">ag</span><span class="p">,</span> <span class="mi">42</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">e1</span><span class="p">{});</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">e2</span><span class="p">{});</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">e3</span><span class="p">{});</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">e4</span><span class="p">{});</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">e5</span><span class="p">{});</span>
+</span></span><span class="line"><span class="cl">  <span class="n">assert</span><span class="p">(</span><span class="n">sm</span><span class="p">.</span><span class="n">is</span><span class="p">(</span><span class="n">sml</span><span class="o">::</span><span class="n">X</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="cm">/*  output:
+</span></span></span><span class="line"><span class="cl"><span class="cm">guard1
+</span></span></span><span class="line"><span class="cl"><span class="cm">action1: N12_GLOBAL__N_12e2E
+</span></span></span><span class="line"><span class="cl"><span class="cm">guard1
+</span></span></span><span class="line"><span class="cl"><span class="cm">action1: N12_GLOBAL__N_12e3E
+</span></span></span><span class="line"><span class="cl"><span class="cm">action2
+</span></span></span><span class="line"><span class="cl"><span class="cm">guard1
+</span></span></span><span class="line"><span class="cl"><span class="cm">guard2
+</span></span></span><span class="line"><span class="cl"><span class="cm">guard1
+</span></span></span><span class="line"><span class="cl"><span class="cm">action4
+</span></span></span><span class="line"><span class="cl"><span class="cm">action4
+</span></span></span><span class="line"><span class="cl"><span class="cm">guard3
+</span></span></span><span class="line"><span class="cl"><span class="cm">action5
+</span></span></span><span class="line"><span class="cl"><span class="cm">*/</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里状态机中的guards和actions的参数都是通过状态机本身的构造函数传入的，需要注意的是，状态机构造函数中参数传入的顺序事无关紧要的，他们会被自动<strong>派发</strong>到正确的位置上，但是<strong>相同的类型至多只能出现一次</strong>，下面我们来看它是如何实现的。</p>
+<p>首先来看<code>sm</code>的构造函数。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">TSM</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">sm</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">using</span> <span class="n">sm_t</span> <span class="o">=</span> <span class="k">typename</span> <span class="n">TSM</span><span class="o">::</span><span class="n">sm</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"> <span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="k">using</span> <span class="n">states</span> <span class="o">=</span> <span class="n">aux</span><span class="o">::</span><span class="n">apply_t</span><span class="o">&lt;</span><span class="n">aux</span><span class="o">::</span><span class="n">unique_t</span><span class="p">,</span> <span class="n">aux</span><span class="o">::</span><span class="n">apply_t</span><span class="o">&lt;</span><span class="n">get_states</span><span class="p">,</span> <span class="n">transitions_t</span><span class="o">&gt;&gt;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">using</span> <span class="n">state_machines</span> <span class="o">=</span> <span class="n">aux</span><span class="o">::</span><span class="n">apply_t</span><span class="o">&lt;</span><span class="n">get_sub_sms</span><span class="p">,</span> <span class="n">states</span><span class="o">&gt;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="k">using</span> <span class="n">deps</span> <span class="o">=</span> <span class="n">aux</span><span class="o">::</span><span class="n">apply_t</span><span class="o">&lt;</span><span class="n">merge_deps</span><span class="p">,</span> <span class="n">transitions_t</span><span class="o">&gt;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">using</span> <span class="n">deps_t</span> <span class="o">=</span>
+</span></span><span class="line"><span class="cl">      <span class="n">aux</span><span class="o">::</span><span class="n">apply_t</span><span class="o">&lt;</span><span class="n">aux</span><span class="o">::</span><span class="n">pool</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                   <span class="n">aux</span><span class="o">::</span><span class="n">apply_t</span><span class="o">&lt;</span><span class="n">aux</span><span class="o">::</span><span class="n">unique_t</span><span class="p">,</span> <span class="n">aux</span><span class="o">::</span><span class="n">join_t</span><span class="o">&lt;</span><span class="n">deps</span><span class="p">,</span> <span class="n">sm_all_t</span><span class="p">,</span> <span class="n">logger_dep_t</span><span class="p">,</span> <span class="n">aux</span><span class="o">::</span><span class="n">apply_t</span><span class="o">&lt;</span><span class="n">merge_deps</span><span class="p">,</span> <span class="n">sub_sms_t</span><span class="o">&gt;&gt;&gt;&gt;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="nc">events_ids</span> <span class="o">:</span> <span class="n">aux</span><span class="o">::</span><span class="n">apply_t</span><span class="o">&lt;</span><span class="n">aux</span><span class="o">::</span><span class="n">inherit</span><span class="p">,</span> <span class="n">events</span><span class="o">&gt;</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl"> <span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">//...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">TDeps</span><span class="p">,</span> <span class="n">__BOOST_SML_REQUIRES</span><span class="p">(</span><span class="o">!</span><span class="n">aux</span><span class="o">::</span><span class="n">is_same</span><span class="o">&lt;</span><span class="n">aux</span><span class="o">::</span><span class="n">remove_reference_t</span><span class="o">&lt;</span><span class="n">TDeps</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">sm</span><span class="o">&gt;::</span><span class="n">value</span><span class="p">)</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">explicit</span> <span class="n">sm</span><span class="p">(</span><span class="n">TDeps</span> <span class="o">&amp;&amp;</span><span class="n">deps</span><span class="p">)</span> <span class="o">:</span> <span class="n">deps_</span><span class="p">{</span><span class="n">aux</span><span class="o">::</span><span class="n">init</span><span class="p">{},</span> <span class="n">aux</span><span class="o">::</span><span class="n">pool</span><span class="o">&lt;</span><span class="n">TDeps</span><span class="o">&gt;</span><span class="p">{</span><span class="n">deps</span><span class="p">}},</span> <span class="n">sub_sms_</span><span class="p">{</span><span class="n">aux</span><span class="o">::</span><span class="n">pool</span><span class="o">&lt;</span><span class="n">TDeps</span><span class="o">&gt;</span><span class="p">{</span><span class="n">deps</span><span class="p">}}</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">aux</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="n">sm_impl</span><span class="o">&lt;</span><span class="n">TSM</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">sub_sms_</span><span class="p">).</span><span class="n">start</span><span class="p">(</span><span class="n">deps_</span><span class="p">,</span> <span class="n">sub_sms_</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err">... </span><span class="nc">TDeps</span><span class="p">,</span> <span class="n">__BOOST_SML_REQUIRES</span><span class="p">((</span><span class="k">sizeof</span><span class="p">...(</span><span class="n">TDeps</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">aux</span><span class="o">::</span><span class="n">is_unique_t</span><span class="o">&lt;</span><span class="n">TDeps</span><span class="p">...</span><span class="o">&gt;::</span><span class="n">value</span><span class="p">)</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">explicit</span> <span class="n">sm</span><span class="p">(</span><span class="n">TDeps</span> <span class="o">&amp;&amp;</span><span class="p">...</span> <span class="n">deps</span><span class="p">)</span> <span class="o">:</span> <span class="n">deps_</span><span class="p">{</span><span class="n">aux</span><span class="o">::</span><span class="n">init</span><span class="p">{},</span> <span class="n">aux</span><span class="o">::</span><span class="n">pool</span><span class="o">&lt;</span><span class="n">TDeps</span><span class="p">...</span><span class="o">&gt;</span><span class="p">{</span><span class="n">deps</span><span class="p">...}},</span> <span class="n">sub_sms_</span><span class="p">{</span><span class="n">aux</span><span class="o">::</span><span class="n">pool</span><span class="o">&lt;</span><span class="n">TDeps</span><span class="p">...</span><span class="o">&gt;</span><span class="p">{</span><span class="n">deps</span><span class="p">...}}</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">aux</span><span class="o">::</span><span class="n">get</span><span class="o">&lt;</span><span class="n">sm_impl</span><span class="o">&lt;</span><span class="n">TSM</span><span class="o">&gt;&gt;</span><span class="p">(</span><span class="n">sub_sms_</span><span class="p">).</span><span class="n">start</span><span class="p">(</span><span class="n">deps_</span><span class="p">,</span> <span class="n">sub_sms_</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">  <span class="c1">//...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    
+</span></span><span class="line"><span class="cl"> <span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="n">deps_t</span> <span class="n">deps_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sub_sms_t</span> <span class="n">sub_sms_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>可以看到状态机将参数转发给了<code>aux::pool</code>的构造函数，我们继续来看<code>pool</code>的构造函数。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err">... </span><span class="nc">Ts</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">pool</span> <span class="o">:</span> <span class="n">pool_type</span><span class="o">&lt;</span><span class="n">Ts</span><span class="o">&gt;</span><span class="p">...</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">using</span> <span class="n">boost_di_inject__</span> <span class="o">=</span> <span class="n">type_list</span><span class="o">&lt;</span><span class="n">Ts</span><span class="p">...</span><span class="o">&gt;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pool</span><span class="p">()</span> <span class="o">=</span> <span class="k">default</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">explicit</span> <span class="nf">pool</span><span class="p">(</span><span class="n">Ts</span><span class="p">...</span> <span class="n">ts</span><span class="p">)</span> <span class="o">:</span> <span class="n">pool_type</span><span class="o">&lt;</span><span class="n">Ts</span><span class="o">&gt;</span><span class="p">(</span><span class="n">ts</span><span class="p">)...</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err">... </span><span class="nc">TArgs</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pool</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="k">const</span> <span class="n">pool</span><span class="o">&lt;</span><span class="n">TArgs</span><span class="p">...</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">)</span> <span class="o">:</span> <span class="n">pool_type</span><span class="o">&lt;</span><span class="n">Ts</span><span class="o">&gt;</span><span class="p">(</span><span class="n">try_get</span><span class="o">&lt;</span><span class="n">aux</span><span class="o">::</span><span class="n">remove_const_t</span><span class="o">&lt;</span><span class="n">aux</span><span class="o">::</span><span class="n">remove_reference_t</span><span class="o">&lt;</span><span class="n">Ts</span><span class="o">&gt;&gt;&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="n">p</span><span class="p">))...</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span><span class="err">... </span><span class="nc">TArgs</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pool</span><span class="p">(</span><span class="k">const</span> <span class="n">pool</span><span class="o">&lt;</span><span class="n">TArgs</span><span class="p">...</span><span class="o">&gt;</span> <span class="o">&amp;</span><span class="n">p</span><span class="p">)</span> <span class="o">:</span> <span class="n">pool_type</span><span class="o">&lt;</span><span class="n">Ts</span><span class="o">&gt;</span><span class="p">(</span><span class="n">init</span><span class="p">{},</span> <span class="n">p</span><span class="p">)...</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里，<code>pool</code>通过variadic template pack extension多继承不同参数类型的<code>pool_type&lt;Ts&gt;</code>并将参数转发给<code>pool_type&lt;Ts&gt;</code>进行构造。也正是这里的限制使得一种类型至多只能使用一次。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">pool_type_base</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">__BOOST_SML_ZERO_SIZE_ARRAY</span><span class="p">(</span><span class="n">byte</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="p">,</span> <span class="k">class</span> <span class="err">= </span><span class="nc">void</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">pool_type_impl</span> <span class="o">:</span> <span class="n">pool_type_base</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">explicit</span> <span class="nf">pool_type_impl</span><span class="p">(</span><span class="n">T</span> <span class="n">object</span><span class="p">)</span> <span class="o">:</span> <span class="n">value</span><span class="p">{</span><span class="n">object</span><span class="p">}</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">TObject</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pool_type_impl</span><span class="p">(</span><span class="n">init</span> <span class="n">i</span><span class="p">,</span> <span class="n">TObject</span> <span class="n">object</span><span class="p">)</span> <span class="o">:</span> <span class="n">value</span><span class="p">{</span><span class="n">i</span><span class="p">,</span> <span class="n">object</span><span class="p">}</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">T</span> <span class="n">value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">pool_type_impl</span><span class="o">&lt;</span><span class="n">T</span> <span class="o">&amp;</span><span class="p">,</span> <span class="n">aux</span><span class="o">::</span><span class="n">enable_if_t</span><span class="o">&lt;</span><span class="n">aux</span><span class="o">::</span><span class="n">is_constructible</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">value</span> <span class="o">&amp;&amp;</span> <span class="n">aux</span><span class="o">::</span><span class="n">is_constructible</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span> <span class="n">T</span><span class="o">&gt;::</span><span class="n">value</span><span class="o">&gt;&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">:</span> <span class="n">pool_type_base</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">explicit</span> <span class="nf">pool_type_impl</span><span class="p">(</span><span class="n">T</span> <span class="o">&amp;</span><span class="n">value</span><span class="p">)</span> <span class="o">:</span> <span class="n">value</span><span class="p">{</span><span class="n">value</span><span class="p">}</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">TObject</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">explicit</span> <span class="n">pool_type_impl</span><span class="p">(</span><span class="n">TObject</span> <span class="n">value</span><span class="p">)</span> <span class="o">:</span> <span class="n">value_</span><span class="p">{</span><span class="n">value</span><span class="p">},</span> <span class="n">value</span><span class="p">{</span><span class="n">value_</span><span class="p">}</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">TObject</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">pool_type_impl</span><span class="p">(</span><span class="k">const</span> <span class="n">init</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">,</span> <span class="k">const</span> <span class="n">TObject</span> <span class="o">&amp;</span><span class="n">object</span><span class="p">)</span> <span class="o">:</span> <span class="n">value</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">object</span><span class="p">)</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">T</span> <span class="n">value_</span><span class="p">{};</span>
+</span></span><span class="line"><span class="cl">  <span class="n">T</span> <span class="o">&amp;</span><span class="n">value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">T</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">pool_type</span> <span class="o">:</span> <span class="n">pool_type_impl</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">using</span> <span class="n">pool_type_impl</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">pool_type_impl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>最后，在<code>pool_type_impl</code>中通过SFINAE匹配到对应的构造函数上并完成真正的构造。</p>
+<h2 id="data">Data</h2>
+<p>这个例子展示了状态机中数据的不同类型。通过event进入状态机的是临时数据，而状态机的成员变量则是所有状态的共享数据。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;boost/sml.hpp&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;cassert&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="k">namespace</span> <span class="n">sml</span> <span class="o">=</span> <span class="n">boost</span><span class="o">::</span><span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">namespace</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">connect</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">id</span><span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">disconnect</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">interrupt</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">Disconnected</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">Connected</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">id</span><span class="p">{};</span>  <span class="c1">// per state data
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">Interrupted</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">id</span><span class="p">{};</span>  <span class="c1">// per state data
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">data</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">using</span> <span class="n">Self</span> <span class="o">=</span> <span class="n">data</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"> <span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="k">explicit</span> <span class="n">data</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="o">&amp;</span> <span class="n">address</span><span class="p">)</span> <span class="o">:</span> <span class="n">address</span><span class="p">{</span><span class="n">address</span><span class="p">}</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="nf">operator</span><span class="p">()()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">using</span> <span class="k">namespace</span> <span class="n">boost</span><span class="o">::</span><span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">const</span> <span class="k">auto</span> <span class="n">set</span> <span class="o">=</span> <span class="p">[](</span><span class="k">const</span> <span class="k">auto</span><span class="o">&amp;</span> <span class="n">event</span><span class="p">,</span> <span class="n">Connected</span><span class="o">&amp;</span> <span class="n">state</span><span class="p">)</span> <span class="p">{</span> <span class="n">state</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">event</span><span class="p">.</span><span class="n">id</span><span class="p">;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="k">const</span> <span class="k">auto</span> <span class="n">update</span> <span class="o">=</span> <span class="p">[](</span><span class="n">Connected</span><span class="o">&amp;</span> <span class="n">src_state</span><span class="p">,</span> <span class="n">Interrupted</span><span class="o">&amp;</span> <span class="n">dst_state</span><span class="p">)</span> <span class="p">{</span> <span class="n">dst_state</span><span class="p">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">src_state</span><span class="p">.</span><span class="n">id</span><span class="p">;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">make_transition_table</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">      <span class="o">*</span> <span class="n">state</span><span class="o">&lt;</span><span class="n">Disconnected</span><span class="o">&gt;</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">connect</span><span class="o">&gt;</span>    <span class="o">/</span> <span class="p">(</span><span class="n">set</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Self</span><span class="o">::</span><span class="n">print</span><span class="p">)</span>    <span class="o">=</span> <span class="n">state</span><span class="o">&lt;</span><span class="n">Connected</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="n">state</span><span class="o">&lt;</span><span class="n">Connected</span><span class="o">&gt;</span>    <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">interrupt</span><span class="o">&gt;</span>  <span class="o">/</span> <span class="p">(</span><span class="n">update</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Self</span><span class="o">::</span><span class="n">print</span><span class="p">)</span> <span class="o">=</span> <span class="n">state</span><span class="o">&lt;</span><span class="n">Interrupted</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="n">state</span><span class="o">&lt;</span><span class="n">Interrupted</span><span class="o">&gt;</span>  <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">connect</span><span class="o">&gt;</span>    <span class="o">/</span> <span class="p">(</span><span class="n">set</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">Self</span><span class="o">::</span><span class="n">print</span><span class="p">)</span>    <span class="o">=</span> <span class="n">state</span><span class="o">&lt;</span><span class="n">Connected</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="n">state</span><span class="o">&lt;</span><span class="n">Connected</span><span class="o">&gt;</span>    <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">disconnect</span><span class="o">&gt;</span> <span class="o">/</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">Self</span><span class="o">::</span><span class="n">print</span><span class="p">)</span>         <span class="o">=</span> <span class="n">X</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="n">print</span><span class="p">(</span><span class="n">Connected</span><span class="o">&amp;</span> <span class="n">state</span><span class="p">)</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">address</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;:&#39;</span> <span class="o">&lt;&lt;</span> <span class="n">state</span><span class="p">.</span><span class="n">id</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">address</span><span class="p">{};</span>  <span class="c1">// shared data between states
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">data</span> <span class="n">d</span><span class="p">{</span><span class="n">std</span><span class="o">::</span><span class="n">string</span><span class="p">{</span><span class="s">&#34;127.0.0.1&#34;</span><span class="p">}};</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sml</span><span class="o">::</span><span class="n">sm</span><span class="o">&lt;</span><span class="n">data</span><span class="o">&gt;</span> <span class="n">sm</span><span class="p">{</span><span class="n">d</span><span class="p">,</span> <span class="n">Connected</span><span class="p">{</span><span class="mi">1</span><span class="p">}};</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">connect</span><span class="p">{</span><span class="mi">1024</span><span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">interrupt</span><span class="p">{});</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">connect</span><span class="p">{</span><span class="mi">1025</span><span class="p">});</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">disconnect</span><span class="p">{});</span>
+</span></span><span class="line"><span class="cl">  <span class="n">assert</span><span class="p">(</span><span class="n">sm</span><span class="p">.</span><span class="n">is</span><span class="p">(</span><span class="n">sml</span><span class="o">::</span><span class="n">X</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="deferprocess">Defer/Process</h2>
+<p>当状态机处于某些状态时，我们希望它不处理外来事件，而是将这些事件保存起来，之后再去处理。比如，当某个能响应外部请求的系统被我们人为挂起时，我们希望将直到它解挂前这段时间内的外部请求保存起来，当系统被解挂后再去处理。我们需要用<code>sml::defer_queue</code>来完成上述功能。在状态发生转移后，<code>sml::defer_queue</code>中的事件会依照先进先出的原则依次被转移边check()，当<code>deferred events</code>不能发生转移时，它将继续留在<code>sml::derfer_queue</code>中。注意这里<code>sml::defer_queue</code>不能用<code>std::queue</code>实例化，只能用<code>std::deque</code>否则会报错。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;boost/sml.hpp&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;cassert&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;deque&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;queue&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="k">namespace</span> <span class="n">sml</span> <span class="o">=</span> <span class="n">boost</span><span class="o">::</span><span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">namespace</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">e1</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">e2</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">e3</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">e4</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">defer_and_process</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="nf">operator</span><span class="p">()()</span> <span class="k">const</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">using</span> <span class="k">namespace</span> <span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">make_transition_table</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">       <span class="o">*</span><span class="s">&#34;idle&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e1</span><span class="o">&gt;</span> <span class="o">/</span> <span class="n">defer</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="s">&#34;idle&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e2</span><span class="o">&gt;</span> <span class="o">=</span> <span class="s">&#34;s1&#34;</span><span class="n">_s</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="s">&#34;s1&#34;</span><span class="n">_s</span>   <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e1</span><span class="o">&gt;</span> <span class="o">=</span> <span class="s">&#34;s2&#34;</span><span class="n">_s</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="s">&#34;s2&#34;</span><span class="n">_s</span>   <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e3</span><span class="o">&gt;</span> <span class="o">/</span> <span class="n">process</span><span class="p">(</span><span class="n">e4</span><span class="p">{})</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="s">&#34;s2&#34;</span><span class="n">_s</span>   <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e4</span><span class="o">&gt;</span> <span class="o">=</span> <span class="n">X</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span> 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">using</span> <span class="k">namespace</span> <span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="o">&lt;</span><span class="n">defer_and_process</span><span class="p">,</span> <span class="n">sml</span><span class="o">::</span><span class="n">defer_queue</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">deque</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">sml</span><span class="o">::</span><span class="n">process_queue</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">queue</span><span class="o">&gt;&gt;</span> <span class="n">sm</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl">  <span class="c1">// defer_queue policy to enable deferred events using std::queue
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">assert</span><span class="p">(</span><span class="n">sm</span><span class="p">.</span><span class="n">is</span><span class="p">(</span><span class="s">&#34;idle&#34;</span><span class="n">_s</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">e1</span><span class="p">{});</span>
+</span></span><span class="line"><span class="cl">  <span class="n">assert</span><span class="p">(</span><span class="n">sm</span><span class="p">.</span><span class="n">is</span><span class="p">(</span><span class="s">&#34;idle&#34;</span><span class="n">_s</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">e2</span><span class="p">{});</span>  <span class="c1">/// triggers idle -&gt; s1 and s1 -&gt; s2 (via deferred e1)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">assert</span><span class="p">(</span><span class="n">sm</span><span class="p">.</span><span class="n">is</span><span class="p">(</span><span class="s">&#34;s2&#34;</span><span class="n">_s</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">e3</span><span class="p">{});</span>  <span class="c1">/// triggers s2.process(e4) -&gt; X (via processed e4)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">assert</span><span class="p">(</span><span class="n">sm</span><span class="p">.</span><span class="n">is</span><span class="p">(</span><span class="n">sml</span><span class="o">::</span><span class="n">X</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="orthogonal-regions">Orthogonal Regions</h2>
+<p>一个状态机中可以同时存在多个不相交的区域，这使得我们同时可以从不同的维度去控制状态机。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;boost/sml.hpp&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;cassert&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="k">namespace</span> <span class="n">sml</span> <span class="o">=</span> <span class="n">boost</span><span class="o">::</span><span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">namespace</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">e1</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">e2</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">e3</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">orthogonal_regions</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="nf">operator</span><span class="p">()()</span> <span class="k">const</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">using</span> <span class="k">namespace</span> <span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">make_transition_table</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">     <span class="o">*</span><span class="s">&#34;idle&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e1</span><span class="o">&gt;</span> <span class="o">=</span> <span class="s">&#34;s1&#34;</span><span class="n">_s</span>
+</span></span><span class="line"><span class="cl">    <span class="p">,</span> <span class="s">&#34;s1&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e2</span><span class="o">&gt;</span> <span class="o">=</span> <span class="n">X</span>
+</span></span><span class="line"><span class="cl">    <span class="p">,</span><span class="o">*</span><span class="s">&#34;idle2&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e2</span><span class="o">&gt;</span> <span class="o">=</span> <span class="s">&#34;s2&#34;</span><span class="n">_s</span>
+</span></span><span class="line"><span class="cl">    <span class="p">,</span> <span class="s">&#34;s2&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e3</span><span class="o">&gt;</span> <span class="o">=</span> <span class="n">X</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>  <span class="c1">// namespace
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sml</span><span class="o">::</span><span class="n">sm</span><span class="o">&lt;</span><span class="n">orthogonal_regions</span><span class="o">&gt;</span> <span class="n">sm</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">using</span> <span class="k">namespace</span> <span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">assert</span><span class="p">(</span><span class="n">sm</span><span class="p">.</span><span class="n">is</span><span class="p">(</span><span class="s">&#34;idle&#34;</span><span class="n">_s</span><span class="p">,</span> <span class="s">&#34;idle2&#34;</span><span class="n">_s</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">e1</span><span class="p">{});</span>
+</span></span><span class="line"><span class="cl">  <span class="n">assert</span><span class="p">(</span><span class="n">sm</span><span class="p">.</span><span class="n">is</span><span class="p">(</span><span class="s">&#34;s1&#34;</span><span class="n">_s</span><span class="p">,</span> <span class="s">&#34;idle2&#34;</span><span class="n">_s</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">e2</span><span class="p">{});</span>
+</span></span><span class="line"><span class="cl">  <span class="n">assert</span><span class="p">(</span><span class="n">sm</span><span class="p">.</span><span class="n">is</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="s">&#34;s2&#34;</span><span class="n">_s</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">e3</span><span class="p">{});</span>
+</span></span><span class="line"><span class="cl">  <span class="n">assert</span><span class="p">(</span><span class="n">sm</span><span class="p">.</span><span class="n">is</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">X</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="history">History</h2>
+<p>通过<code>&quot;idle&quot;_s(H)</code>可以将一个状态机标识为history模式(同时它也是该状态机的初始状态)。标识为history模式意味着每次进入该状态机时被激活的状态是最近使用的状态(上一次离开时的最后的激活状态)。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;boost/sml.hpp&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;cassert&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="k">namespace</span> <span class="n">sml</span> <span class="o">=</span> <span class="n">boost</span><span class="o">::</span><span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">namespace</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">sub</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="nf">operator</span><span class="p">()()</span> <span class="k">const</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">using</span> <span class="k">namespace</span> <span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">make_transition_table</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">      <span class="s">&#34;s1&#34;</span><span class="n">_s</span> <span class="o">&lt;=</span> <span class="s">&#34;idle&#34;</span><span class="n">_s</span><span class="p">(</span><span class="n">H</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#34;e1&#34;</span><span class="n">_e</span> <span class="o">/</span> <span class="p">[]</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;in sub&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">,</span> <span class="n">X</span>      <span class="o">&lt;=</span> <span class="s">&#34;s1&#34;</span><span class="n">_s</span>      <span class="o">+</span> <span class="s">&#34;e2&#34;</span><span class="n">_e</span> <span class="o">/</span> <span class="p">[]</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;in sub again&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">history</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="nf">operator</span><span class="p">()()</span> <span class="k">const</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">using</span> <span class="k">namespace</span> <span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">make_transition_table</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">      <span class="n">state</span><span class="o">&lt;</span><span class="n">sub</span><span class="o">&gt;</span> <span class="o">&lt;=</span> <span class="o">*</span><span class="s">&#34;idle&#34;</span><span class="n">_s</span>  <span class="o">+</span> <span class="s">&#34;e1&#34;</span><span class="n">_e</span> <span class="o">/</span> <span class="p">[]</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;enter sub&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">,</span> <span class="s">&#34;s1&#34;</span><span class="n">_s</span>     <span class="o">&lt;=</span> <span class="n">state</span><span class="o">&lt;</span><span class="n">sub</span><span class="o">&gt;</span> <span class="o">+</span> <span class="s">&#34;e3&#34;</span><span class="n">_e</span> <span class="o">/</span> <span class="p">[]</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;exit sub&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">,</span> <span class="n">state</span><span class="o">&lt;</span><span class="n">sub</span><span class="o">&gt;</span> <span class="o">&lt;=</span> <span class="s">&#34;s1&#34;</span><span class="n">_s</span>     <span class="o">+</span> <span class="s">&#34;e4&#34;</span><span class="n">_e</span> <span class="o">/</span> <span class="p">[]</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;enter sub again&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>  <span class="c1">// namespace
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sml</span><span class="o">::</span><span class="n">sm</span><span class="o">&lt;</span><span class="n">history</span><span class="o">&gt;</span> <span class="n">sm</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">using</span> <span class="k">namespace</span> <span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="s">&#34;e1&#34;</span><span class="n">_e</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">//enter sub
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="s">&#34;e1&#34;</span><span class="n">_e</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">//in sub
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="s">&#34;e3&#34;</span><span class="n">_e</span><span class="p">());</span> 
+</span></span><span class="line"><span class="cl">  <span class="c1">// exit sub
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="s">&#34;e4&#34;</span><span class="n">_e</span><span class="p">());</span>  
+</span></span><span class="line"><span class="cl">  <span class="c1">// enter sub again
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="s">&#34;e2&#34;</span><span class="n">_e</span><span class="p">());</span>  
+</span></span><span class="line"><span class="cl">  <span class="c1">// in sub again (history)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="runtime-dispatcher">Runtime Dispatcher</h2>
+<p>我们可以通过给事件标号，然后在运行时通过标号来表示发生的事件进行转移。既可以通过定义静态常量来标号，也可以通过继承<code>sml::utility::id</code>来进行标号。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;boost/sml/utility/dispatch_table.hpp&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;boost/sml.hpp&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;cassert&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="k">namespace</span> <span class="n">sml</span> <span class="o">=</span> <span class="n">boost</span><span class="o">::</span><span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">namespace</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">runtime_event</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">id</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">event1</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">static</span> <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">id</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">event1</span><span class="p">(</span><span class="k">const</span> <span class="n">runtime_event</span> <span class="o">&amp;</span><span class="p">)</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">event2</span><span class="o">:</span> <span class="n">sml</span><span class="o">::</span><span class="n">utility</span><span class="o">::</span><span class="n">id</span><span class="o">&lt;</span><span class="mi">2</span><span class="o">&gt;</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">dispatch_table</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="nf">operator</span><span class="p">()()</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">using</span> <span class="k">namespace</span> <span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">make_transition_table</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">       <span class="o">*</span><span class="s">&#34;idle&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">event1</span><span class="o">&gt;</span> <span class="o">=</span> <span class="s">&#34;s1&#34;</span><span class="n">_s</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="s">&#34;s1&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">event2</span><span class="o">&gt;</span> <span class="o">=</span> <span class="n">X</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sml</span><span class="o">::</span><span class="n">sm</span><span class="o">&lt;</span><span class="n">dispatch_table</span><span class="o">&gt;</span> <span class="n">sm</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="n">dispatch_event</span> <span class="o">=</span> <span class="n">sml</span><span class="o">::</span><span class="n">utility</span><span class="o">::</span><span class="n">make_dispatch_table</span><span class="o">&lt;</span><span class="n">runtime_event</span><span class="p">,</span> <span class="mi">1</span> <span class="cm">/*min*/</span><span class="p">,</span> <span class="mi">5</span> <span class="cm">/*max*/</span><span class="o">&gt;</span><span class="p">(</span><span class="n">sm</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">runtime_event</span> <span class="n">event</span><span class="p">{</span><span class="mi">1</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dispatch_event</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">event</span><span class="p">.</span><span class="n">id</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">runtime_event</span> <span class="n">event</span><span class="p">{</span><span class="mi">2</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dispatch_event</span><span class="p">(</span><span class="n">event</span><span class="p">,</span> <span class="n">event</span><span class="p">.</span><span class="n">id</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">assert</span><span class="p">(</span><span class="n">sm</span><span class="p">.</span><span class="n">is</span><span class="p">(</span><span class="n">sml</span><span class="o">::</span><span class="n">X</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="error-handling">Error Handling</h2>
+<p>我们可以在状态转移表中定制状态机发生异常时的行为，这里异常既可以是<code>std::exception</code>，也可以是某些不正常的转移。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;boost/sml.hpp&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;cassert&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdexcept&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="k">namespace</span> <span class="n">sml</span> <span class="o">=</span> <span class="n">boost</span><span class="o">::</span><span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">namespace</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">some_event</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">error_handling</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="nf">operator</span><span class="p">()()</span> <span class="k">const</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">using</span> <span class="k">namespace</span> <span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">make_transition_table</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="o">*</span><span class="p">(</span><span class="s">&#34;idle&#34;</span><span class="n">_s</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#34;event1&#34;</span><span class="n">_e</span> <span class="o">/</span> <span class="p">[]</span> <span class="p">{</span> <span class="k">throw</span> <span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span><span class="p">{</span><span class="s">&#34;error&#34;</span><span class="p">};</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span>   <span class="s">&#34;idle&#34;</span><span class="n">_s</span>  <span class="o">+</span> <span class="s">&#34;event2&#34;</span><span class="n">_e</span> <span class="o">/</span> <span class="p">[]</span> <span class="p">{</span> <span class="k">throw</span> <span class="mi">0</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="s">&#34;exceptions handling&#34;</span><span class="n">_s</span><span class="p">)</span> <span class="o">+</span> <span class="n">exception</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span><span class="o">&gt;</span> <span class="o">/</span> <span class="p">[]</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;exception caught&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span>   <span class="s">&#34;exceptions handling&#34;</span><span class="n">_s</span>  <span class="o">+</span> <span class="n">exception</span><span class="o">&lt;</span><span class="n">_</span><span class="o">&gt;</span> <span class="o">/</span> <span class="p">[]</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;generic exception caught&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span> <span class="o">=</span> <span class="n">X</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="o">*</span><span class="p">(</span><span class="s">&#34;unexpected events handling&#34;</span><span class="n">_s</span><span class="p">)</span> <span class="o">+</span> <span class="n">unexpected_event</span><span class="o">&lt;</span><span class="n">some_event</span><span class="o">&gt;</span> <span class="o">/</span> <span class="p">[]</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;unexpected event &#39;some_event&#39;&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span>   <span class="s">&#34;unexpected events handling&#34;</span><span class="n">_s</span>  <span class="o">+</span> <span class="n">unexpected_event</span><span class="o">&lt;</span><span class="n">_</span><span class="o">&gt;</span> <span class="o">/</span> <span class="p">[]</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;generic unexpected event&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span> <span class="p">}</span> <span class="o">=</span> <span class="n">X</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>  <span class="c1">// namespace
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">using</span> <span class="k">namespace</span> <span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="o">&lt;</span><span class="n">error_handling</span><span class="o">&gt;</span> <span class="n">sm</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="s">&#34;event1&#34;</span><span class="n">_e</span><span class="p">());</span>  <span class="c1">// throws runtime_error
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">assert</span><span class="p">(</span><span class="n">sm</span><span class="p">.</span><span class="n">is</span><span class="p">(</span><span class="s">&#34;idle&#34;</span><span class="n">_s</span><span class="p">,</span> <span class="s">&#34;exceptions handling&#34;</span><span class="n">_s</span><span class="p">,</span> <span class="s">&#34;unexpected events handling&#34;</span><span class="n">_s</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="s">&#34;event2&#34;</span><span class="n">_e</span><span class="p">());</span>  <span class="c1">// throws 0
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">assert</span><span class="p">(</span><span class="n">sm</span><span class="p">.</span><span class="n">is</span><span class="p">(</span><span class="s">&#34;idle&#34;</span><span class="n">_s</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="s">&#34;unexpected events handling&#34;</span><span class="n">_s</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">some_event</span><span class="p">{});</span>  <span class="c1">// unexpected event
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">assert</span><span class="p">(</span><span class="n">sm</span><span class="p">.</span><span class="n">is</span><span class="p">(</span><span class="s">&#34;idle&#34;</span><span class="n">_s</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="s">&#34;unexpected events handling&#34;</span><span class="n">_s</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="kt">int</span><span class="p">{});</span>  <span class="c1">// unexpected any event
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">assert</span><span class="p">(</span><span class="n">sm</span><span class="p">.</span><span class="n">is</span><span class="p">(</span><span class="s">&#34;idle&#34;</span><span class="n">_s</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">X</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="testing">Testing</h2>
+<p><code>[Boost::ext].SML</code>为我们提供了<code>set_current_states</code>成员函数来方便我们更好地测试与调试。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;boost/sml.hpp&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;cassert&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="k">namespace</span> <span class="n">sml</span> <span class="o">=</span> <span class="n">boost</span><span class="o">::</span><span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">namespace</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">e1</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">e2</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">e3</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">data</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">int</span> <span class="n">value</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">testing</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="nf">operator</span><span class="p">()()</span> <span class="k">const</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">using</span> <span class="k">namespace</span> <span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">const</span> <span class="k">auto</span> <span class="n">guard</span> <span class="o">=</span> <span class="p">[](</span><span class="n">data</span><span class="o">&amp;</span> <span class="n">d</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="o">!</span><span class="n">d</span><span class="p">.</span><span class="n">value</span><span class="p">;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="k">const</span> <span class="k">auto</span> <span class="n">action</span> <span class="o">=</span> <span class="p">[](</span><span class="n">data</span><span class="o">&amp;</span> <span class="n">d</span><span class="p">)</span> <span class="p">{</span> <span class="n">d</span><span class="p">.</span><span class="n">value</span> <span class="o">=</span> <span class="mi">42</span><span class="p">;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">make_transition_table</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">       <span class="o">*</span><span class="s">&#34;idle&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e1</span><span class="o">&gt;</span> <span class="o">=</span> <span class="s">&#34;s1&#34;</span><span class="n">_s</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="s">&#34;s1&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e2</span><span class="o">&gt;</span> <span class="o">=</span> <span class="s">&#34;s2&#34;</span><span class="n">_s</span>
+</span></span><span class="line"><span class="cl">      <span class="p">,</span> <span class="s">&#34;s2&#34;</span><span class="n">_s</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">e3</span><span class="o">&gt;</span> <span class="p">[</span><span class="n">guard</span><span class="p">]</span> <span class="o">/</span> <span class="n">action</span> <span class="o">=</span> <span class="n">X</span> <span class="c1">// transition under test
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>  <span class="c1">// namespace
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">using</span> <span class="k">namespace</span> <span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">data</span> <span class="n">fake_data</span><span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sml</span><span class="o">::</span><span class="n">sm</span><span class="o">&lt;::</span><span class="n">testing</span><span class="p">,</span> <span class="n">sml</span><span class="o">::</span><span class="n">testing</span><span class="o">&gt;</span> <span class="n">sm</span><span class="p">{</span><span class="n">fake_data</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">set_current_states</span><span class="p">(</span><span class="s">&#34;s2&#34;</span><span class="n">_s</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="p">.</span><span class="n">process_event</span><span class="p">(</span><span class="n">e3</span><span class="p">{});</span>
+</span></span><span class="line"><span class="cl">  <span class="n">assert</span><span class="p">(</span><span class="n">sm</span><span class="p">.</span><span class="n">is</span><span class="p">(</span><span class="n">X</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="n">assert</span><span class="p">(</span><span class="n">fake_data</span><span class="p">.</span><span class="n">value</span> <span class="o">==</span> <span class="mi">42</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="logging">Logging</h2>
+<p><code>[Boost::ext].SML</code>还为我们提供了日志功能让我们更方便的跟踪和debug。详见最后一个例子。</p>
+<h2 id="policy">Policy</h2>
+<p><code>[Boost::ext].SML</code>为我们提供了四种dispatch的实现方式，分别是jump table,switch/case,if/else和fold expression，我们可以在创建状态机时指定其中的任意一个。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">sml</span><span class="o">::</span><span class="n">sm</span><span class="o">&lt;</span><span class="n">Connection</span><span class="p">,</span> <span class="n">sml</span><span class="o">::</span><span class="n">dispatch</span><span class="o">&lt;</span><span class="nl">sml</span><span class="p">:</span><span class="err">🔙</span><span class="o">:</span><span class="n">policies</span><span class="o">::</span><span class="n">jump_table</span><span class="o">&gt;&gt;</span> <span class="n">connection</span><span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="n">sml</span><span class="o">::</span><span class="n">sm</span><span class="o">&lt;</span><span class="n">Connection</span><span class="p">,</span> <span class="n">sml</span><span class="o">::</span><span class="n">dispatch</span><span class="o">&lt;</span><span class="nl">sml</span><span class="p">:</span><span class="err">🔙</span><span class="o">:</span><span class="n">policies</span><span class="o">::</span><span class="n">switch_stm</span><span class="o">&gt;&gt;</span> <span class="n">connection</span><span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="n">sml</span><span class="o">::</span><span class="n">sm</span><span class="o">&lt;</span><span class="n">Connection</span><span class="p">,</span> <span class="n">sml</span><span class="o">::</span><span class="n">dispatch</span><span class="o">&lt;</span><span class="nl">sml</span><span class="p">:</span><span class="err">🔙</span><span class="o">:</span><span class="n">policies</span><span class="o">::</span><span class="n">branch_stm</span><span class="o">&gt;&gt;</span> <span class="n">connection</span><span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="n">sml</span><span class="o">::</span><span class="n">sm</span><span class="o">&lt;</span><span class="n">Connection</span><span class="p">,</span> <span class="n">sml</span><span class="o">::</span><span class="n">dispatch</span><span class="o">&lt;</span><span class="nl">sml</span><span class="p">:</span><span class="err">🔙</span><span class="o">:</span><span class="n">policies</span><span class="o">::</span><span class="n">fold_expr</span><span class="o">&gt;&gt;</span> <span class="n">connection</span><span class="p">{};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>各自的实现如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">jump_table</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">TEvent</span><span class="p">,</span> <span class="k">class</span><span class="err">... </span><span class="nc">TStates</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">dispatch</span><span class="p">(</span><span class="n">State</span> <span class="o">&amp;</span><span class="n">current_state</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                          <span class="k">const</span> <span class="n">TEvent</span> <span class="o">&amp;</span><span class="n">event</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                          <span class="n">type_list</span><span class="o">&lt;</span><span class="n">TStates</span><span class="p">...</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">using</span> <span class="n">dispatch_table_t</span> <span class="o">=</span> <span class="kt">bool</span> <span class="p">(</span><span class="o">*</span><span class="p">)(</span><span class="k">const</span> <span class="n">TEvent</span><span class="o">&amp;</span><span class="p">,</span> <span class="n">State</span> <span class="o">&amp;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">constexpr</span> <span class="k">static</span> <span class="n">dispatch_table_t</span> <span class="n">dispatch_table</span><span class="p">[]</span> <span class="o">=</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="o">&amp;</span><span class="n">mappings_t</span><span class="o">&lt;</span><span class="n">TStates</span><span class="o">&gt;::</span><span class="k">template</span> <span class="n">execute</span><span class="o">&lt;</span><span class="n">TEvent</span><span class="o">&gt;</span><span class="p">...</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">dispatch_table</span><span class="p">[</span><span class="n">current_state</span><span class="p">](</span><span class="n">event</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">switch_stm</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">TEvent</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">dispatch</span><span class="p">(</span><span class="n">State</span> <span class="o">&amp;</span><span class="p">,</span> <span class="k">const</span> <span class="n">TEvent</span> <span class="o">&amp;</span><span class="p">,</span> <span class="n">type_list</span><span class="o">&lt;&gt;</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">TEvent</span><span class="p">,</span> <span class="k">class</span> <span class="nc">TState</span><span class="p">,</span> <span class="k">class</span><span class="err">... </span><span class="nc">TStates</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">dispatch</span><span class="p">(</span><span class="n">State</span> <span class="o">&amp;</span><span class="n">current_state</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                          <span class="k">const</span> <span class="n">TEvent</span> <span class="o">&amp;</span><span class="n">event</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                          <span class="n">type_list</span><span class="o">&lt;</span><span class="n">TState</span><span class="p">,</span> <span class="n">TStates</span><span class="p">...</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">switch</span> <span class="p">(</span><span class="n">current_state</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">default</span><span class="o">:</span> <span class="k">return</span> <span class="n">dispatch</span><span class="p">(</span><span class="n">current_state</span><span class="p">,</span> <span class="n">type_list</span><span class="o">&lt;</span><span class="n">TStates</span><span class="p">...</span><span class="o">&gt;</span><span class="p">{});</span>
+</span></span><span class="line"><span class="cl">      <span class="k">case</span> <span class="nl">N</span><span class="p">:</span> <span class="k">return</span> <span class="n">mappings_t</span><span class="o">&lt;</span><span class="n">TState</span><span class="o">&gt;::</span><span class="k">template</span> <span class="n">execute</span><span class="o">&lt;</span><span class="n">TEvent</span><span class="o">&gt;</span><span class="p">(</span><span class="n">event</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">branch_stm</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">TEvent</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">dispatch</span><span class="p">(</span><span class="n">State</span> <span class="o">&amp;</span><span class="p">,</span> <span class="k">const</span> <span class="n">TEvent</span> <span class="o">&amp;</span><span class="p">,</span> <span class="n">type_list</span><span class="o">&lt;&gt;</span><span class="p">)</span> <span class="p">{</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">TEvent</span><span class="p">,</span> <span class="k">class</span> <span class="nc">TState</span><span class="p">,</span> <span class="k">class</span><span class="err">... </span><span class="nc">TStates</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">dispatch</span><span class="p">(</span><span class="n">State</span> <span class="o">&amp;</span><span class="n">current_state</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                          <span class="k">const</span> <span class="n">TEvent</span> <span class="o">&amp;</span><span class="n">event</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                          <span class="n">type_list</span><span class="o">&lt;</span><span class="n">TState</span><span class="p">,</span> <span class="n">TStates</span><span class="p">...</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">current_state</span> <span class="o">==</span> <span class="n">N</span>
+</span></span><span class="line"><span class="cl">      <span class="o">?</span> <span class="n">mappings_t</span><span class="o">&lt;</span><span class="n">TState</span><span class="o">&gt;::</span><span class="k">template</span> <span class="n">execute</span><span class="o">&lt;</span><span class="n">TEvent</span><span class="o">&gt;</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">:</span> <span class="n">dispatch</span><span class="p">(</span><span class="n">current_state</span><span class="p">,</span> <span class="n">event</span><span class="p">,</span> <span class="n">type_list</span><span class="o">&lt;</span><span class="n">TStates</span><span class="p">...</span><span class="o">&gt;</span><span class="p">{});</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">fold_expr</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">template</span> <span class="o">&lt;</span><span class="k">auto</span><span class="p">...</span> <span class="n">Ns</span><span class="p">,</span> <span class="k">class</span> <span class="nc">TEvent</span><span class="p">,</span> <span class="k">class</span><span class="err">... </span><span class="nc">TStates</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">constexpr</span> <span class="k">auto</span> <span class="n">dispatch_impl</span><span class="p">(</span><span class="n">State</span> <span class="o">&amp;</span><span class="n">current_state</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                              <span class="n">index_sequence</span><span class="o">&lt;</span><span class="n">Ns</span><span class="p">...</span><span class="o">&gt;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                              <span class="k">const</span> <span class="n">TEvent</span> <span class="o">&amp;</span><span class="n">event</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">                              <span class="n">type_list</span><span class="o">&lt;</span><span class="n">TStates</span><span class="p">...</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="p">((</span><span class="n">current_state</span> <span class="o">==</span> <span class="n">Ns</span>
+</span></span><span class="line"><span class="cl">      <span class="o">?</span> <span class="n">mappings_t</span><span class="o">&lt;</span><span class="n">TStates</span><span class="o">&gt;::</span><span class="k">template</span>
+</span></span><span class="line"><span class="cl">          <span class="n">execute</span><span class="o">&lt;</span><span class="n">TEvent</span><span class="o">&gt;</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="o">:</span> <span class="nb">false</span>
+</span></span><span class="line"><span class="cl">    <span class="p">)</span> <span class="o">||</span> <span class="p">...);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="应用一个模拟服务器demo的实现">应用：一个模拟服务器demo的实现</h2>
+<p>最后，让我们来看一个综合性的例子，在这个例子中，我们需要实现如下的状态机：</p>
+<div style="text-align:center;">
+<img src="/imgs/系统状态机.png" style="zoom:50%;" />
+</div>
+<p>这是一个能够处理外部请求的系统，系统开启后能够处理外来的连接，挂起时能保留外部请求并在恢复后重新处理，同时，它还有一个单独的分支(watchdog定时器)用于监视系统正常运行。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;boost/sml.hpp&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;boost/sml/utility/dispatch_table.hpp&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;cassert&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;fstream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;cstdio&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;cstdlib&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;queue&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="k">namespace</span> <span class="n">sml</span> <span class="o">=</span> <span class="n">boost</span><span class="o">::</span><span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">namespace</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="c1">/// logger
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">struct</span> <span class="nc">printf_logger</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">SM</span><span class="p">,</span> <span class="k">class</span> <span class="nc">TEvent</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="n">log_process_event</span><span class="p">(</span><span class="k">const</span> <span class="n">TEvent</span><span class="o">&amp;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;[%s][process_event] %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">sml</span><span class="o">::</span><span class="n">aux</span><span class="o">::</span><span class="n">get_type_name</span><span class="o">&lt;</span><span class="n">SM</span><span class="o">&gt;</span><span class="p">(),</span> <span class="n">sml</span><span class="o">::</span><span class="n">aux</span><span class="o">::</span><span class="n">get_type_name</span><span class="o">&lt;</span><span class="n">TEvent</span><span class="o">&gt;</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">SM</span><span class="p">,</span> <span class="k">class</span> <span class="nc">TGuard</span><span class="p">,</span> <span class="k">class</span> <span class="nc">TEvent</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="n">log_guard</span><span class="p">(</span><span class="k">const</span> <span class="n">TGuard</span><span class="o">&amp;</span><span class="p">,</span> <span class="k">const</span> <span class="n">TEvent</span><span class="o">&amp;</span><span class="p">,</span> <span class="kt">bool</span> <span class="n">result</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;[%s][guard] %s %s %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">sml</span><span class="o">::</span><span class="n">aux</span><span class="o">::</span><span class="n">get_type_name</span><span class="o">&lt;</span><span class="n">SM</span><span class="o">&gt;</span><span class="p">(),</span> <span class="n">sml</span><span class="o">::</span><span class="n">aux</span><span class="o">::</span><span class="n">get_type_name</span><span class="o">&lt;</span><span class="n">TEvent</span><span class="o">&gt;</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">           <span class="n">sml</span><span class="o">::</span><span class="n">aux</span><span class="o">::</span><span class="n">get_type_name</span><span class="o">&lt;</span><span class="n">TGuard</span><span class="o">&gt;</span><span class="p">(),</span> <span class="p">(</span><span class="n">result</span> <span class="o">?</span> <span class="s">&#34;[OK]&#34;</span> <span class="o">:</span> <span class="s">&#34;[Reject]&#34;</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">SM</span><span class="p">,</span> <span class="k">class</span> <span class="nc">TAction</span><span class="p">,</span> <span class="k">class</span> <span class="nc">TEvent</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="n">log_action</span><span class="p">(</span><span class="k">const</span> <span class="n">TAction</span><span class="o">&amp;</span><span class="p">,</span> <span class="k">const</span> <span class="n">TEvent</span><span class="o">&amp;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;[%s][action] %s %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">sml</span><span class="o">::</span><span class="n">aux</span><span class="o">::</span><span class="n">get_type_name</span><span class="o">&lt;</span><span class="n">SM</span><span class="o">&gt;</span><span class="p">(),</span> <span class="n">sml</span><span class="o">::</span><span class="n">aux</span><span class="o">::</span><span class="n">get_type_name</span><span class="o">&lt;</span><span class="n">TEvent</span><span class="o">&gt;</span><span class="p">(),</span>
+</span></span><span class="line"><span class="cl">           <span class="n">sml</span><span class="o">::</span><span class="n">aux</span><span class="o">::</span><span class="n">get_type_name</span><span class="o">&lt;</span><span class="n">TAction</span><span class="o">&gt;</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">template</span> <span class="o">&lt;</span><span class="k">class</span> <span class="nc">SM</span><span class="p">,</span> <span class="k">class</span> <span class="nc">TSrcState</span><span class="p">,</span> <span class="k">class</span> <span class="nc">TDstState</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="n">log_state_change</span><span class="p">(</span><span class="k">const</span> <span class="n">TSrcState</span><span class="o">&amp;</span> <span class="n">src</span><span class="p">,</span> <span class="k">const</span> <span class="n">TDstState</span><span class="o">&amp;</span> <span class="n">dst</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">printf</span><span class="p">(</span><span class="s">&#34;[%s][transition] %s -&gt; %s</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">sml</span><span class="o">::</span><span class="n">aux</span><span class="o">::</span><span class="n">get_type_name</span><span class="o">&lt;</span><span class="n">SM</span><span class="o">&gt;</span><span class="p">(),</span> <span class="n">src</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span> <span class="n">dst</span><span class="p">.</span><span class="n">c_str</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">/// events
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">struct</span> <span class="nc">connect</span> <span class="o">:</span> <span class="n">sml</span><span class="o">::</span><span class="n">utility</span><span class="o">::</span><span class="n">id</span><span class="o">&lt;</span><span class="n">__COUNTER__</span><span class="o">&gt;</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">ping</span> <span class="o">:</span> <span class="n">sml</span><span class="o">::</span><span class="n">utility</span><span class="o">::</span><span class="n">id</span><span class="o">&lt;</span><span class="n">__COUNTER__</span><span class="o">&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">explicit</span> <span class="nf">ping</span><span class="p">(</span><span class="k">const</span> <span class="kt">void</span><span class="o">*</span> <span class="n">msg</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">     <span class="o">:</span> <span class="n">valid</span><span class="p">{</span><span class="n">msg</span><span class="p">}</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="n">valid</span><span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">established</span> <span class="o">:</span> <span class="n">sml</span><span class="o">::</span><span class="n">utility</span><span class="o">::</span><span class="n">id</span><span class="o">&lt;</span><span class="n">__COUNTER__</span><span class="o">&gt;</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">timeout</span> <span class="o">:</span> <span class="n">sml</span><span class="o">::</span><span class="n">utility</span><span class="o">::</span><span class="n">id</span><span class="o">&lt;</span><span class="n">__COUNTER__</span><span class="o">&gt;</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">disconnect</span> <span class="o">:</span> <span class="n">sml</span><span class="o">::</span><span class="n">utility</span><span class="o">::</span><span class="n">id</span><span class="o">&lt;</span><span class="n">__COUNTER__</span><span class="o">&gt;</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">power_up</span> <span class="o">:</span> <span class="n">sml</span><span class="o">::</span><span class="n">utility</span><span class="o">::</span><span class="n">id</span><span class="o">&lt;</span><span class="n">__COUNTER__</span><span class="o">&gt;</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">suspend</span> <span class="o">:</span> <span class="n">sml</span><span class="o">::</span><span class="n">utility</span><span class="o">::</span><span class="n">id</span><span class="o">&lt;</span><span class="n">__COUNTER__</span><span class="o">&gt;</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">resume</span> <span class="o">:</span> <span class="n">sml</span><span class="o">::</span><span class="n">utility</span><span class="o">::</span><span class="n">id</span><span class="o">&lt;</span><span class="n">__COUNTER__</span><span class="o">&gt;</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">tick</span> <span class="o">:</span> <span class="n">sml</span><span class="o">::</span><span class="n">utility</span><span class="o">::</span><span class="n">id</span><span class="o">&lt;</span><span class="n">__COUNTER__</span><span class="o">&gt;</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">/// guards
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">const</span> <span class="k">auto</span> <span class="n">is_valid</span> <span class="o">=</span> <span class="p">[](</span><span class="k">const</span> <span class="k">auto</span><span class="o">&amp;</span> <span class="n">event</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">puts</span><span class="p">(</span><span class="s">&#34;is_valid&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">event</span><span class="p">.</span><span class="n">valid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">const</span> <span class="k">auto</span> <span class="n">is_healthy</span> <span class="o">=</span> <span class="p">[]</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">puts</span><span class="p">(</span><span class="s">&#34;is_healthy&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">const</span> <span class="k">auto</span> <span class="n">has_battery</span> <span class="o">=</span> <span class="p">[]</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">puts</span><span class="p">(</span><span class="s">&#34;has_battery&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">/// actions
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">const</span> <span class="k">auto</span> <span class="n">establish</span> <span class="o">=</span> <span class="p">[]()</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;establish</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">const</span> <span class="k">auto</span> <span class="n">close</span> <span class="o">=</span> <span class="p">[]()</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;close</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">const</span> <span class="k">auto</span> <span class="n">resetTimeout</span> <span class="o">=</span> <span class="p">[]()</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;resetTimeout</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">const</span> <span class="k">auto</span> <span class="n">setup</span> <span class="o">=</span> <span class="p">[]()</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;setup</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">System</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="nc">Connection</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="nf">operator</span><span class="p">()()</span> <span class="k">const</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">using</span> <span class="k">namespace</span> <span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="n">make_transition_table</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">        <span class="s">&#34;Disconnected&#34;</span><span class="n">_s</span><span class="p">(</span><span class="n">H</span><span class="p">)</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">connect</span><span class="o">&gt;</span> <span class="o">/</span> <span class="n">establish</span>                <span class="o">=</span> <span class="s">&#34;Connecting&#34;</span><span class="n">_s</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s">&#34;Connecting&#34;</span><span class="n">_s</span>      <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">established</span><span class="o">&gt;</span>                        <span class="o">=</span> <span class="s">&#34;Connected&#34;</span><span class="n">_s</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s">&#34;Connected&#34;</span><span class="n">_s</span>       <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">ping</span><span class="o">&gt;</span> <span class="p">[</span> <span class="n">is_valid</span> <span class="p">]</span> <span class="o">/</span> <span class="n">resetTimeout</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s">&#34;Connected&#34;</span><span class="n">_s</span>       <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">timeout</span><span class="o">&gt;</span> <span class="o">/</span> <span class="n">establish</span>                <span class="o">=</span> <span class="s">&#34;Connecting&#34;</span><span class="n">_s</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="s">&#34;Connected&#34;</span><span class="n">_s</span>       <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">disconnect</span><span class="o">&gt;</span> <span class="o">/</span> <span class="n">close</span>                 <span class="o">=</span> <span class="s">&#34;Disconnected&#34;</span><span class="n">_s</span>
+</span></span><span class="line"><span class="cl">      <span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"> <span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="k">operator</span><span class="p">()()</span> <span class="k">const</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">using</span> <span class="k">namespace</span> <span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// clang-format off
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">return</span> <span class="nf">make_transition_table</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl">     <span class="o">*</span> <span class="s">&#34;Idle&#34;</span><span class="n">_s</span>          <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">power_up</span><span class="o">&gt;</span> <span class="p">[</span> <span class="n">has_battery</span> <span class="n">and</span>
+</span></span><span class="line"><span class="cl">                                             <span class="n">is_healthy</span> <span class="p">]</span> <span class="o">/</span> <span class="n">setup</span>       <span class="o">=</span> <span class="n">state</span><span class="o">&lt;</span><span class="n">Connection</span><span class="o">&gt;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">       <span class="n">state</span><span class="o">&lt;</span><span class="n">Connection</span><span class="o">&gt;</span> <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">suspend</span><span class="o">&gt;</span>                               <span class="o">=</span> <span class="s">&#34;Suspended&#34;</span><span class="n">_s</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">       <span class="s">&#34;Suspended&#34;</span><span class="n">_s</span>     <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">resume</span><span class="o">&gt;</span>                                <span class="o">=</span> <span class="n">state</span><span class="o">&lt;</span><span class="n">Connection</span><span class="o">&gt;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">       <span class="s">&#34;Suspended&#34;</span><span class="n">_s</span>     <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">ping</span><span class="o">&gt;</span> <span class="o">/</span> <span class="n">defer</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">     <span class="c1">// --------------------------------------------------------------------------------- //
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>     <span class="o">*</span> <span class="s">&#34;Watchdog&#34;</span><span class="n">_s</span>      <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">tick</span><span class="o">&gt;</span> <span class="o">/</span> <span class="n">resetTimeout</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">       <span class="s">&#34;Watchdog&#34;</span><span class="n">_s</span>      <span class="o">+</span> <span class="n">event</span><span class="o">&lt;</span><span class="n">timeout</span><span class="o">&gt;</span>                               <span class="o">=</span> <span class="n">X</span>
+</span></span><span class="line"><span class="cl">    <span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">**</span> <span class="n">argv</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">using</span> <span class="k">namespace</span> <span class="n">sml</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">printf_logger</span> <span class="n">log</span><span class="p">{};</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">ofstream</span> <span class="n">out</span><span class="p">{</span><span class="s">&#34;out&#34;</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="n">sm</span><span class="o">&lt;</span><span class="n">System</span><span class="p">,</span> <span class="n">logger</span><span class="o">&lt;</span><span class="n">printf_logger</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">defer_queue</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">deque</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">dispatch</span><span class="o">&lt;</span><span class="n">back</span><span class="o">::</span><span class="n">policies</span><span class="o">::</span><span class="n">switch_stm</span><span class="o">&gt;&gt;</span> <span class="n">system</span><span class="p">{</span><span class="n">log</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="n">dispatch</span> <span class="o">=</span> <span class="n">sml</span><span class="o">::</span><span class="n">utility</span><span class="o">::</span><span class="n">make_dispatch_table</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">*</span><span class="p">,</span> <span class="mi">0</span> <span class="cm">/*min*/</span><span class="p">,</span> <span class="n">__COUNTER__</span> <span class="o">-</span> <span class="mi">1</span> <span class="cm">/*max*/</span><span class="o">&gt;</span><span class="p">(</span><span class="n">system</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="k">auto</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">argc</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">const</span> <span class="k">auto</span> <span class="n">event_id</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">atoi</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">dispatch</span><span class="p">(</span><span class="k">nullptr</span><span class="p">,</span> <span class="n">event_id</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>测试结果如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">./a.out <span class="m">5</span> <span class="m">0</span> <span class="m">2</span> <span class="m">1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="o">[{</span>anonymous<span class="o">}</span>::System<span class="o">][</span>process_event<span class="o">]</span> <span class="o">{</span>anonymous<span class="o">}</span>::power_up
+</span></span><span class="line"><span class="cl">has_battery
+</span></span><span class="line"><span class="cl"><span class="o">[{</span>anonymous<span class="o">}</span>::System<span class="o">][</span>guard<span class="o">]</span> <span class="o">{</span>anonymous<span class="o">}</span>::power_up <span class="o">{</span>anonymous<span class="o">}</span>::&lt;lambda<span class="o">()</span>&gt; <span class="o">[</span>OK<span class="o">]</span>
+</span></span><span class="line"><span class="cl">is_healthy
+</span></span><span class="line"><span class="cl"><span class="o">[{</span>anonymous<span class="o">}</span>::System<span class="o">][</span>guard<span class="o">]</span> <span class="o">{</span>anonymous<span class="o">}</span>::power_up <span class="o">{</span>anonymous<span class="o">}</span>::&lt;lambda<span class="o">()</span>&gt; <span class="o">[</span>OK<span class="o">]</span>
+</span></span><span class="line"><span class="cl"><span class="o">[{</span>anonymous<span class="o">}</span>::System<span class="o">][</span>transition<span class="o">]</span> Idle -&gt; <span class="o">{</span>anonymous<span class="o">}</span>::System::Connection
+</span></span><span class="line"><span class="cl"><span class="o">[{</span>anonymous<span class="o">}</span>::System<span class="o">][</span>action<span class="o">]</span> <span class="o">{</span>anonymous<span class="o">}</span>::power_up <span class="o">{</span>anonymous<span class="o">}</span>::&lt;lambda<span class="o">()</span>&gt;
+</span></span><span class="line"><span class="cl">setup
+</span></span><span class="line"><span class="cl"><span class="o">[{</span>anonymous<span class="o">}</span>::System<span class="o">][</span>process_event<span class="o">]</span> <span class="o">{</span>anonymous<span class="o">}</span>::connect
+</span></span><span class="line"><span class="cl"><span class="o">[{</span>anonymous<span class="o">}</span>::System::Connection<span class="o">][</span>process_event<span class="o">]</span> <span class="o">{</span>anonymous<span class="o">}</span>::connect
+</span></span><span class="line"><span class="cl"><span class="o">[{</span>anonymous<span class="o">}</span>::System::Connection<span class="o">][</span>transition<span class="o">]</span> Disconnected -&gt; Connecting
+</span></span><span class="line"><span class="cl"><span class="o">[{</span>anonymous<span class="o">}</span>::System::Connection<span class="o">][</span>action<span class="o">]</span> <span class="o">{</span>anonymous<span class="o">}</span>::connect <span class="o">{</span>anonymous<span class="o">}</span>::&lt;lambda<span class="o">()</span>&gt;
+</span></span><span class="line"><span class="cl">establish
+</span></span><span class="line"><span class="cl"><span class="o">[{</span>anonymous<span class="o">}</span>::System<span class="o">][</span>process_event<span class="o">]</span> <span class="o">{</span>anonymous<span class="o">}</span>::established
+</span></span><span class="line"><span class="cl"><span class="o">[{</span>anonymous<span class="o">}</span>::System::Connection<span class="o">][</span>process_event<span class="o">]</span> <span class="o">{</span>anonymous<span class="o">}</span>::established
+</span></span><span class="line"><span class="cl"><span class="o">[{</span>anonymous<span class="o">}</span>::System::Connection<span class="o">][</span>transition<span class="o">]</span> Connecting -&gt; Connected
+</span></span><span class="line"><span class="cl"><span class="o">[{</span>anonymous<span class="o">}</span>::System<span class="o">][</span>process_event<span class="o">]</span> <span class="o">{</span>anonymous<span class="o">}</span>::ping
+</span></span><span class="line"><span class="cl"><span class="o">[{</span>anonymous<span class="o">}</span>::System::Connection<span class="o">][</span>process_event<span class="o">]</span> <span class="o">{</span>anonymous<span class="o">}</span>::ping
+</span></span><span class="line"><span class="cl">is_valid
+</span></span><span class="line"><span class="cl"><span class="o">[{</span>anonymous<span class="o">}</span>::System::Connection<span class="o">][</span>guard<span class="o">]</span> <span class="o">{</span>anonymous<span class="o">}</span>::ping <span class="o">{</span>anonymous<span class="o">}</span>::&lt;lambda<span class="o">(</span>const auto:13<span class="p">&amp;</span><span class="o">)</span>&gt; <span class="o">[</span>Reject<span class="o">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">bobh</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        0001-01-01
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/C&#43;&#43;/">C&#43;&#43;</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/asio%E5%B0%8F%E7%BB%93/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Asio小结</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/cpp_memory_order/">
+            <span class="next-text nav-default">C&#43;&#43; execution model and memory order</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
+      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
+      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
+      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
+      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
+      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
+      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
+      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
+      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
+      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

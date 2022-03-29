@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>C&#43;&#43;20协程 - bobh&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="bobh" /><meta name="description" content="C&#43;&#43; coroutine TS 概述 Coroutine TS提供了一种通用机制，使得我们可以通过实现符合特定接口的类型来灵活地定制协程的行为，利用这套机制，我们可以对协程的流程实现细粒" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.96.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/C&#43;&#43;20coroutine/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="C&#43;&#43;20协程" />
+<meta property="og:description" content="C&#43;&#43; coroutine TS 概述 Coroutine TS提供了一种通用机制，使得我们可以通过实现符合特定接口的类型来灵活地定制协程的行为，利用这套机制，我们可以对协程的流程实现细粒" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/C&#43;&#43;20coroutine/" /><meta property="article:section" content="post" />
+
+
+
+<meta itemprop="name" content="C&#43;&#43;20协程">
+<meta itemprop="description" content="C&#43;&#43; coroutine TS 概述 Coroutine TS提供了一种通用机制，使得我们可以通过实现符合特定接口的类型来灵活地定制协程的行为，利用这套机制，我们可以对协程的流程实现细粒">
+
+<meta itemprop="wordCount" content="8941">
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="C&#43;&#43;20协程"/>
+<meta name="twitter:description" content="C&#43;&#43; coroutine TS 概述 Coroutine TS提供了一种通用机制，使得我们可以通过实现符合特定接口的类型来灵活地定制协程的行为，利用这套机制，我们可以对协程的流程实现细粒"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">bobh&#39;s blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">bobh&#39;s blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">C&#43;&#43;20协程</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 0001-01-01 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#c-coroutine-ts-概述">C++ coroutine TS 概述</a></li>
+        <li><a href="#co_awaitawaitable和awaiter"><code>co_await</code>,<code>awaitable</code>和<code>awaiter</code></a>
+          <ul>
+            <li><a href="#example">Example</a></li>
+          </ul>
+        </li>
+        <li><a href="#promise_type"><code>promise_type</code></a></li>
+        <li><a href="#coroutine_handle和协程帧"><code>coroutine_handle</code>和协程帧</a></li>
+        <li><a href="#协程在线程间切换时的数据安全问题">协程在线程间切换时的数据安全问题</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="c-coroutine-ts-概述">C++ coroutine TS 概述</h2>
+<p>Coroutine TS提供了一种通用机制，使得我们可以通过实现符合特定接口的类型来灵活地定制协程的行为，利用这套机制，我们可以对协程的流程实现细粒度的控制（这也使得它对于使用者来说有些过于繁重）。我们实现特定接口并使用关键字使得函数成为协程，然后编译器在特定位置插入代码并对其进行转换并将协程体转化为状态机使得重入的效率更高。同时，它使得我们能够将业务逻辑从框架中抽离出来，使得代码结构更加清晰。简单来说，协程可以看做是编译器支持的回调包装器。</p>
+<p>如果函数的定义进行了下列操作之一，那么它是协程：</p>
+<ul>
+<li>用<code>co_await</code>运算符暂停执行，直到恢复。</li>
+<li>用<code>co_yield</code> 暂停执行并返回一个值。</li>
+<li>用<code>co_return</code>完成执行并返回一个值。</li>
+</ul>
+<p>C++ coroutine TS中有三个比较核心的概念:<code>promise_type</code>，<code>awaiter</code>和<code>coroutine_handle</code>，这里先简要介绍一下他们各自的职责。</p>
+<p><code>promise_type</code>指定了定制协程本身的方法。我们可以灵活地定制协程被调用时做什么，协程返回时做什么(包括一般意义上返回和异常之后返回)，还可以定制协程中调用<code>co_await</code>和<code>co_yield</code>时的行为。它从内部操控协程，并且充当调用者和协程之间的通信信道，协程通过<code>promise_type</code>对象提交结果到外部（类似<code>promise/future</code>当中<code>promise</code>的用法），协程中的异常也通过它来传递并处理。</p>
+<p><code>awaiter</code>接口指定了控制<code>co_wait</code>表达式语义的方法。当一个值被<code>co_await</code>时，代码被转换成一系列对<code>awaiter</code>对象上的方法的调用，这些调用允许它指定：是否挂起当前协程，在它挂起后执行一些逻辑来调度(/安排)协程以便稍后恢复，并在协程恢复后执行一些逻辑，以生成<code>co_await</code>表达式的结果。</p>
+<p><code>coroutine_handle</code>代表了协程帧的非拥有句柄，它可以用于恢复协程的执行或者销毁协程帧。协程帧包含了协程的状态，包括<code>promise_type</code>对象、值传递的函数参数、挂起点的位置以及局部变量和生命周期跨越挂起点的临时变量。当协程被挂起时，这些在栈帧上对象被复制到堆上的协程帧中，而当协程恢复时，它们又会重新从协程帧中复制会栈帧上(该过程可能被编译器优化掉)。由于协程的状态是持续存在的，其生命周期是独立的的，所以需要一个额外的对象管理其生命周期，使其生命周期和执行过程解绑，而这正是<code>coroutine_handle</code>的职责，它就是一个指向协程帧的类型擦除指针，给我们提供了从外部控制协程的能力。</p>
+<h2 id="co_awaitawaitable和awaiter"><code>co_await</code>,<code>awaitable</code>和<code>awaiter</code></h2>
+<p>任何包含使用<code>co_await</code>运算符的函数体都将被编译为一个协程，支持<code>co_await</code>运算符的类型被称为<code>awaitable</code>类型。我么可以通过重载<code>co_await</code>操作符或在<code>promise_type</code>中实现<code>await_transform</code>来定制<code>co_await</code>的行为。</p>
+<p>标准库定义了两个平凡的<code>awaitable</code>类型：<code>std::suspend_always</code>和 <code>std::suspend_never</code>如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">suspend_never</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">bool</span> <span class="n">await_ready</span><span class="p">()</span> <span class="p">{</span><span class="k">return</span> <span class="nb">true</span><span class="p">;}</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="nf">await_suspend</span><span class="p">(</span><span class="n">coroutine_handle</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="p">){}</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="nf">await_resume</span><span class="p">(){}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">suspend_always</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">bool</span> <span class="n">await_ready</span><span class="p">()</span> <span class="p">{</span><span class="k">return</span> <span class="nb">false</span><span class="p">;}</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="nf">await_suspend</span><span class="p">(</span><span class="n">coroutine_handle</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="p">){}</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="nf">await_resume</span><span class="p">(){}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><!--有两种类型的awaitable，第一种类型在协程上下文中支持co_await操作符，其promise类型没有await_transform成员。另外一种在某些类型的协程的上下文中只支持co_await操作符，因为在协程的promise类型中存在await_transform方法-->
+<p>对于一个<code>co_await &lt;exp&gt;</code>表达式来说，首先会执行该表达式，然后用下列方式获取<code>awaitable</code>对象</p>
+<ul>
+<li>如果 <code>&lt;exp&gt; </code>由初始暂停点、最终暂停点或 yield 表达式所产生，那么<code>awaitable</code>是<code>&lt;exp&gt;</code>本身。</li>
+<li>否则，如果当前协程的<code>promise_type</code>拥有成员函数 <code>await_transform()</code>，那么<code>awaitable</code>是<code>promise.await_transform(&lt;exp&gt;)</code>。</li>
+<li>否则，<code>awaitable</code>是<code> &lt;exp&gt;</code>本身。</li>
+</ul>
+<blockquote>
+<p>Note: 上述过程是在<code>&lt;exp&gt;</code>本身执行完之后(控制流返回到此处)所发生的流程，如果<code>&lt;exp&gt;</code>也是一个协程(函数体中包含<code>co_await/co_yield/co_return</code>的函数)，那么会先执行该协程，该协程返回(可能是在该协程中的<code>co_await promise.initial_suspend()</code>返回，也可能在该协程中的<code>co_await promise.final_suspend()</code>返回等)的对象即为<code>awaitable</code>对象。</p>
+</blockquote>
+<p>然后继续通过以下方式获得<code>awaiter</code>对象：</p>
+<ul>
+<li>如果针对 <code>operator co_await</code> 的重载决议给出某个最佳重载，那么<code>awaiter</code>是该调用的结果。</li>
+<li>否则，<code>awaiter</code>是<code>awaitable</code>本身</li>
+</ul>
+<p>而一个<code>awaiter</code>需要实现以下三个接口：</p>
+<ul>
+<li><code>await_ready() </code>: 用于通知协程是否需要挂起，如果其返回值为<code>false</code>，则协程被挂起</li>
+<li><code>await_suspend()</code>： 协程挂起前执行的操作</li>
+<li><code>await_resume()</code> : 协程恢复时执行的操作</li>
+</ul>
+<p>当获取到<code>awaiter</code>对象后，<code>co_await awaiter</code>被大致翻译为下述代码（详细的描述见<a href="https://en.cppreference.com/w/cpp/language/coroutines#co_await">cppreference</a>）：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">awaiter</span><span class="p">.</span><span class="n">await_ready</span><span class="p">()){</span>
+</span></span><span class="line"><span class="cl">    	<span class="k">using</span> <span class="n">handle_t</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">experimental</span><span class="o">::</span><span class="n">coroutine_handle</span><span class="o">&lt;</span><span class="n">P</span><span class="o">&gt;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    	<span class="k">using</span> <span class="n">await_suspend_result_t</span> <span class="o">=</span><span class="k">decltype</span><span class="p">(</span><span class="n">awaiter</span><span class="p">.</span><span class="n">await_suspend</span><span class="p">(</span><span class="n">handle_t</span><span class="o">::</span><span class="n">from_promise</span><span class="p">(</span><span class="n">p</span><span class="p">)));</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    	<span class="o">&lt;</span><span class="n">suspend</span><span class="o">-</span><span class="n">coroutine</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">        
+</span></span><span class="line"><span class="cl">    	<span class="k">if</span> <span class="k">constexpr</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">is_void_v</span><span class="o">&lt;</span><span class="n">await_suspend_result_t</span><span class="o">&gt;</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    		<span class="n">awaiter</span><span class="p">.</span><span class="n">await_suspend</span><span class="p">(</span><span class="n">handle_t</span><span class="o">::</span><span class="n">from_promise</span><span class="p">(</span><span class="n">p</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">      		<span class="o">&lt;</span><span class="k">return</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">caller</span><span class="o">-</span><span class="n">or</span><span class="o">-</span><span class="n">resumer</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">   		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">    	<span class="k">else</span> <span class="nf">if</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">is_bool_v</span><span class="o">&lt;</span><span class="n">await_suspend_result_t</span><span class="o">&gt;</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      		<span class="k">if</span> <span class="p">(</span><span class="n">awaiter</span><span class="p">.</span><span class="n">await_suspend</span><span class="p">(</span><span class="n">handle_t</span><span class="o">::</span><span class="n">from_promise</span><span class="p">(</span><span class="n">p</span><span class="p">))){</span>
+</span></span><span class="line"><span class="cl">     			<span class="o">&lt;</span><span class="k">return</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">caller</span><span class="o">-</span><span class="n">or</span><span class="o">-</span><span class="n">resumer</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">      		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">    	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">    	<span class="k">else</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">        	<span class="k">auto</span> <span class="n">h</span> <span class="o">=</span> <span class="n">awaiter</span><span class="p">.</span><span class="n">await_suspend</span><span class="p">(</span><span class="n">handle_t</span><span class="o">::</span><span class="n">from_promise</span><span class="p">(</span><span class="n">p</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    		<span class="n">h</span><span class="p">.</span><span class="n">resume</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    		<span class="o">&lt;</span><span class="k">return</span><span class="o">-</span><span class="n">to</span><span class="o">-</span><span class="n">caller</span><span class="o">-</span><span class="n">or</span><span class="o">-</span><span class="n">resumer</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">    	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="nl">__resume_point</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">  	<span class="k">return</span> <span class="n">awaiter</span><span class="p">.</span><span class="n">await_resume</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>对于返回值为<code>void</code>版本的<code>await_suspend()</code>，当对<code>await_suspend()</code>的调用返回时无条件转回执行协程的主调函数/调用<code>resume</code>者。而返回值为<code>bool</code>类型的版本则允许<code>awaiter</code>对象有条件地不返回主调函数/resumer而立即恢复协程。</p>
+<p>如果 <code>await_suspend</code> 返回某个其他协程的<code>coroutine_handle</code>，那么恢复该句柄，注意这可以连锁进行，并最终导致当前协程恢复。</p>
+<p>下面我们通过一个例子来深入理解<code>co_await</code>的作用。</p>
+<h3 id="example">Example</h3>
+<p>在这个例子中，有多个并发执行的协程等待，直到某个线程调用<code>set()</code>方法，此时任何等待的协程都将恢复。如果已经有某个线程调用过<code>set()</code>方法，那么协程将会不挂起而继续执行。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">T</span> <span class="n">value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="n">async_manual_reset_event</span> <span class="n">event</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// A single call to produce a value
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">void</span> <span class="nf">producer</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">  <span class="n">value</span> <span class="o">=</span> <span class="n">some_long_running_computation</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Publish the value by setting the event.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">event</span><span class="p">.</span><span class="n">set</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Supports multiple concurrent consumers
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">task</span><span class="o">&lt;&gt;</span> <span class="n">consumer</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Wait until the event is signalled by call to event.set()
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// in the producer() function.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">co_await</span> <span class="n">event</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Now it&#39;s safe to consume &#39;value&#39;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// This is guaranteed to &#39;happen after&#39; assignment to &#39;value&#39;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">value</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>事件只可能处于set或not set状态，当其处于not set时，将会有一个等待协程列表，等待它变成<code>set</code>。我们使用<code>std::atomic&lt;void*&gt;</code>来表示事件状态。当其值为事件对象的<code>this</code>指针时表示set状态，因为我们知道它不能与任何列表项的地址相同。否则，事件处于“not set”状态，并且该值是指向正在等待的协程的单链表的头结点的指针。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">async_manual_reset_event</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">async_manual_reset_event</span><span class="p">(</span><span class="kt">bool</span> <span class="n">initiallySet</span> <span class="o">=</span> <span class="nb">false</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// No copying/moving
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="n">async_manual_reset_event</span><span class="p">(</span><span class="k">const</span> <span class="n">async_manual_reset_event</span><span class="o">&amp;</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">async_manual_reset_event</span><span class="p">(</span><span class="n">async_manual_reset_event</span><span class="o">&amp;&amp;</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">async_manual_reset_event</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span> <span class="n">async_manual_reset_event</span><span class="o">&amp;</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">async_manual_reset_event</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="n">async_manual_reset_event</span><span class="o">&amp;&amp;</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="nf">is_set</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="nc">awaiter</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">awaiter</span> <span class="k">operator</span> <span class="nf">co_await</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">set</span><span class="p">()</span> <span class="k">noexcept</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">reset</span><span class="p">()</span> <span class="k">noexcept</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">friend</span> <span class="k">struct</span> <span class="nc">awaiter</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// - &#39;this&#39; =&gt; set state
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// - otherwise =&gt; not set, head of linked list of awaiter*.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">mutable</span> <span class="n">std</span><span class="o">::</span><span class="n">atomic</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">*&gt;</span> <span class="n">m_state</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们可以将节点存储在协程帧的<code>awaiter</code>对象里，这样就可以避免在堆上为链表分配节点带来的额外的系统调用。</p>
+<p>下面让我们定义<code>awaiter</code>类型。首先，它需要知道它将等待哪个<code>async_manual_reset_event</code>事件对象，因此它需要一个对事件的引用和一个构造函数来初始化它。它还需要充当awaiter值链表中的节点，因此需要持有指向链表中下一个<code>awaiter</code>对象的指针。它还需要存储正在执行<code>co_await</code>表达式的等待着的协程的<code>coroutine_handle</code>句柄，以便事件在变为“set”时可以恢复协程。我们不关心协程的<code>promise</code>类型，所以我们只使用协程句柄<code>coroutine_handle&lt;&gt;</code>。awaiter的基本类接口如下所示：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">async_manual_reset_event</span><span class="o">::</span><span class="n">awaiter</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">awaiter</span><span class="p">(</span><span class="k">const</span> <span class="n">async_manual_reset_event</span><span class="o">&amp;</span> <span class="n">event</span><span class="p">)</span> <span class="k">noexcept</span><span class="o">:</span> <span class="n">m_event</span><span class="p">(</span><span class="n">event</span><span class="p">){}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="nf">await_ready</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="nf">await_suspend</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">experimental</span><span class="o">::</span><span class="n">coroutine_handle</span><span class="o">&lt;&gt;</span> <span class="n">awaitingCoroutine</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">void</span> <span class="nf">await_resume</span><span class="p">()</span> <span class="k">noexcept</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="k">const</span> <span class="n">async_manual_reset_event</span><span class="o">&amp;</span> <span class="n">m_event</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">experimental</span><span class="o">::</span><span class="n">coroutine_handle</span><span class="o">&lt;&gt;</span> <span class="n">m_awaitingCoroutine</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="n">awaiter</span><span class="o">*</span> <span class="n">m_next</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="kt">bool</span> <span class="n">async_manual_reset_event</span><span class="o">::</span><span class="n">awaiter</span><span class="o">::</span><span class="n">await_ready</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">m_event</span><span class="p">.</span><span class="n">is_set</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kt">bool</span> <span class="n">async_manual_reset_event</span><span class="o">::</span><span class="n">awaiter</span><span class="o">::</span><span class="n">await_suspend</span><span class="p">(</span>
+</span></span><span class="line"><span class="cl"> 	<span class="n">std</span><span class="o">::</span><span class="n">experimental</span><span class="o">::</span><span class="n">coroutine_handle</span><span class="o">&lt;&gt;</span> <span class="n">awaitingCoroutine</span><span class="p">)</span> <span class="k">noexcept</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Special m_state value that indicates the event is in the &#39;set&#39; state.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span> 	<span class="k">const</span> <span class="kt">void</span><span class="o">*</span> <span class="k">const</span> <span class="n">setState</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">m_event</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Remember the handle of the awaiting coroutine.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  	<span class="n">m_awaitingCoroutine</span> <span class="o">=</span> <span class="n">awaitingCoroutine</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="c1">// Try to atomically push this awaiter onto the front of the list.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  	<span class="kt">void</span><span class="o">*</span> <span class="n">oldValue</span> <span class="o">=</span> <span class="n">m_event</span><span class="p">.</span><span class="n">m_state</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">memory_order_acquire</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  	<span class="k">do</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    	<span class="c1">// Resume immediately if already in &#39;set&#39; state.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    	<span class="k">if</span> <span class="p">(</span><span class="n">oldValue</span> <span class="o">==</span> <span class="n">setState</span><span class="p">)</span> <span class="k">return</span> <span class="nb">false</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl">    	<span class="c1">// Update linked list to point at current head.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    	<span class="n">m_next</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">awaiter</span><span class="o">*&gt;</span><span class="p">(</span><span class="n">oldValue</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    	<span class="c1">// Finally, try to swap the old list head, inserting this awaiter
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    	<span class="c1">// as the new list head.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  	<span class="p">}</span><span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">m_event</span><span class="p">.</span><span class="n">m_state</span><span class="p">.</span><span class="n">compare_exchange_weak</span><span class="p">(</span><span class="n">oldValue</span><span class="p">,</span><span class="k">this</span><span class="p">,</span><span class="n">std</span><span class="o">::</span><span class="n">memory_order_release</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">             <span class="n">std</span><span class="o">::</span><span class="n">memory_order_acquire</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// Successfully enqueued. Remain suspended.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  	<span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在<code>await_suspend()</code>方法中，它需要将等待着的协程的协程句柄存储到<code>m_awaitingCoroutine</code>成员中，以便事件稍后可以对其调用<code>resume()</code>。之后，我们尝试将<code>awaiter</code>原子地进入到等待协程的链表。如果我们成功地将其入队，那么返回true以指示我们不希望立即恢复协程，否则如果我们发现事件已同时更改为set状态，那么我们返回<code>false</code>以指示应立即恢复协程。</p>
+<p>在加载旧状态时，我们使用<code>acquire</code>内存顺序，这样，如果读取特殊的set值，就可以看到在调用<code>set()</code>之前发生的写操作。如果<code>compare-exchange</code>成功，则需要<code>release</code>语义的内存顺序，以便随后对<code>set()</code>的调用将看到我们对<code>m_awaitingCoroutine</code>的写入以及对协程状态之前的写入。</p>
+<p>下面是<code>async_manua_reset_event</code>成员函数的实现。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="n">async_manual_reset_event</span><span class="o">::</span><span class="n">async_manual_reset_event</span><span class="p">(</span><span class="kt">bool</span> <span class="n">initiallySet</span><span class="p">)</span> <span class="k">noexcept</span>
+</span></span><span class="line"><span class="cl">    <span class="o">:</span> <span class="n">m_state</span><span class="p">(</span><span class="n">initiallySet</span> <span class="o">?</span> <span class="k">this</span> <span class="o">:</span> <span class="k">nullptr</span><span class="p">){}</span>
+</span></span><span class="line"><span class="cl"><span class="kt">bool</span> <span class="n">async_manual_reset_event</span><span class="o">::</span><span class="n">is_set</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">m_state</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">memory_order_acquire</span><span class="p">)</span> <span class="o">==</span> <span class="k">this</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">async_manual_reset_event</span><span class="o">::</span><span class="n">reset</span><span class="p">()</span> <span class="k">noexcept</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  	<span class="kt">void</span><span class="o">*</span> <span class="n">oldValue</span> <span class="o">=</span> <span class="k">this</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  	<span class="n">m_state</span><span class="p">.</span><span class="n">compare_exchange_strong</span><span class="p">(</span><span class="n">oldValue</span><span class="p">,</span> <span class="k">nullptr</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">memory_order_acquire</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">async_manual_reset_event</span><span class="o">::</span><span class="n">set</span><span class="p">()</span> <span class="k">noexcept</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  	<span class="c1">// Needs to be &#39;release&#39; so that subsequent &#39;co_await&#39; has visibility of our prior writes.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  	<span class="c1">// Needs to be &#39;acquire&#39; so that we have visibility of prior writes by awaiting coroutines.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  	<span class="kt">void</span><span class="o">*</span> <span class="n">oldValue</span> <span class="o">=</span> <span class="n">m_state</span><span class="p">.</span><span class="n">exchange</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">memory_order_acq_rel</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  	<span class="k">if</span> <span class="p">(</span><span class="n">oldValue</span> <span class="o">!=</span> <span class="k">this</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    	<span class="c1">// Wasn&#39;t already in &#39;set&#39; state.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    	<span class="c1">// Treat old value as head of a linked-list of waiters
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    	<span class="c1">// which we have now acquired and need to resume.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    	<span class="k">auto</span><span class="o">*</span> <span class="n">waiters</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="n">awaiter</span><span class="o">*&gt;</span><span class="p">(</span><span class="n">oldValue</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    	<span class="k">while</span> <span class="p">(</span><span class="n">waiters</span> <span class="o">!=</span> <span class="k">nullptr</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">      		<span class="c1">// Read m_next before resuming the coroutine as resuming
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      		<span class="c1">// the coroutine will likely destroy the awaiter object.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>      		<span class="k">auto</span><span class="o">*</span> <span class="n">next</span> <span class="o">=</span> <span class="n">waiters</span><span class="o">-&gt;</span><span class="n">m_next</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">      		<span class="n">waiters</span><span class="o">-&gt;</span><span class="n">m_awaitingCoroutine</span><span class="p">.</span><span class="n">resume</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">      		<span class="n">waiters</span> <span class="o">=</span> <span class="n">next</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">  	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="n">async_manual_reset_event</span><span class="o">::</span><span class="n">awaiter</span> <span class="n">async_manual_reset_event</span><span class="o">::</span><span class="k">operator</span> <span class="k">co_await</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">return</span> <span class="n">awaiter</span><span class="p">{</span> <span class="o">*</span><span class="k">this</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在<code>set()</code>方法中，我们希望通过将当前状态与特殊的“set”值——<code>this</code>交换，从而转换到set状态，然后检查旧值是什么。如果有任何等待的协程，那么我们希望在返回之前依次恢复它们中的每一个。</p>
+<h2 id="promise_type"><code>promise_type</code></h2>
+<p><code>promise_type</code>从内部控制协程，它定义了协程本身的绝大多数行为，同时我们可以通过<code>promise_type</code>跟踪并控制协程的状态。一个含有<code>promise_type</code>的包装类可能有如下定义</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span> <span class="k">struct</span> <span class="nc">generator</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="nc">promise_type</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">using</span> <span class="n">handle</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">coroutine_handle</span><span class="o">&lt;</span><span class="n">promise_type</span><span class="o">&gt;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="nc">promise_type</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">T</span> <span class="o">*</span><span class="n">current_value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">static</span> <span class="k">auto</span> <span class="nf">get_return_object_on_allocation_failure</span><span class="p">()</span><span class="k">noexcept</span><span class="p">{</span> <span class="k">return</span> <span class="n">generator</span><span class="p">{</span><span class="k">nullptr</span><span class="p">};</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">auto</span> <span class="nf">get_return_object</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">generator</span><span class="p">{</span><span class="n">handle</span><span class="o">::</span><span class="n">from_promise</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">)};</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">auto</span> <span class="nf">initial_suspend</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">suspend_always</span><span class="p">{};</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">auto</span> <span class="nf">final_suspend</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">suspend_always</span><span class="p">{};</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">void</span> <span class="nf">unhandled_exception</span><span class="p">()</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">terminate</span><span class="p">();</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">void</span> <span class="nf">return_void</span><span class="p">()</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">auto</span> <span class="nf">yield_value</span><span class="p">(</span><span class="n">T</span> <span class="o">&amp;</span><span class="n">value</span><span class="p">)</span><span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">current_value</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">addressof</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">suspend_always</span><span class="p">{};</span>
+</span></span><span class="line"><span class="cl">    	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">bool</span> <span class="nf">move_next</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">coro</span> <span class="o">?</span> <span class="p">(</span><span class="n">coro</span><span class="p">.</span><span class="n">resume</span><span class="p">(),</span> <span class="o">!</span><span class="n">coro</span><span class="p">.</span><span class="n">done</span><span class="p">())</span> <span class="o">:</span> <span class="nb">false</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">int</span> <span class="nf">current_value</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">coro</span><span class="p">.</span><span class="n">promise</span><span class="p">().</span><span class="n">current_value</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">generator</span><span class="p">(</span><span class="n">generator</span> <span class="k">const</span><span class="o">&amp;</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">generator</span><span class="p">(</span><span class="n">generator</span> <span class="o">&amp;&amp;</span> <span class="n">rhs</span><span class="p">)</span> <span class="o">:</span> <span class="n">coro</span><span class="p">(</span><span class="n">rhs</span><span class="p">.</span><span class="n">coro</span><span class="p">)</span> <span class="p">{</span> <span class="n">rhs</span><span class="p">.</span><span class="n">coro</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="o">~</span><span class="n">generator</span><span class="p">()</span> <span class="p">{</span> <span class="k">if</span> <span class="p">(</span><span class="n">coro</span><span class="p">)</span> <span class="n">coro</span><span class="p">.</span><span class="n">destroy</span><span class="p">();</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">generator</span><span class="p">(</span><span class="n">handle</span> <span class="n">h</span><span class="p">)</span> <span class="o">:</span> <span class="n">coro</span><span class="p">(</span><span class="n">h</span><span class="p">)</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">handle</span> <span class="n">coro</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>当协程开始执行时，协程体将进行下列操作：</p>
+<ul>
+<li>用<code>operator new</code>分配协程状态对象</li>
+<li>将所有函数形参复制到协程状态中：按值传递的形参被移动或复制，按引用传递的参数保持为引用（如果在被指代对象的生存期结束后恢复协程，它可能变成悬垂引用）</li>
+<li>调用承诺对象的构造函数。如果承诺类型拥有接收所有协程形参的构造函数，那么以复制后的协程实参调用该构造函数。否则调用其默认构造函数。</li>
+<li>调用 <code>promise.get_return_object()</code> 并将其结果在局部变量中保持。该调用的结果将在协程首次暂停时返回给调用方。至此并包含这个步骤为止，任何抛出的异常均传播回调用方，而非置于承诺中。</li>
+<li>调用 <code>promise.initial_suspend()</code> 并 <code>co_await</code> 其结果。</li>
+<li>当 <code>co_await promise.initial_suspend()</code> 恢复时，开始协程体的执行。</li>
+</ul>
+<p>用代码表达流程大致如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">auto</span> <span class="nf">example</span><span class="p">(</span><span class="n">Args</span><span class="p">...</span> <span class="n">args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">return_type</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">using</span> <span class="n">T</span> <span class="o">=</span> <span class="n">coroutine_traits</span><span class="o">&lt;</span><span class="n">return_type</span><span class="p">,</span> <span class="n">Args</span><span class="p">...</span><span class="o">&gt;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">using</span> <span class="n">promise_type</span> <span class="o">=</span> <span class="n">T</span><span class="o">::</span><span class="n">promise_type</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">using</span> <span class="n">frame_type</span><span class="o">=</span><span class="n">tuple</span><span class="o">&lt;</span><span class="n">frame_prefix</span><span class="p">,</span><span class="n">promise_type</span><span class="p">,</span><span class="n">Args</span><span class="p">...</span><span class="o">&gt;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="o">*</span><span class="n">frame</span><span class="o">=</span><span class="p">(</span><span class="n">frame_type</span><span class="o">*</span><span class="p">)</span><span class="n">promise_type</span><span class="o">::</span><span class="k">operator</span> <span class="k">new</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">frame_type</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="n">promise_type</span> <span class="o">*</span><span class="n">promise</span><span class="o">=</span><span class="n">addressof</span><span class="p">(</span><span class="n">get</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">(</span><span class="o">*</span><span class="n">frame</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">promise_type</span> <span class="n">promise</span><span class="p">{</span><span class="n">args</span><span class="p">...};</span>
+</span></span><span class="line"><span class="cl">    <span class="k">auto</span> <span class="n">return_object</span> <span class="o">=</span> <span class="p">{</span> <span class="n">p</span><span class="p">.</span><span class="n">get_return_object</span><span class="p">()</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="k">co_await</span> <span class="n">p</span><span class="p">.</span><span class="n">initial_suspend</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    	<span class="c1">// our code...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="k">catch</span> <span class="p">(...)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    	<span class="n">p</span><span class="p">.</span><span class="n">unhandled_exception</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="nl">__final_suspend_point</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="k">co_await</span> <span class="n">p</span><span class="p">.</span><span class="n">final_suspend</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nl">__destroy_point</span><span class="p">:</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="n">promise_type</span><span class="o">::</span><span class="k">operator</span> <span class="k">delete</span><span class="p">(</span><span class="n">frame</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="n">frame_type</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里，(编译器插入的代码)首先会利用<code>coroutine_traits&lt;return_type,Args...&gt;</code>根据协程的返回类型和参数列表(即协程的函数签名)来萃取出对应的<code>promise_type</code>类型，然后根据<code>promise_type</code>继续执行后续动作。于是我们可以通过模板特化/偏特化来定制不同协程的<code>promise_type</code>以控制其流程。</p>
+<p>我们可以通过重载<code>promise_type</code>中的<code>operator new</code>来定制协程帧分配的行为。同时，如果协程状态的生存期严格内嵌于调用方的生存期且协程帧的大小在调用点已知，那么编译器可以优化掉对<code>operator new</code>的调用而将协程状态嵌入调用方栈帧中。</p>
+<p>如果协程帧堆分配失败，那么协程抛出 <code>std::bad_alloc</code>，如果<code>promise</code>类型定义了成员函数<code>get_return_object_on_allocation_failure()</code>，那么使用 <code>operator new(size_t ,nothow_t )</code>的重载进行分配，而在分配失败时(返回<code>nullptr</code>)，协程会将 <code>promise::get_return_object_on_allocation_failure()</code> 获得的对象返回给调用方并且不抛出异常。</p>
+<p>我们需要在启动协程函数体之前构造<code>return-object</code>对象，是因为在调用<code>coroutine_handle::resume()</code>返回之前，协程帧（以及<code>promise</code>对象）可能在这个线程上或另一个线程上被破坏，因此，在开始执行协程函数体之后调用<code>get_return_object()</code>是不安全的。</p>
+<p>当协程函数到达它的第一个<code>&lt;return-to-caller-or-resumer&gt;</code>点（或者没有到达这个点，协程已经执行完成），那么通过<code>get_return_object()</code>构造的<code>return-object</code>对象将返回给协程的主调函数。</p>
+<p>当协程抵达<code>co_return</code>语句时，它进行下列操作：</p>
+<ul>
+<li>对下列情形调用 <code>promise.return_void()</code>
+<ul>
+<li><code>co_return</code>;</li>
+<li><code>co_return &lt;expr&gt;</code>，其中 <code>&lt;expr&gt;</code> 具有 <code>void</code> 类型</li>
+<li>控制流离开<code>void</code>的协程的末尾。此时如果<code>promise_type</code>没有 <code>promise_type::return_void()</code>成员函数，那么则行为未定义。</li>
+</ul>
+</li>
+<li>或对于<code>co_return &lt;expr&gt;</code>调用 <code>promise.return_value(&lt;expr&gt;)</code>，其中<code>expr</code>具有非<code>void</code>类型</li>
+<li>以创建的逆序销毁所有具有自动存储期的变量。</li>
+<li>调用<code>promise.final_suspend()</code>并<code>co_await</code>其结果。</li>
+</ul>
+<p>如果协程因未捕捉的异常结束，那么它进行下列操作：</p>
+<ul>
+<li>捕捉异常并在<code>catch</code>块内调用<code>promise.unhandled_exception()</code>,</li>
+<li>调用<code>promise.final_suspend()</code>并<code>co_await</code>其结果（例如，以恢复某个继续或发布其结果）。此时开始恢复协程是未定义行为。</li>
+</ul>
+<p>当经由 <code>co_return</code> 或未捕捉异常而终止协程导致协程状态被销毁，或经由其句柄而导致其被销毁时，它进行下列操作：</p>
+<ul>
+<li>调用承诺对象的析构函数。</li>
+<li>调用各个函数形参副本的析构函数。</li>
+<li>调用<code>operator delete</code> 以释放协程状态所用的内存。</li>
+<li>转移执行回到调用方/恢复方。</li>
+</ul>
+<p>而<code>co_yield &lt;exp&gt;</code>表达式相当于<code>co_await promise.yield_value(&lt;exp&gt;)</code>。正如前面所说的，<code>promise</code>对象充当了我们和协程之间的信道，协程可以将值放入<code>promise</code>对象中，之后我们在外部从<code>promise</code>中再取出它，我们也可以做同样的操作。</p>
+<p>下面是cppreference上的一个例子，展示了如何利用协程编写一个能够惰性求值的生成器。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;coroutine&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;optional&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span> 
+</span></span><span class="line"><span class="cl"><span class="k">template</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">movable</span> <span class="n">T</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">Generator</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="nc">promise_type</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Generator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">get_return_object</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="n">Generator</span><span class="p">{</span><span class="n">Handle</span><span class="o">::</span><span class="n">from_promise</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">)};</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">static</span> <span class="n">std</span><span class="o">::</span><span class="n">suspend_always</span> <span class="n">initial_suspend</span><span class="p">()</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="p">{};</span> 
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">static</span> <span class="n">std</span><span class="o">::</span><span class="n">suspend_always</span> <span class="n">final_suspend</span><span class="p">()</span> <span class="k">noexcept</span> <span class="p">{</span> 
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="p">{};</span> 
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">suspend_always</span> <span class="n">yield_value</span><span class="p">(</span><span class="n">T</span> <span class="n">value</span><span class="p">)</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">current_value</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">value</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// Disallow co_await in generator coroutines.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="kt">void</span> <span class="nf">await_transform</span><span class="p">()</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="na">[[noreturn]]</span>
+</span></span><span class="line"><span class="cl">        <span class="k">static</span> <span class="kt">void</span> <span class="n">unhandled_exception</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">throw</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">optional</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">current_value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">    <span class="k">using</span> <span class="n">Handle</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">coroutine_handle</span><span class="o">&lt;</span><span class="n">promise_type</span><span class="o">&gt;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">    <span class="k">explicit</span> <span class="nf">Generator</span><span class="p">(</span><span class="k">const</span> <span class="n">Handle</span> <span class="n">coroutine</span><span class="p">)</span> <span class="o">:</span> 
+</span></span><span class="line"><span class="cl">        <span class="n">m_coroutine</span><span class="p">{</span><span class="n">coroutine</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{}</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">    <span class="n">Generator</span><span class="p">()</span> <span class="o">=</span> <span class="k">default</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="o">~</span><span class="n">Generator</span><span class="p">()</span> <span class="p">{</span> 
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">m_coroutine</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">m_coroutine</span><span class="p">.</span><span class="n">destroy</span><span class="p">();</span> 
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">    <span class="n">Generator</span><span class="p">(</span><span class="k">const</span> <span class="n">Generator</span><span class="o">&amp;</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Generator</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="k">const</span> <span class="n">Generator</span><span class="o">&amp;</span><span class="p">)</span> <span class="o">=</span> <span class="k">delete</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">    <span class="n">Generator</span><span class="p">(</span><span class="n">Generator</span><span class="o">&amp;&amp;</span> <span class="n">other</span><span class="p">)</span> <span class="k">noexcept</span> <span class="o">:</span> 
+</span></span><span class="line"><span class="cl">        <span class="n">m_coroutine</span><span class="p">{</span><span class="n">other</span><span class="p">.</span><span class="n">m_coroutine</span><span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span> 
+</span></span><span class="line"><span class="cl">        <span class="n">other</span><span class="p">.</span><span class="n">m_coroutine</span> <span class="o">=</span> <span class="p">{};</span> 
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Generator</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">=</span><span class="p">(</span><span class="n">Generator</span><span class="o">&amp;&amp;</span> <span class="n">other</span><span class="p">)</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="k">this</span> <span class="o">!=</span> <span class="o">&amp;</span><span class="n">other</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="n">m_coroutine</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">m_coroutine</span><span class="p">.</span><span class="n">destroy</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="n">m_coroutine</span> <span class="o">=</span> <span class="n">other</span><span class="p">.</span><span class="n">m_coroutine</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">other</span><span class="p">.</span><span class="n">m_coroutine</span> <span class="o">=</span> <span class="p">{};</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="o">*</span><span class="k">this</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">    <span class="c1">// Range-based for loop support.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">class</span> <span class="nc">Iter</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">void</span> <span class="k">operator</span><span class="o">++</span><span class="p">()</span> <span class="p">{</span> 
+</span></span><span class="line"><span class="cl">            <span class="n">m_coroutine</span><span class="p">.</span><span class="n">resume</span><span class="p">();</span> 
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">const</span> <span class="n">T</span><span class="o">&amp;</span> <span class="k">operator</span><span class="o">*</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> 
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="o">*</span><span class="n">m_coroutine</span><span class="p">.</span><span class="n">promise</span><span class="p">().</span><span class="n">current_value</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>        
+</span></span><span class="line"><span class="cl">        <span class="kt">bool</span> <span class="k">operator</span><span class="o">==</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">default_sentinel_t</span><span class="p">)</span> <span class="k">const</span> <span class="p">{</span> 
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="o">!</span><span class="n">m_coroutine</span> <span class="o">||</span> <span class="n">m_coroutine</span><span class="p">.</span><span class="n">done</span><span class="p">();</span> 
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">        <span class="k">explicit</span> <span class="nf">Iter</span><span class="p">(</span><span class="k">const</span> <span class="n">Handle</span> <span class="n">coroutine</span><span class="p">)</span> <span class="o">:</span> <span class="n">m_coroutine</span><span class="p">{</span><span class="n">coroutine</span><span class="p">}</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">    <span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">        <span class="n">Handle</span> <span class="n">m_coroutine</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl">    <span class="n">Iter</span> <span class="nf">begin</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">m_coroutine</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">m_coroutine</span><span class="p">.</span><span class="n">resume</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> 
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">Iter</span><span class="p">{</span><span class="n">m_coroutine</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">default_sentinel_t</span> <span class="n">end</span><span class="p">()</span> <span class="p">{</span> 
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="p">{};</span> 
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="k">private</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Handle</span> <span class="n">m_coroutine</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="k">template</span><span class="o">&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">integral</span> <span class="n">T</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="n">Generator</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">range</span><span class="p">(</span><span class="n">T</span> <span class="n">first</span><span class="p">,</span> <span class="k">const</span> <span class="n">T</span> <span class="n">last</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="p">(</span><span class="n">first</span> <span class="o">&lt;</span> <span class="n">last</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">co_yield</span> <span class="n">first</span><span class="o">++</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"> 
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">for</span> <span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="nl">i</span> <span class="p">:</span> <span class="n">range</span><span class="p">(</span><span class="mi">65</span><span class="p">,</span> <span class="mi">91</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">i</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39; &#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="coroutine_handle和协程帧"><code>coroutine_handle</code>和协程帧</h2>
+<p><code>coroutine_handle</code>是协程帧的非拥有句柄，协程帧包含了必要的协程状态(<code>promise_type</code>对象、值传递的函数参数、挂起点的位置以及局部变量和生命周期跨越挂起点的临时变量)，于是我们可以通过<code>coroutine_handle</code>来恢复协程的执行或者销毁协程帧。</p>
+<p>下面是<code>coruotine_handle</code>的接口。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">PromiseType</span> <span class="o">=</span> <span class="kt">void</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">coroutine_handle</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">coroutine_handle</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">protected</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="n">prefix_t</span> <span class="n">prefix</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">static_assert</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">prefix_t</span><span class="p">)</span> <span class="o">==</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">//Checks whether *this is non-null
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">operator</span> <span class="kt">bool</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">//Resumes the execution of the coroutine to which *this refers
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="kt">void</span> <span class="nf">resume</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">operator</span><span class="p">()()</span><span class="k">const</span><span class="p">;</span> <span class="c1">//same as resume()
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    
+</span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="nf">destroy</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// Query if the coroutine is suspended at the final_suspend point.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// Undefined behaviour if coroutine is not currently suspended.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="kt">bool</span> <span class="nf">done</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// Convert to/from a void* for passing into C-style interop functions.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">constexpr</span> <span class="kt">void</span><span class="o">*</span> <span class="nf">address</span><span class="p">()</span> <span class="k">const</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">static</span> <span class="k">constexpr</span> <span class="n">coroutine_handle</span> <span class="nf">from_address</span><span class="p">(</span><span class="kt">void</span><span class="o">*</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">PromiseType</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">coroutine_handle</span> <span class="o">:</span> <span class="k">public</span> <span class="n">coroutine_handle</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="k">public</span><span class="o">:</span>
+</span></span><span class="line"><span class="cl">	<span class="k">using</span> <span class="n">promise_type</span> <span class="o">=</span> <span class="n">PromiseType</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">using</span> <span class="n">coroutine_handle</span><span class="o">&lt;</span><span class="kt">void</span><span class="o">&gt;::</span><span class="n">coroutine_handle</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// Access to the coroutine&#39;s promise object.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">auto</span> <span class="nf">promise</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">promise_type</span><span class="o">&amp;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">    <span class="c1">// Reconstruct the coroutine handle from the promise object.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">static</span> <span class="n">coroutine_handle</span> <span class="nf">from_promise</span><span class="p">(</span><span class="n">promise_type</span><span class="o">&amp;</span> <span class="n">prom</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们有两种方法获得一个协程的<code>coroutine_handle</code></p>
+<ul>
+<li>在<code>co_await</code>表达式中，它被传递给<code>await_suspend()</code>作为参数</li>
+<li>利用<code>coroutine_handle&lt;proimse_type&gt;::from(*promise)</code>从<code>promise</code>对象重新构造</li>
+</ul>
+<p>需要注意的是，<code>coroutine_handle</code>不是RAII对象。我们必须手动调用<code>destroy()</code>来销毁协程帧并释放其资源。<strong>可以把它看作是用于管理内存的<code>void*</code>的等价物</strong>。这样设计是因为性能的原因：使它成为一个RAII对象会给coroutine增加额外的开销，例如需要引用计数。</p>
+<p>例如，在下面的例子中，在<code>main2</code>函数的第一行，<code>counter2()</code>返回一个<code>ReturnObject2</code>的临时对象，我们通过定制<code>operator std::coroutine_handle&lt;&gt;()</code>来保存其中的<code>coroutine_handle</code>至<code>main2</code>中的<code>h</code>里，在第二行开始之前，该临时对象销毁(但不会销毁其中<code>h_</code>所指向的协程帧)，由于我们已经在外部保存了协程帧指针，之后我们通过该协程帧指针来恢复协程，最后我们调用<code>h.destroy()</code>来销毁协程帧。如果我们在调用<code>counter()</code>的时候忽略它的返回值，或是在最后没有调用<code>h.destroy()</code>，那么就会发生内存泄漏。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">ReturnObject2</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="nc">promise_type</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ReturnObject2</span> <span class="nf">get_return_object</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="p">{.</span><span class="n">h_</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">coroutine_handle</span><span class="o">&lt;</span><span class="n">promise_type</span><span class="o">&gt;::</span><span class="n">from_promise</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">)};</span>
+</span></span><span class="line"><span class="cl">      <span class="c1">// C++20 designated initializer syntax
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">suspend_never</span> <span class="n">initial_suspend</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="p">{};</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">suspend_never</span> <span class="n">final_suspend</span><span class="p">()</span> <span class="k">noexcept</span> <span class="p">{</span> <span class="k">return</span> <span class="p">{};</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">unhandled_exception</span><span class="p">()</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">coroutine_handle</span><span class="o">&lt;</span><span class="n">promise_type</span><span class="o">&gt;</span> <span class="n">h_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="n">coroutine_handle</span><span class="o">&lt;</span><span class="n">promise_type</span><span class="o">&gt;</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="n">h_</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="c1">// A coroutine_handle&lt;promise_type&gt; converts to coroutine_handle&lt;&gt;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="n">coroutine_handle</span><span class="o">&lt;&gt;</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="n">h_</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="n">ReturnObject2</span> <span class="nf">counter2</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">co_await</span> <span class="n">std</span><span class="o">::</span><span class="n">suspend_always</span><span class="p">{};</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;counter2: &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">i</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">main2</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">coroutine_handle</span><span class="o">&lt;&gt;</span> <span class="n">h</span> <span class="o">=</span> <span class="n">counter2</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;In main2 function</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">h</span><span class="p">();</span> <span class="c1">//same as h.resume()
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">h</span><span class="p">.</span><span class="n">destroy</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>如果我们将协程中某个在协程帧当中的对象的指针通过<code>promise_type</code>传递给外部，在协程被挂起后，我们可以通过该指针访问该对象。例如</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">ReturnObject3</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="nc">promise_type</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">unsigned</span><span class="o">*</span> <span class="n">value_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">ReturnObject3</span> <span class="nf">get_return_object</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">      <span class="k">return</span> <span class="n">ReturnObject3</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="p">.</span><span class="n">h_</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">coroutine_handle</span><span class="o">&lt;</span><span class="n">promise_type</span><span class="o">&gt;::</span><span class="n">from_promise</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">      <span class="p">};</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">suspend_never</span> <span class="n">initial_suspend</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="p">{};</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">suspend_never</span> <span class="n">final_suspend</span><span class="p">()</span> <span class="k">noexcept</span> <span class="p">{</span> <span class="k">return</span> <span class="p">{};</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="nf">unhandled_exception</span><span class="p">()</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">  <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">coroutine_handle</span><span class="o">&lt;</span><span class="n">promise_type</span><span class="o">&gt;</span> <span class="n">h_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="n">coroutine_handle</span><span class="o">&lt;</span><span class="n">promise_type</span><span class="o">&gt;</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="n">h_</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="n">ReturnObject3</span> <span class="nf">counter3</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="n">pp</span> <span class="o">=</span> <span class="k">co_await</span> <span class="n">GetPromise</span><span class="o">&lt;</span><span class="n">ReturnObject3</span><span class="o">::</span><span class="n">promise_type</span><span class="o">&gt;</span><span class="p">{};</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">pp</span><span class="o">-&gt;</span><span class="n">value_</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">co_await</span> <span class="n">std</span><span class="o">::</span><span class="n">suspend_always</span><span class="p">{};</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">main3</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">coroutine_handle</span><span class="o">&lt;</span><span class="n">ReturnObject3</span><span class="o">::</span><span class="n">promise_type</span><span class="o">&gt;</span> <span class="n">h</span> <span class="o">=</span> <span class="n">counter3</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="n">ReturnObject3</span><span class="o">::</span><span class="n">promise_type</span> <span class="o">&amp;</span><span class="n">promise</span> <span class="o">=</span> <span class="n">h</span><span class="p">.</span><span class="n">promise</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;counter3: &#34;</span> <span class="o">&lt;&lt;</span> <span class="o">*</span><span class="n">promise</span><span class="p">.</span><span class="n">value_</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">h</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">h</span><span class="p">.</span><span class="n">destroy</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在这个例子中，<code>couter3()</code>的<code>for</code>循环中的<code>i</code>是该协程生命周期跨过挂起点的临时变量，在每次协程挂起前我们指向它的指针放入<code>promise_type</code>中，之后再在主函数中访问它。正如前面所说，生命周期跨过挂起点的临时变量会放在堆上，所以知道我们调用<code>h.destroy()</code>之前他们都是可以访问的。</p>
+<h2 id="协程在线程间切换时的数据安全问题">协程在线程间切换时的数据安全问题</h2>
+<p>我们知道，<code>co_await</code>运算符让我们能够在协程挂起和执行权返回主调函数/resumer之前执行额外代码。这允许一个awaiter对象在协程挂起后初始化一个异步操作，将挂起的协程的<code>coroutine_handle</code>传递给后续能安全恢复(挂起的协程)的操作，该操作完成时就可以恢复协程(可能是在另一个线程中)，并且这当中不需要额外的同步语句。同时由于 <code>await_suspend()</code> 在当前线程上持续执行， <code>await_suspend()</code> 应该把<code>*this</code>当作已被销毁并且在柄被发布到其他线程后不再访问它。这是因为一旦我们将协程句柄发布给其它线程，那么其它线程可能会在<code>await_suspend()</code>方法返回之前恢复协程，这可能会导致(其它线程中的)协程与(当前线程中的协程的)<code>await_suspend()</code>方法的剩余部分并发地执行。</p>
+<p>而协程恢复时第一件要做的事就是调用<code>await_resume()</code>方法来获取结果，之后，它大概率会立即销毁<code>awaiter</code>对象(也就是调用<code>await_suspend()</code>的<code>this</code>指针)。（在另一个线程上恢复的）协程接下来可能会在当前线程中的<code>await_suspend()</code>返回之前会执行到结束，销毁协程和<code>promise</code>对象。</p>
+<p>所以，一旦有可能在另一个线程中并发恢复当前协程，我们需要保证在<code>await_suspend()</code>方法中避免访问<code>this</code>指针或协程的<code>promise</code>对象，因为这些可能已经(在另外的线程中)被销毁。一般来说，在操作开始和协程被安排在未来某点恢复之后能安全访问的内容就是<code>await_suspend()</code>内的局部变量，下面我们看一个具体的例子。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;coroutine&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;stdexcept&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;thread&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span><span class="k">auto</span> <span class="nf">switch_to_new_thread</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">jthread</span><span class="o">&amp;</span> <span class="n">out</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">struct</span> <span class="nc">awaitable</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">std</span><span class="o">::</span><span class="n">jthread</span><span class="o">*</span> <span class="n">p_out</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="kt">bool</span> <span class="n">await_ready</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">false</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="kt">void</span> <span class="n">await_suspend</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">coroutine_handle</span><span class="o">&lt;&gt;</span> <span class="n">h</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">std</span><span class="o">::</span><span class="n">jthread</span><span class="o">&amp;</span> <span class="n">out</span> <span class="o">=</span> <span class="o">*</span><span class="n">p_out</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="p">(</span><span class="n">out</span><span class="p">.</span><span class="n">joinable</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">				<span class="k">throw</span> <span class="n">std</span><span class="o">::</span><span class="n">runtime_error</span><span class="p">(</span><span class="s">&#34;Output jthread parameter not empty&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">			<span class="n">out</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">jthread</span><span class="p">([</span><span class="n">h</span><span class="p">]</span> <span class="p">{</span> <span class="n">h</span><span class="p">.</span><span class="n">resume</span><span class="p">();</span> <span class="p">});</span>
+</span></span><span class="line"><span class="cl">			<span class="c1">// Potential undefined behavior: accessing potentially destroyed *this
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>			<span class="c1">// std::cout &lt;&lt; &#34;New thread ID: &#34; &lt;&lt; p_out-&gt;get_id() &lt;&lt; &#39;\n&#39;;
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>             <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;new thread ID：&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">out</span><span class="p">.</span><span class="n">get_id</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span> <span class="c1">// this is ok
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">    	<span class="kt">void</span> <span class="n">await_resume</span><span class="p">()</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">  	<span class="p">};</span>
+</span></span><span class="line"><span class="cl">  	<span class="k">return</span> <span class="n">awaitable</span><span class="p">{</span><span class="o">&amp;</span><span class="n">out</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">task</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="nc">promise_type</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">task</span> <span class="nf">get_return_object</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="p">{};</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">suspend_never</span> <span class="n">initial_suspend</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="p">{};</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">suspend_never</span> <span class="n">final_suspend</span><span class="p">()</span> <span class="k">noexcept</span> <span class="p">{</span> <span class="k">return</span> <span class="p">{};</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">void</span> <span class="nf">return_void</span><span class="p">()</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">void</span> <span class="nf">unhandled_exception</span><span class="p">()</span> <span class="p">{}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="n">task</span> <span class="nf">resuming_on_new_thread</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">jthread</span><span class="o">&amp;</span> <span class="n">out</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;coroutine begins, thread ID：&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">this_thread</span><span class="o">::</span><span class="n">get_id</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">co_await</span> <span class="n">switch_to_new_thread</span><span class="p">(</span><span class="n">out</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// awatier destroyed here
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;coroutine resumes, thread ID：&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">this_thread</span><span class="o">::</span><span class="n">get_id</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">std</span><span class="o">::</span><span class="n">jthread</span> <span class="n">out</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">resuming_on_new_thread</span><span class="p">(</span><span class="n">out</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在这个例子中，协程开始时在一个线程上开始执行，然后通过在<code>await_suspend()</code>中将<code>coroutine_handle</code>传递给新线程从而使协程在另一个线程上恢复。正如前面所说的，在这种情况下，<code>await_suspend()</code>执行过程中能安全访问的内容应当是<code>await_suspend()</code>内的局部变量。由于协程在第二个线程恢复后与第一个线程中<code>await_suspend()</code>的剩余部分并发执行，其可能在第一个线程的<code>await_suspend()</code>执行过程中就已经完成了协程帧的销毁，而<code>awaiter</code>对象是在协程帧中的(其生命周期跨过了挂起点)，也就是说<code>awaiter</code>对象(连同其持有的<code>jthread</code>指针)可能在第一个线程执行<code>await_suspend()</code>的过程中随时被销毁，所以我们要在将当前协程的<code>coroutine_handle</code>传递给第二个线程之前先用<code>std::jthread&amp; out = *p_out;</code>将其保留在第一个线程函数的栈帧上才能保证没有错误。</p>
+<!--coroutine_handle是指向协程帧的指针。对于一般的函数，其存储器相关信息的栈帧的生命周期和，当函数返回时，局部变量被销毁，控制权被返回给调用者。但协程的状态是持续存在的，其生命周期是独立的的，所以需要coroutine_handle指向它用于管理生命周期，使其生命周期和执行过程解绑。同时，由于编译器一般不知道协程帧的大小，所以协程帧在堆上动态分配，coroutine_handle就是指向这个堆上对象的类型擦除指针。包装类对象拥有promise_type和coroutine_handle对象，它被分配在栈上，借助coroutine_handle管理堆上协程帧的生命周期。	-->
+<!--编译器会进行优化使得重入的效率更高，如果编译器能看到协程帧的生命周期，它可以将协程放在栈上-->
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">bobh</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        0001-01-01
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      
+      <nav class="post-nav">
+        <a class="prev" href="/post/cpp_memory_order/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">C&#43;&#43; execution model and memory order</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/C&#43;&#43;%E4%B8%AD%E7%9A%84%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/">
+            <span class="next-text nav-default">C&#43;&#43;中的内存对齐</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
+      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
+      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
+      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
+      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
+      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
+      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
+      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
+      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
+      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

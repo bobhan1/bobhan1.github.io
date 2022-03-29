@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>一个利用Boost::pfr展示结构体内存布局的pretty printer - bobh&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="bobh" /><meta name="description" content="直接贴代码，注意MSVC需要将alignments前的constexpr去掉才能过编译。godbot 其实只用了boost::pfr::str" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.96.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/struct_layout_pretty_printer/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="一个利用Boost::pfr展示结构体内存布局的pretty printer" />
+<meta property="og:description" content="直接贴代码，注意MSVC需要将alignments前的constexpr去掉才能过编译。godbot 其实只用了boost::pfr::str" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/struct_layout_pretty_printer/" /><meta property="article:section" content="post" />
+
+
+
+<meta itemprop="name" content="一个利用Boost::pfr展示结构体内存布局的pretty printer">
+<meta itemprop="description" content="直接贴代码，注意MSVC需要将alignments前的constexpr去掉才能过编译。godbot 其实只用了boost::pfr::str">
+
+<meta itemprop="wordCount" content="1828">
+<meta itemprop="keywords" content="C&#43;&#43;,Boost," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="一个利用Boost::pfr展示结构体内存布局的pretty printer"/>
+<meta name="twitter:description" content="直接贴代码，注意MSVC需要将alignments前的constexpr去掉才能过编译。godbot 其实只用了boost::pfr::str"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">bobh&#39;s blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">bobh&#39;s blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">一个利用Boost::pfr展示结构体内存布局的pretty printer</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 0001-01-01 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents"></nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>直接贴代码，注意MSVC需要将<code>alignments</code>前的<code>constexpr</code>去掉才能过编译。<a href="https://gcc.godbolt.org/z/6bfWez4Ej">godbot</a></p>
+<!-- more -->
+<p>其实只用了<code>boost::pfr::structure_to_tuple()</code>这一个函数，有关将POD类型转化为<code>tuple</code>的原理可参见<a href="boost::pfr::structure_to_tuple">C++14实现编译期反射&ndash;剖析magic_get中的magic
+</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span><span class="lnt">120
+</span><span class="lnt">121
+</span><span class="lnt">122
+</span><span class="lnt">123
+</span><span class="lnt">124
+</span><span class="lnt">125
+</span><span class="lnt">126
+</span><span class="lnt">127
+</span><span class="lnt">128
+</span><span class="lnt">129
+</span><span class="lnt">130
+</span><span class="lnt">131
+</span><span class="lnt">132
+</span><span class="lnt">133
+</span><span class="lnt">134
+</span><span class="lnt">135
+</span><span class="lnt">136
+</span><span class="lnt">137
+</span><span class="lnt">138
+</span><span class="lnt">139
+</span><span class="lnt">140
+</span><span class="lnt">141
+</span><span class="lnt">142
+</span><span class="lnt">143
+</span><span class="lnt">144
+</span><span class="lnt">145
+</span><span class="lnt">146
+</span><span class="lnt">147
+</span><span class="lnt">148
+</span><span class="lnt">149
+</span><span class="lnt">150
+</span><span class="lnt">151
+</span><span class="lnt">152
+</span><span class="lnt">153
+</span><span class="lnt">154
+</span><span class="lnt">155
+</span><span class="lnt">156
+</span><span class="lnt">157
+</span><span class="lnt">158
+</span><span class="lnt">159
+</span><span class="lnt">160
+</span><span class="lnt">161
+</span><span class="lnt">162
+</span><span class="lnt">163
+</span><span class="lnt">164
+</span><span class="lnt">165
+</span><span class="lnt">166
+</span><span class="lnt">167
+</span><span class="lnt">168
+</span><span class="lnt">169
+</span><span class="lnt">170
+</span><span class="lnt">171
+</span><span class="lnt">172
+</span><span class="lnt">173
+</span><span class="lnt">174
+</span><span class="lnt">175
+</span><span class="lnt">176
+</span><span class="lnt">177
+</span><span class="lnt">178
+</span><span class="lnt">179
+</span><span class="lnt">180
+</span><span class="lnt">181
+</span><span class="lnt">182
+</span><span class="lnt">183
+</span><span class="lnt">184
+</span><span class="lnt">185
+</span><span class="lnt">186
+</span><span class="lnt">187
+</span><span class="lnt">188
+</span><span class="lnt">189
+</span><span class="lnt">190
+</span><span class="lnt">191
+</span><span class="lnt">192
+</span><span class="lnt">193
+</span><span class="lnt">194
+</span><span class="lnt">195
+</span><span class="lnt">196
+</span><span class="lnt">197
+</span><span class="lnt">198
+</span><span class="lnt">199
+</span><span class="lnt">200
+</span><span class="lnt">201
+</span><span class="lnt">202
+</span><span class="lnt">203
+</span><span class="lnt">204
+</span><span class="lnt">205
+</span><span class="lnt">206
+</span><span class="lnt">207
+</span><span class="lnt">208
+</span><span class="lnt">209
+</span><span class="lnt">210
+</span><span class="lnt">211
+</span><span class="lnt">212
+</span><span class="lnt">213
+</span><span class="lnt">214
+</span><span class="lnt">215
+</span><span class="lnt">216
+</span><span class="lnt">217
+</span><span class="lnt">218
+</span><span class="lnt">219
+</span><span class="lnt">220
+</span><span class="lnt">221
+</span><span class="lnt">222
+</span><span class="lnt">223
+</span><span class="lnt">224
+</span><span class="lnt">225
+</span><span class="lnt">226
+</span><span class="lnt">227
+</span><span class="lnt">228
+</span><span class="lnt">229
+</span><span class="lnt">230
+</span><span class="lnt">231
+</span><span class="lnt">232
+</span><span class="lnt">233
+</span><span class="lnt">234
+</span><span class="lnt">235
+</span><span class="lnt">236
+</span><span class="lnt">237
+</span><span class="lnt">238
+</span><span class="lnt">239
+</span><span class="lnt">240
+</span><span class="lnt">241
+</span><span class="lnt">242
+</span><span class="lnt">243
+</span><span class="lnt">244
+</span><span class="lnt">245
+</span><span class="lnt">246
+</span><span class="lnt">247
+</span><span class="lnt">248
+</span><span class="lnt">249
+</span><span class="lnt">250
+</span><span class="lnt">251
+</span><span class="lnt">252
+</span><span class="lnt">253
+</span><span class="lnt">254
+</span><span class="lnt">255
+</span><span class="lnt">256
+</span><span class="lnt">257
+</span><span class="lnt">258
+</span><span class="lnt">259
+</span><span class="lnt">260
+</span><span class="lnt">261
+</span><span class="lnt">262
+</span><span class="lnt">263
+</span><span class="lnt">264
+</span><span class="lnt">265
+</span><span class="lnt">266
+</span><span class="lnt">267
+</span><span class="lnt">268
+</span><span class="lnt">269
+</span><span class="lnt">270
+</span><span class="lnt">271
+</span><span class="lnt">272
+</span><span class="lnt">273
+</span><span class="lnt">274
+</span><span class="lnt">275
+</span><span class="lnt">276
+</span><span class="lnt">277
+</span><span class="lnt">278
+</span><span class="lnt">279
+</span><span class="lnt">280
+</span><span class="lnt">281
+</span><span class="lnt">282
+</span><span class="lnt">283
+</span><span class="lnt">284
+</span><span class="lnt">285
+</span><span class="lnt">286
+</span><span class="lnt">287
+</span><span class="lnt">288
+</span><span class="lnt">289
+</span><span class="lnt">290
+</span><span class="lnt">291
+</span><span class="lnt">292
+</span><span class="lnt">293
+</span><span class="lnt">294
+</span><span class="lnt">295
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Pretty-printer for `struct` layout and padding bytes
+</span></span></span><span class="line"><span class="cl"><span class="c1">// by Vittorio Romeo (@supahvee1234) (https://vittorioromeo.info)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;boost/pfr.hpp&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;tuple&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;utility&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;type_traits&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;typeinfo&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;cmath&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iomanip&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;cstring&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;array&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="k">namespace</span> <span class="n">detail</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ------------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// Round `x` up to the nearest multiple of `mult`.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="na">[[nodiscard]]</span> <span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="n">size_t</span> <span class="n">round_up</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">size_t</span> <span class="n">x</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">        <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">size_t</span> <span class="n">mult</span><span class="p">)</span> <span class="k">noexcept</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="p">((</span><span class="n">x</span> <span class="o">+</span> <span class="n">mult</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">mult</span><span class="p">)</span> <span class="o">*</span> <span class="n">mult</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// ------------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// Recursively print the memory layout of `T` using identation `indent` and
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="c1">// keeping track of the total occupied bytes in `used`.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="kt">void</span> <span class="n">print_layout_impl</span><span class="p">(</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">size_t</span> <span class="n">indent</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">size_t</span><span class="o">&amp;</span> <span class="n">used</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// ------------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// Utilities.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="k">const</span> <span class="n">t_name</span> <span class="o">=</span> <span class="k">typeid</span><span class="p">(</span><span class="n">T</span><span class="p">).</span><span class="n">name</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">size_t</span> <span class="n">line_length</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">strlen</span><span class="p">(</span><span class="n">t_name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">32</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">const</span> <span class="k">auto</span> <span class="n">print_indent</span> <span class="o">=</span> <span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">size_t</span> <span class="n">spacing</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">for</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">indent</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="p">((</span><span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">?</span> <span class="sc">&#39;|&#39;</span> <span class="o">:</span> <span class="sc">&#39; &#39;</span><span class="p">);</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="k">for</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">spacing</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39; &#39;</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">const</span> <span class="k">auto</span> <span class="n">print_line</span> <span class="o">=</span> <span class="p">[</span><span class="o">&amp;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">print_indent</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">            <span class="k">for</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">line_length</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;-&#39;</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">// ------------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// Tuple type of all data members of `T`, in order. Used to reflect on `T`.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">using</span> <span class="n">tuple_type</span> <span class="o">=</span> <span class="k">decltype</span><span class="p">(</span><span class="n">boost</span><span class="o">::</span><span class="n">pfr</span><span class="o">::</span><span class="n">structure_to_tuple</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">declval</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">()));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="c1">// ------------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// We use a pointer to `std::tuple` to support non-default-constructible types.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="c1">// We need this inner lambda so that we can use `Ts...` as a pack.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="p">[</span><span class="o">&amp;</span><span class="p">]</span><span class="o">&lt;</span><span class="k">typename</span><span class="p">...</span> <span class="n">Ts</span><span class="o">&gt;</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">tuple</span><span class="o">&lt;</span><span class="n">Ts</span><span class="p">...</span><span class="o">&gt;*</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">// ------------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// All alignments of the data members, with the alignment of `T` at the end.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">            <span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="n">array</span> <span class="n">alignments</span><span class="p">{</span> <span class="k">alignof</span><span class="p">(</span><span class="n">Ts</span><span class="p">)...,</span> <span class="k">alignof</span><span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="p">};</span>
+</span></span><span class="line"><span class="cl">            <span class="c1">//std::array alignments{ alignof(Ts)..., alignof(T) };   MSVC
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">            <span class="c1">// ------------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// Information printed in the header.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="n">size_t</span> <span class="n">sum_of_member_sizes</span> <span class="o">=</span> <span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">Ts</span><span class="p">)</span> <span class="o">+</span> <span class="p">...);</span>
+</span></span><span class="line"><span class="cl">            <span class="k">constexpr</span> <span class="n">std</span><span class="o">::</span><span class="n">size_t</span> <span class="n">total_padding_bytes</span> <span class="o">=</span> <span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="o">-</span> <span class="n">sum_of_member_sizes</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="c1">// ------------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// Print the header.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="n">print_line</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">            <span class="n">print_indent</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">t_name</span>
+</span></span><span class="line"><span class="cl">                <span class="o">&lt;&lt;</span> <span class="s">&#34; {size: &#34;</span> <span class="o">&lt;&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34; (&#34;</span>
+</span></span><span class="line"><span class="cl">                <span class="o">&lt;&lt;</span> <span class="n">sum_of_member_sizes</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;# &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">total_padding_bytes</span>
+</span></span><span class="line"><span class="cl">                <span class="o">&lt;&lt;</span> <span class="s">&#34;p), align: &#34;</span> <span class="o">&lt;&lt;</span> <span class="k">alignof</span><span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;}</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="n">print_line</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="n">std</span><span class="o">::</span><span class="n">size_t</span> <span class="n">type_idx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="c1">// -----------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// Print padding in relation to a given alignment
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="k">const</span> <span class="k">auto</span> <span class="n">print_padding</span> <span class="o">=</span> <span class="p">[</span><span class="o">&amp;</span><span class="p">](</span><span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">size_t</span> <span class="n">alignment</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="k">const</span> <span class="n">std</span><span class="o">::</span><span class="n">size_t</span> <span class="n">padding</span> <span class="o">=</span> <span class="n">round_up</span><span class="p">(</span><span class="n">used</span><span class="p">,</span> <span class="n">alignment</span><span class="p">)</span> <span class="o">-</span> <span class="n">used</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">padding</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;p&#39;</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">                <span class="n">used</span> <span class="o">+=</span> <span class="n">padding</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="c1">// -----------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// Non-recursively print a fundamental/pointer/reference type
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="k">const</span> <span class="k">auto</span> <span class="n">print_fundamental</span> <span class="o">=</span> <span class="p">[</span><span class="o">&amp;</span><span class="p">]</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">X</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">print_indent</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">                <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">setw</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">used</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;: [&#34;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                <span class="n">print_padding</span><span class="p">(</span><span class="n">alignments</span><span class="p">[</span><span class="n">type_idx</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                <span class="k">for</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">X</span><span class="p">);</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;#&#39;</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">                <span class="n">used</span> <span class="o">+=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">X</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                <span class="n">print_padding</span><span class="p">(</span><span class="n">alignments</span><span class="p">[</span><span class="n">type_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;] &#34;</span> <span class="o">&lt;&lt;</span> <span class="k">typeid</span><span class="p">(</span><span class="n">X</span><span class="p">).</span><span class="n">name</span><span class="p">()</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">            <span class="c1">// -----------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="c1">// Recursively print all data members
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>            <span class="p">([</span><span class="o">&amp;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">            <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="k">if</span> <span class="nf">constexpr</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">is_fundamental_v</span><span class="o">&lt;</span><span class="n">Ts</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">                    <span class="o">||</span> <span class="n">std</span><span class="o">::</span><span class="n">is_pointer_v</span><span class="o">&lt;</span><span class="n">Ts</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">                    <span class="o">||</span> <span class="n">std</span><span class="o">::</span><span class="n">is_reference_v</span><span class="o">&lt;</span><span class="n">Ts</span><span class="o">&gt;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">print_fundamental</span><span class="p">.</span><span class="k">template</span> <span class="k">operator</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">Ts</span> <span class="o">&gt;</span> <span class="p">();</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">                <span class="k">else</span>
+</span></span><span class="line"><span class="cl">                <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                    <span class="n">print_layout_impl</span><span class="o">&lt;</span><span class="n">Ts</span><span class="o">&gt;</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="n">used</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">                <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">                <span class="o">++</span><span class="n">type_idx</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}(),</span> <span class="p">...);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">tuple_type</span><span class="o">*&gt;</span><span class="p">(</span><span class="k">nullptr</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="n">print_line</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">print_layout</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">size_t</span> <span class="n">used</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">detail</span><span class="o">::</span><span class="n">print_layout_impl</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="p">(</span><span class="mi">0</span> <span class="cm">/* indent */</span><span class="p">,</span> <span class="n">used</span> <span class="cm">/* used */</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="nc">foo1</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">char</span><span class="o">*</span> <span class="n">p</span><span class="p">;</span>     <span class="cm">/* 8 bytes */</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">char</span> <span class="n">c</span><span class="p">;</span>      <span class="cm">/* 1 byte
+</span></span></span><span class="line"><span class="cl"><span class="cm">        char pad[7];    7 bytes */</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">long</span> <span class="n">x</span><span class="p">;</span>      <span class="cm">/* 8 bytes */</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">print_layout</span><span class="o">&lt;</span><span class="n">foo1</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// ------------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="nc">foo2</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">char</span>  <span class="n">c</span><span class="p">;</span>      <span class="cm">/* 1 byte
+</span></span></span><span class="line"><span class="cl"><span class="cm">        char  pad[7];    7 bytes */</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">char</span><span class="o">*</span> <span class="n">p</span><span class="p">;</span>      <span class="cm">/* 8 bytes */</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">long</span>  <span class="n">x</span><span class="p">;</span>      <span class="cm">/* 8 bytes */</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">print_layout</span><span class="o">&lt;</span><span class="n">foo2</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// ------------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="nc">foo3</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">char</span><span class="o">*</span> <span class="n">p</span><span class="p">;</span>      <span class="cm">/* 8 bytes */</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">char</span>  <span class="n">c</span><span class="p">;</span>      <span class="cm">/* 1 byte
+</span></span></span><span class="line"><span class="cl"><span class="cm">        char  pad[7];    7 bytes */</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">print_layout</span><span class="o">&lt;</span><span class="n">foo3</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// ------------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="nc">foo4</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">short</span> <span class="n">s</span><span class="p">;</span>      <span class="cm">/* 2 bytes */</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">char</span>  <span class="n">c</span><span class="p">;</span>      <span class="cm">/* 1 byte
+</span></span></span><span class="line"><span class="cl"><span class="cm">        char  pad[1];    1 byte */</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">print_layout</span><span class="o">&lt;</span><span class="n">foo4</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// ------------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="nc">foo5</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">char</span> <span class="n">c</span><span class="p">;</span>           <span class="cm">/* 1 byte
+</span></span></span><span class="line"><span class="cl"><span class="cm">        char pad1[7];        7 bytes */</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">        <span class="k">struct</span> <span class="nc">foo5_inner</span>
+</span></span><span class="line"><span class="cl">        <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="kt">char</span><span class="o">*</span> <span class="n">p</span><span class="p">;</span>       <span class="cm">/* 8 bytes */</span>
+</span></span><span class="line"><span class="cl">            <span class="kt">short</span> <span class="n">x</span><span class="p">;</span>       <span class="cm">/* 2 bytes
+</span></span></span><span class="line"><span class="cl"><span class="cm">            char  pad2[6];    6 bytes */</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="n">inner</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">print_layout</span><span class="o">&lt;</span><span class="n">foo5</span><span class="o">::</span><span class="n">foo5_inner</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">print_layout</span><span class="o">&lt;</span><span class="n">foo5</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// ------------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="nc">foo10</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">char</span>   <span class="n">c</span><span class="p">;</span>       <span class="cm">/* 1 byte
+</span></span></span><span class="line"><span class="cl"><span class="cm">        char   pad1[7];    7 bytes */</span>
+</span></span><span class="line"><span class="cl">        <span class="n">foo10</span><span class="o">*</span> <span class="n">p</span><span class="p">;</span>       <span class="cm">/* 8 bytes */</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">short</span>  <span class="n">x</span><span class="p">;</span>       <span class="cm">/* 2 bytes
+</span></span></span><span class="line"><span class="cl"><span class="cm">        char   pad2[6];    6 bytes */</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">print_layout</span><span class="o">&lt;</span><span class="n">foo10</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// ------------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="nc">foo11</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">foo11</span><span class="o">*</span> <span class="n">p</span><span class="p">;</span>      <span class="cm">/* 8 bytes */</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">short</span>  <span class="n">x</span><span class="p">;</span>      <span class="cm">/* 2 bytes */</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">char</span>   <span class="n">c</span><span class="p">;</span>      <span class="cm">/* 1 byte
+</span></span></span><span class="line"><span class="cl"><span class="cm">        char   pad[5];    5 bytes */</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">print_layout</span><span class="o">&lt;</span><span class="n">foo11</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// ------------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="nc">test0</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">int</span>   <span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">char</span>  <span class="n">c</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">float</span> <span class="n">f</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">print_layout</span><span class="o">&lt;</span><span class="n">test0</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// ------------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="nc">test1</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">int</span>    <span class="n">i</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">double</span> <span class="n">d</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">char</span>   <span class="n">c</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">float</span>  <span class="n">f</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">print_layout</span><span class="o">&lt;</span><span class="n">test1</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// ------------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="nc">test2</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">void</span><span class="o">*</span> <span class="n">p0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">test0</span> <span class="n">t0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">void</span><span class="o">*</span> <span class="n">p1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">test1</span> <span class="n">t1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">void</span><span class="o">*</span> <span class="n">p2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">print_layout</span><span class="o">&lt;</span><span class="n">test2</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">// ------------------------------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl">    <span class="k">struct</span> <span class="nc">test2_flat</span>
+</span></span><span class="line"><span class="cl">    <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">void</span><span class="o">*</span> <span class="n">p0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">int</span>    <span class="n">i0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">char</span>   <span class="n">c0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">float</span>  <span class="n">f0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">void</span><span class="o">*</span> <span class="n">p1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">int</span>    <span class="n">i1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">double</span> <span class="n">d0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">char</span>   <span class="n">c1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">float</span>  <span class="n">f1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">void</span><span class="o">*</span> <span class="n">p2</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">print_layout</span><span class="o">&lt;</span><span class="n">test2_flat</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="sc">&#39;\n&#39;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>输出如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">  1
+</span><span class="lnt">  2
+</span><span class="lnt">  3
+</span><span class="lnt">  4
+</span><span class="lnt">  5
+</span><span class="lnt">  6
+</span><span class="lnt">  7
+</span><span class="lnt">  8
+</span><span class="lnt">  9
+</span><span class="lnt"> 10
+</span><span class="lnt"> 11
+</span><span class="lnt"> 12
+</span><span class="lnt"> 13
+</span><span class="lnt"> 14
+</span><span class="lnt"> 15
+</span><span class="lnt"> 16
+</span><span class="lnt"> 17
+</span><span class="lnt"> 18
+</span><span class="lnt"> 19
+</span><span class="lnt"> 20
+</span><span class="lnt"> 21
+</span><span class="lnt"> 22
+</span><span class="lnt"> 23
+</span><span class="lnt"> 24
+</span><span class="lnt"> 25
+</span><span class="lnt"> 26
+</span><span class="lnt"> 27
+</span><span class="lnt"> 28
+</span><span class="lnt"> 29
+</span><span class="lnt"> 30
+</span><span class="lnt"> 31
+</span><span class="lnt"> 32
+</span><span class="lnt"> 33
+</span><span class="lnt"> 34
+</span><span class="lnt"> 35
+</span><span class="lnt"> 36
+</span><span class="lnt"> 37
+</span><span class="lnt"> 38
+</span><span class="lnt"> 39
+</span><span class="lnt"> 40
+</span><span class="lnt"> 41
+</span><span class="lnt"> 42
+</span><span class="lnt"> 43
+</span><span class="lnt"> 44
+</span><span class="lnt"> 45
+</span><span class="lnt"> 46
+</span><span class="lnt"> 47
+</span><span class="lnt"> 48
+</span><span class="lnt"> 49
+</span><span class="lnt"> 50
+</span><span class="lnt"> 51
+</span><span class="lnt"> 52
+</span><span class="lnt"> 53
+</span><span class="lnt"> 54
+</span><span class="lnt"> 55
+</span><span class="lnt"> 56
+</span><span class="lnt"> 57
+</span><span class="lnt"> 58
+</span><span class="lnt"> 59
+</span><span class="lnt"> 60
+</span><span class="lnt"> 61
+</span><span class="lnt"> 62
+</span><span class="lnt"> 63
+</span><span class="lnt"> 64
+</span><span class="lnt"> 65
+</span><span class="lnt"> 66
+</span><span class="lnt"> 67
+</span><span class="lnt"> 68
+</span><span class="lnt"> 69
+</span><span class="lnt"> 70
+</span><span class="lnt"> 71
+</span><span class="lnt"> 72
+</span><span class="lnt"> 73
+</span><span class="lnt"> 74
+</span><span class="lnt"> 75
+</span><span class="lnt"> 76
+</span><span class="lnt"> 77
+</span><span class="lnt"> 78
+</span><span class="lnt"> 79
+</span><span class="lnt"> 80
+</span><span class="lnt"> 81
+</span><span class="lnt"> 82
+</span><span class="lnt"> 83
+</span><span class="lnt"> 84
+</span><span class="lnt"> 85
+</span><span class="lnt"> 86
+</span><span class="lnt"> 87
+</span><span class="lnt"> 88
+</span><span class="lnt"> 89
+</span><span class="lnt"> 90
+</span><span class="lnt"> 91
+</span><span class="lnt"> 92
+</span><span class="lnt"> 93
+</span><span class="lnt"> 94
+</span><span class="lnt"> 95
+</span><span class="lnt"> 96
+</span><span class="lnt"> 97
+</span><span class="lnt"> 98
+</span><span class="lnt"> 99
+</span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
+</span><span class="lnt">103
+</span><span class="lnt">104
+</span><span class="lnt">105
+</span><span class="lnt">106
+</span><span class="lnt">107
+</span><span class="lnt">108
+</span><span class="lnt">109
+</span><span class="lnt">110
+</span><span class="lnt">111
+</span><span class="lnt">112
+</span><span class="lnt">113
+</span><span class="lnt">114
+</span><span class="lnt">115
+</span><span class="lnt">116
+</span><span class="lnt">117
+</span><span class="lnt">118
+</span><span class="lnt">119
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span> struct <span class="sb">`</span>int __cdecl main<span class="o">(</span>void<span class="o">)</span><span class="s1">&#39;::`2&#39;</span>::foo1 <span class="o">{</span>size: <span class="m">16</span> <span class="o">(</span>13# 3p<span class="o">)</span>, align: 8<span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  0: <span class="o">[</span><span class="c1">########] char * __ptr64</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  8: <span class="o">[</span><span class="c1">#ppp] char</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> 12: <span class="o">[</span><span class="c1">####] long</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span> struct <span class="sb">`</span>int __cdecl main<span class="o">(</span>void<span class="o">)</span><span class="s1">&#39;::`2&#39;</span>::foo2 <span class="o">{</span>size: <span class="m">24</span> <span class="o">(</span>13# 11p<span class="o">)</span>, align: 8<span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  0: <span class="o">[</span><span class="c1">#ppppppp] char</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  8: <span class="o">[</span><span class="c1">########] char * __ptr64</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> 16: <span class="o">[</span><span class="c1">####pppp] long</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span> struct <span class="sb">`</span>int __cdecl main<span class="o">(</span>void<span class="o">)</span><span class="s1">&#39;::`2&#39;</span>::foo3 <span class="o">{</span>size: <span class="m">16</span> <span class="o">(</span>9# 7p<span class="o">)</span>, align: 8<span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  0: <span class="o">[</span><span class="c1">########] char * __ptr64</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  8: <span class="o">[</span><span class="c1">#ppppppp] char</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span> struct <span class="sb">`</span>int __cdecl main<span class="o">(</span>void<span class="o">)</span><span class="s1">&#39;::`2&#39;</span>::foo4 <span class="o">{</span>size: <span class="m">4</span> <span class="o">(</span>3# 1p<span class="o">)</span>, align: 2<span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  0: <span class="o">[</span><span class="c1">##] short</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  2: <span class="o">[</span><span class="c1">#p] char</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span> struct <span class="sb">`</span>int __cdecl main<span class="o">(</span>void<span class="o">)</span><span class="s1">&#39;::`2&#39;</span>::foo5::foo5_inner <span class="o">{</span>size: <span class="m">16</span> <span class="o">(</span>10# 6p<span class="o">)</span>, align: 8<span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  0: <span class="o">[</span><span class="c1">########] char * __ptr64</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  8: <span class="o">[</span><span class="c1">##pppppp] short</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span> struct <span class="sb">`</span>int __cdecl main<span class="o">(</span>void<span class="o">)</span><span class="s1">&#39;::`2&#39;</span>::foo5 <span class="o">{</span>size: <span class="m">24</span> <span class="o">(</span>17# 7p<span class="o">)</span>, align: 8<span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  0: <span class="o">[</span><span class="c1">#ppppppp] char</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span>--------------------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span> struct <span class="sb">`</span>int __cdecl main<span class="o">(</span>void<span class="o">)</span><span class="s1">&#39;::`2&#39;</span>::foo5::foo5_inner <span class="o">{</span>size: <span class="m">16</span> <span class="o">(</span>10# 6p<span class="o">)</span>, align: 8<span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span>--------------------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span>  8: <span class="o">[</span><span class="c1">########] char * __ptr64</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span> 16: <span class="o">[</span><span class="c1">##pppppp] short</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span>--------------------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span> struct <span class="sb">`</span>int __cdecl main<span class="o">(</span>void<span class="o">)</span><span class="s1">&#39;::`2&#39;</span>::foo10 <span class="o">{</span>size: <span class="m">24</span> <span class="o">(</span>11# 13p<span class="o">)</span>, align: 8<span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  0: <span class="o">[</span><span class="c1">#ppppppp] char</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  8: <span class="o">[</span><span class="c1">########] struct `int __cdecl main(void)&#39;::`2&#39;::foo10 * __ptr64</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> 16: <span class="o">[</span><span class="c1">##pppppp] short</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span> struct <span class="sb">`</span>int __cdecl main<span class="o">(</span>void<span class="o">)</span><span class="s1">&#39;::`2&#39;</span>::foo11 <span class="o">{</span>size: <span class="m">16</span> <span class="o">(</span>11# 5p<span class="o">)</span>, align: 8<span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  0: <span class="o">[</span><span class="c1">########] struct `int __cdecl main(void)&#39;::`2&#39;::foo11 * __ptr64</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  8: <span class="o">[</span><span class="c1">##] short</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> 10: <span class="o">[</span><span class="c1">#ppppp] char</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span> struct <span class="sb">`</span>int __cdecl main<span class="o">(</span>void<span class="o">)</span><span class="s1">&#39;::`2&#39;</span>::test0 <span class="o">{</span>size: <span class="m">12</span> <span class="o">(</span>9# 3p<span class="o">)</span>, align: 4<span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  0: <span class="o">[</span><span class="c1">####] int</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  4: <span class="o">[</span><span class="c1">#ppp] char</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  8: <span class="o">[</span><span class="c1">####] float</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span> struct <span class="sb">`</span>int __cdecl main<span class="o">(</span>void<span class="o">)</span><span class="s1">&#39;::`2&#39;</span>::test1 <span class="o">{</span>size: <span class="m">24</span> <span class="o">(</span>17# 7p<span class="o">)</span>, align: 8<span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  0: <span class="o">[</span><span class="c1">####pppp] int</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  8: <span class="o">[</span><span class="c1">########] double</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> 16: <span class="o">[</span><span class="c1">#ppp] char</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> 20: <span class="o">[</span><span class="c1">####] float</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span> struct <span class="sb">`</span>int __cdecl main<span class="o">(</span>void<span class="o">)</span><span class="s1">&#39;::`2&#39;</span>::test2 <span class="o">{</span>size: <span class="m">64</span> <span class="o">(</span>60# 4p<span class="o">)</span>, align: 8<span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  0: <span class="o">[</span><span class="c1">########] void * __ptr64</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span> struct <span class="sb">`</span>int __cdecl main<span class="o">(</span>void<span class="o">)</span><span class="s1">&#39;::`2&#39;</span>::test0 <span class="o">{</span>size: <span class="m">12</span> <span class="o">(</span>9# 3p<span class="o">)</span>, align: 4<span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span>  8: <span class="o">[</span><span class="c1">####] int</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span> 12: <span class="o">[</span><span class="c1">#ppp] char</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span> 16: <span class="o">[</span><span class="c1">####] float</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span> 20: <span class="o">[</span>pppp########<span class="o">]</span> void * __ptr64
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span> struct <span class="sb">`</span>int __cdecl main<span class="o">(</span>void<span class="o">)</span><span class="s1">&#39;::`2&#39;</span>::test1 <span class="o">{</span>size: <span class="m">24</span> <span class="o">(</span>17# 7p<span class="o">)</span>, align: 8<span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span> 32: <span class="o">[</span><span class="c1">####pppp] int</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span> 40: <span class="o">[</span><span class="c1">########] double</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span> 48: <span class="o">[</span><span class="c1">#ppp] char</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span> 52: <span class="o">[</span><span class="c1">####] float</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> <span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span> 56: <span class="o">[</span><span class="c1">########] void * __ptr64</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>---------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span> struct <span class="sb">`</span>int __cdecl main<span class="o">(</span>void<span class="o">)</span><span class="s1">&#39;::`2&#39;</span>::test2_flat <span class="o">{</span>size: <span class="m">64</span> <span class="o">(</span>50# 14p<span class="o">)</span>, align: 8<span class="o">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------------
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  0: <span class="o">[</span><span class="c1">########] void * __ptr64</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>  8: <span class="o">[</span><span class="c1">####] int</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> 12: <span class="o">[</span><span class="c1">#ppp] char</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> 16: <span class="o">[</span><span class="c1">####pppp] float</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> 24: <span class="o">[</span><span class="c1">########] void * __ptr64</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> 32: <span class="o">[</span><span class="c1">####pppp] int</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> 40: <span class="o">[</span><span class="c1">########] double</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> 48: <span class="o">[</span><span class="c1">#ppp] char</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> 52: <span class="o">[</span><span class="c1">####] float</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span> 56: <span class="o">[</span><span class="c1">########] void * __ptr64</span>
+</span></span><span class="line"><span class="cl"><span class="p">|</span>--------------------------------------------------------------------------------
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">bobh</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        0001-01-01
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/C&#43;&#43;/">C&#43;&#43;</a>
+          <a href="/tags/Boost/">Boost</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/openGL%E7%AC%94%E8%AE%B0/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">openGL入门笔记</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/%E5%8F%98%E5%88%86%E6%B3%95%E6%8E%A8%E5%AF%BC%E6%9B%B2%E9%9D%A2%E4%B8%8A%E7%9A%84%E6%B5%8B%E5%9C%B0%E7%BA%BF%E6%96%B9%E7%A8%8B/">
+            <span class="next-text nav-default">变分法推导曲面上的测地线方程</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
+      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
+      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
+      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
+      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
+      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
+      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
+      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
+      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
+      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

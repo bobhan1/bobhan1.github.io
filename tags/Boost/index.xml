@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Boost on bobh&#39;s blog</title>
+    <link>http://localhost:1313/tags/Boost/</link>
+    <description>Recent content in Boost on bobh&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language><atom:link href="http://localhost:1313/tags/Boost/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>一个利用Boost::pfr展示结构体内存布局的pretty printer</title>
+      <link>http://localhost:1313/post/struct_layout_pretty_printer/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/struct_layout_pretty_printer/</guid>
+      <description>直接贴代码，注意MSVC需要将alignments前的constexpr去掉才能过编译。godbot 其实只用了boost::pfr::str</description>
+    </item>
+    
+  </channel>
+</rss>

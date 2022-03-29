@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>张量 - bobh&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="bobh" /><meta name="description" content="基本概念 定义 对偶向量空间 设$V$是$n$维向量空间,令$V^{*}=L(V;R)$,则$V^{*}$是$n$维向量空间,且与$R^n$线性同" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.96.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/%E5%BC%A0%E9%87%8F%E7%9A%84%E6%9E%84%E9%80%A0/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="张量" />
+<meta property="og:description" content="基本概念 定义 对偶向量空间 设$V$是$n$维向量空间,令$V^{*}=L(V;R)$,则$V^{*}$是$n$维向量空间,且与$R^n$线性同" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/%E5%BC%A0%E9%87%8F%E7%9A%84%E6%9E%84%E9%80%A0/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2022-01-01T00:00:00+00:00" />
+<meta property="article:modified_time" content="2022-01-01T00:00:00+00:00" />
+
+<meta itemprop="name" content="张量">
+<meta itemprop="description" content="基本概念 定义 对偶向量空间 设$V$是$n$维向量空间,令$V^{*}=L(V;R)$,则$V^{*}$是$n$维向量空间,且与$R^n$线性同"><meta itemprop="datePublished" content="2022-01-01T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2022-01-01T00:00:00+00:00" />
+<meta itemprop="wordCount" content="3693">
+<meta itemprop="keywords" content="张量," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="张量"/>
+<meta name="twitter:description" content="基本概念 定义 对偶向量空间 设$V$是$n$维向量空间,令$V^{*}=L(V;R)$,则$V^{*}$是$n$维向量空间,且与$R^n$线性同"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">bobh&#39;s blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">bobh&#39;s blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">张量</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2022-01-01 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#基本概念">基本概念</a></li>
+        <li><a href="#协变张量">协变张量</a></li>
+        <li><a href="#1阶反变r阶协变的张量">$1$阶反变,$r$阶协变的张量</a></li>
+        <li><a href="#r阶反变s阶协变的张量">$r$阶反变,$s$阶协变的张量</a></li>
+        <li><a href="#张量的缩并">张量的缩并</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <!--注意行内公式中的星号('*')和下划线('_')均要使用反斜杠转义,改为'\*','\_',否则会解析为强调和斜体-->
+<h2 id="基本概念">基本概念</h2>
+<blockquote>
+<p><strong>定义 对偶向量空间</strong> 
+设$V$是$n$维向量空间,令$V^{*}=L(V;R)$,则$V^{*}$是$n$维向量空间,且与$R^n$线性同构,称为$V$的对偶向量空间.对于$V$的一个基底${e_1,&hellip;,e_n}$,对于每一个分量$1\le i\le n$,定义$V$上的实值线性函数$e^i:V\to R$为$e^i(e_j)=\delta_{i}^j$.即对任意的$u=u^i e_i$,有$e^i(u)=u^i$.则${e^1,&hellip;,e^n}$构成$V^ * $的一个基底,称为对偶空间$V^ * $中和${e_1,&hellip;,e_n}$对偶的基底.</p>
+</blockquote>
+<p>设$V$是$n$维向量空间,$V^ * $是它的对偶向量空间,$V$中有基底$ { e_i } $,其在$V^ * $中的对偶基底为${e^i}$.若${\widetilde{e}_i}$是$V$的另一个基底,满足$\widetilde{e}_k=a_k^i\widetilde{e}_i$,下面我们计算其在$V^ * $中对应的对偶基底${\widetilde{e}^i}$.将线性函数$e^j$在基底${\widetilde{e}_k}$的各个分量上求值得到
+$$e^j(\widetilde{e}_k)=e^j(a_k^i e_i)=a_k^i e^j(e_i)=a_k^i \delta_i^j=a_k^j=a_l^j \delta_l^l=a_l^j \widetilde{e}^l(\widetilde{e}_k).$$
+由于线性函数$e^j$和$a_l^j\widetilde{e}^l$在各个基上的值相同,故他们是同一个函数,即
+$$e^j=a_l^j\widetilde{e}^l,\ 1\le j\le n.$$
+即$(a_i^j)$的逆矩阵为$(b_i^j)$,则有
+$$\widetilde{e}^j=b_l^j e_l,\ 1\le j\le n.$$
+注意到原基底的变换公式是关于变换矩阵的上指标求和,而在对偶空间中的对应基底的变换公式中是关于变换矩阵的下指标求和,我们称$V^ * $中的对偶基底遵循和$V$中基底反变的线性变换规律.</p>
+<blockquote>
+<p><strong>注</strong> 尽管$V$和$V^ *  $可以在代数上建立线性同构的关系,但这种线性同构的关系是通过基底之间的对应关系建立起来的,它们之间不存在一种自然的线性同构关系,即不存在一种不依赖基底的线性同构关系.事实上,如果在$V$和$V^ * $间建立一一对应关系使得$e_i$和$e^i$相对应,则当基底${e_i}$做如上变换时,基底${e^i}$按照反变的规律进行,对于新的基底而言,不再是$\widetilde{e}_i$和$\widetilde{e}^i$相对应了.</p>
+</blockquote>
+<p>对于任意$v\in V$,$v=v^i e_i$,在上述基底变换下,其表示为$\widetilde{v}=\widetilde{v}^i \widetilde{e}_i$,则有
+$$v^i e_i=\widetilde{v}^j\widetilde{e}_j=\widetilde{v}^j a_j^i e_i.$$
+由唯一性可得
+$$v^i=a_j^i\widetilde{v}^j.$$
+即$v$的分量遵循与$V$的基底反变的线性变换的规律.</p>
+<p>对任意$f\in V^ * $,$f=f_i e^i$,在上述基底变换下,其表示为$\widetilde{f}=\widetilde{f}_i \widetilde{e}^i$,则有
+$$\widetilde{f}_i \widetilde{e}^i=f_i e^i=f_i a_j^i \widetilde{e}^j,$$
+由唯一性得
+$$\widetilde{f}_i=a_i^j f_j.$$
+说明$f$的分量遵循和$V$中基底变换规律是一致的,称为$f$的分量遵循与$V$中基底协变的线性变换规律.</p>
+<p>反变和协变的概念都是以向量空间$V$的基底变换公式为参考标准的,强调的是他们的分量在$V$的基底变换时的变换规律的异同.这反映了反变向量和协变向量是两类不同的向量,前者是属于向量空间$V$本身的元素,后者是$V^ * $中的元素.</p>
+<h2 id="协变张量">协变张量</h2>
+<p>设$f:V\times V\to R$是定义在$V$上的二元函数,如果它对每一个自变量都是线性的,则$f$称为$v$上的二重线性函数.$V$上全体二重线性函数的集合记为$L(V,V;R)$,显然它是一个向量空间.为了找到$L(V,V;R)$的一个基底,首先要知道如何用两个线性函数构造二重线性函数.对任意$f,g\in V^ * $定义$f\otimes g:V\times V\to R$如下:对任意的$u,v\in V$令
+$$(f\otimes g)(u,v)=f(u)\cdot g(v).$$
+由于$f,g$均为线性函数,显然有$f\otimes g\in L(V,V;R)$,称其为$f$和$g$的张量积.对任意两个固定的指标$1\le i,j\le n$,张量积$e^i\otimes e^j\in L(V,V;R)$,这样的张量积有$n^2$个,由于对$f\in L(V,V;R),u=u^i e_i,v=v^j e_j$有
+$$f(u,v)=f(u^i e_i,v^j e_j)=u^i f(e_i,v^j e_j)=u^i v^j f(e_i,e_j)=f_{i j}e^i(u)e^j(v)=f_{i j}\cdot(e^i\otimes e^j)(u,v),$$
+其中$f_{i j}=f(e_i,e_j).$且对任意固定的指标$1\le k,l\le n,$
+$$0=a_{i j}\cdot (e^i,e^j)(e_k,e_l)=a_{i j}e^i(e_k)e^j(e_l)=a_{i j}\delta_{k}^i\delta_{l}^j=a_{k l}$$
+故${e^i\otimes e^j}$线性无关.所以${e^i\otimes e^j}$是$L(V,V;R)$的一组基底.$L(V,V;R)$的维数为$n^2$.</p>
+<p>下面考察二重线性函数$f$的分量随$V$的基底变换时的变换规律,设$V$中另一个基底为${\widetilde{e}_i}$,在$V^ * $中的对偶基为${\widetilde{e}^i}$,且$\widetilde{e}<em>k=a_k^i e_i.$则
+$$\widetilde{f}</em>{k l}=f(\widetilde{e}<em>l,\widetilde{e}<em>l)=f(a</em>{k}^i e_i,a_l^j e_j)=a_k^i a_l^j f</em>{i j}.$$
+上式遵循协变线性变换的规律,故也将$V$上的二重线性函数称为$V$上的二重协变张量,记为$V_2^0$.将$V^ * =L(V;R)$上的元素称为$V$上的一阶协变张量,记为$V_1^0$.</p>
+<p>一般地,对于$V$上$r$重线性函数构成的集合
+$$V_r^0=L(\overbrace{V\times\cdots\times V}^{r};R),$$
+其基底为${e^{i_1}\otimes\cdots\otimes e^{i_r}}$,$V_r^0$中的元素$f$可表示为$f=f_{i_1\cdots i_r}e^{i_1}\otimes\cdots\otimes e^{i_r}$,当$V$的基底变为${\widetilde{e}^i}$时,若$\widetilde{e}^k=a_{k}^i e_i$,则</p>
+<p>$$\widetilde{f}<em>{i_1\cdots i_r}=f(\widetilde{e}</em>{i_1},\cdots,\widetilde{e}<em>{i_r})=a</em>{i_1}^{j_1}\cdots a_{i_r}^{j_r}f(e_{j_1},\cdots,e_{j_r})=a_{i_1}^{j_1}\cdots a_{i_r}^{j_r}f_{j_1\cdot j_r}.$$</p>
+<h2 id="1阶反变r阶协变的张量">$1$阶反变,$r$阶协变的张量</h2>
+<p>记定义在$V^{*}\times V$上的二重线性函数的集合为$L(V^{*},V;R)$,显然它是一个向量空间.对于$v\in V=L(V^{*};R)$和$f\in V^{*}=L(V;R)$,定义它们的张量积为
+$$(v\otimes f)(g,u)=v(g)\cdot f(u)=g(v)\cdot f(u),\ g\in V^{*} ,u\in V,$$
+则$v\otimes f\in L(V^{ *  },V;R)$.显然${e_i\otimes e^j}$构成了$L(V^ * ,V;R)$的一组基底.对任意$h\in L(V^{*},V;R)$有$h=h_j^i e_i\otimes e^j$.若$V$中有另一组基底${\widetilde{e}_i},\widetilde{e}_k=a_k^i e_i$,则其在$V^{*}$中相应的对偶基底${\widetilde{e}^i}$满足$e^j=a^j_l \widetilde{e}^l$,记$(b_k^l)$是$(a_l^j)$的逆矩阵,则$h$在新的基底下的分量为
+$$\widetilde{h}_k^l=h(\widetilde{e}^l,\widetilde{e}_k)=h(b_j^l e^j,a_k^i e_i)=b_j^l a_k^i h_i^j.$$
+可以看到,它是一次反变线性变换和一次逆变线性变换的合成.故将$L(V^ * ,V;R)$记为$V_1^1$,它是$n^2$维向量空间.</p>
+<blockquote>
+<p><strong>定理</strong> 
+设$V$是$n$维向量空间,则$(1,1)$型张量空间$V_1^1=L(V^ * ,V;R)$和向量空间$L(V;V)$是自然同构的.</p>
+</blockquote>
+<!---->
+<blockquote>
+<p><strong>推论</strong> 
+设$V$是$n$维向量空间,对任意非负整数$r$,$(1,r)$型张量空间$V_r^1=L(V^ * ,\overbrace{V,\cdots,V}^{r};R)$和向量空间$L(\overbrace{V,\cdots,V}^{r})$是自然同构的.</p>
+</blockquote>
+<!---->
+<blockquote>
+<p><strong>定理</strong> 
+$n$维欧式向量空间$(V,g)$中,$V$和$V^ * $自然同构.</p>
+</blockquote>
+<h2 id="r阶反变s阶协变的张量">$r$阶反变,$s$阶协变的张量</h2>
+<p>将上面的概念推广,我们得到$(r,s)$型的张量空间
+$$L(\overbrace{V^{<em>},\cdots,V^</em>}^{r},\overbrace{V,\cdots,V}^{s};V)=V_s^r.$$</p>
+<p>设$V$的一个基底为${e_i}$,在$V^{*}$中对应的对偶基底为${e^i}$,则$V_s^r$的基底为
+$${e_{i_1}\otimes\cdots\otimes e_{i_r}\otimes e^{j_1}\otimes\cdots\otimes e^{j_s}}.$$
+任意$(r,s)$型张量$\tau\in V_s^r$可表示为
+$$\tau=\tau_{j_1\cdots j_{s}}^{i_{1}\cdots i_{r}}e_{i_1}\otimes\cdots\otimes e_{i_r}\otimes e^{j_1}\otimes\cdots\otimes e^{j_s},$$
+其中
+$$\tau_{j_1\cdots j_{s}}^{i_{1}\cdots i_{r}}=\tau(e^{i_1},\cdots,e^{i_r},e_{j_1},\cdots,e_{j_s}).$$</p>
+<p>若在$V$中取另一组基底${\widetilde{e}<em>i},\widetilde{e}<em>k=a_k^i e_i$,其在$V^ * $中相应的对偶基底${\widetilde{e}^i}$满足$e^j=a^j_l \widetilde{e}^l$,记$(b_k^l)$是$(a_l^j)$的逆矩阵,则张量$\tau$的分量的变换公式为
+$$\widetilde{\tau}</em>{j_1\cdots j_s}^{r_1\cdots i_r}=\tau(\widetilde{e}^{i_1},\cdots,\widetilde{e}^{i_r},\widetilde{e}</em>{j_1},c\cdots,\widetilde{e}<em>{j_s})=b</em>{k_1\cdots k_r}^{i_1\cdots i_r}a_{j_1\cdots j_s}^{l_1\cdots l_s}\tau_{l_1\cdots l_s}^{k_1\cdots k_r}.$$</p>
+<h2 id="张量的缩并">张量的缩并</h2>
+<p>张量积的作用是将低阶张量相乘得到高阶张量,张量的缩并将一个$(r,s)$型张量变成一个$(r-1,s-1)$型的张量.取$V$中的一组基底${\widetilde{e}<em>i},\widetilde{e}<em>k=a_k^i e_i$,其在$V^{*}$中相应的对偶基底${\widetilde{e}^i}$满足$e^j=a^j_l \widetilde{e}^l$,对$\tau\in V_s^r,\alpha^i\in V^ * ,v_i\in V$,定义映射
+$$\sigma:\overbrace{V^{<em>} \times\cdots\times V^{</em>} }^{r-1}\times\overbrace{V\times \cdots\times V}^{s-1}\to R$$
+为
+$$\sigma(\alpha^1,\cdots,\alpha^{r-1},v_1,\cdots,v</em>{s-1})=\tau(e^i,\alpha^1,\cdots,\alpha^{r-1},e_i,v_1,\cdots,v</em>{s-1}).$$
+显然,$\sigma$是$(r-1,s-1)$型张量,且由于
+$$\tau(\widetilde{e}^i,\alpha^1,\cdots,\alpha^{r-1},\widetilde{e}<em>i,v_1,\cdots,v</em>{s-1})=\tau(\widetilde{e}^i,\alpha^1,\cdots,\alpha^{r-1},a_i^j e_j,v_1,\cdots,v_{s-1})$$
+$$=\tau(a_i^j\widetilde{e}^i,\alpha^1,\cdots,\alpha^{r-1},e_j,v_1,\cdots,v_{s-1})=\tau(e^j,\alpha^1,\cdots,\alpha^{r-1},e_j,v_1,\cdots,v_{s-1}),$$
+故$\sigma$与$V$中基底的选择无关.</p>
+<p>张量$\sigma$称为$\tau$关于第一个反变指标和第一个协变指标的缩并,记为$C_1^1(r)=\sigma$.可见,他就是将它的分量的第一个反变指标和第一个逆变指标取相同的值求和的结果.</p>
+<blockquote>
+<p><strong>例</strong>  设$\tau$是$n$维向量空间$V$到它自身的线性映射额,在基底${e_i}$下表示为$\tau(e_i)=A_i^j e_j$,证明:矩阵$(A_i^j)$的迹和基底的选取无关.</p>
+</blockquote>
+<p><strong>证明</strong>  根据定理1.2,$\tau\in L(V;V)$是$V$上的$(1,1)$型张量,它在基底${e_i}$下表示为$\tau=\tau_i^j e_j\otimes e^i$,其分量为
+$$\tau_i^j=\tau(e^j,e_i)=e^j(\tau(e_i))=e^j(A_i^k e_k)=A_i^k e^j(e_k)=A_i^k \delta_k^j=A_i^j.$$
+因此
+$$tr(A_i^j)=A_i^i=r_i^i=C_1^1(r)$$
+是不变量,和基底的选取无关.</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">bobh</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2022-01-01
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E5%BC%A0%E9%87%8F/">张量</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/test/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Test</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/%E5%BE%AA%E7%8E%AF%E7%BE%A4%E7%9A%84%E8%87%AA%E5%90%8C%E6%9E%84%E7%BE%A4%E7%9A%84%E7%BB%93%E6%9E%84/">
+            <span class="next-text nav-default">循环群的自同构群的结构</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
+      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
+      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
+      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
+      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
+      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
+      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
+      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
+      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
+      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

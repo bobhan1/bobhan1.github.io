@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>变分法推导极小曲面方程 - bobh&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="bobh" /><meta name="description" content="​ 本文中的公式均采用爱因斯坦求和约定 在推导极小曲面的方程之前，我们先考虑一个更一般的极值问题： 设$C$是空间以光滑闭曲线，$S$是过$C$的" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.96.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/%E5%8F%98%E5%88%86%E6%B3%95%E6%8E%A8%E5%AF%BC%E6%9E%81%E5%B0%8F%E6%9B%B2%E9%9D%A2%E6%96%B9%E7%A8%8B/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="变分法推导极小曲面方程" />
+<meta property="og:description" content="​ 本文中的公式均采用爱因斯坦求和约定 在推导极小曲面的方程之前，我们先考虑一个更一般的极值问题： 设$C$是空间以光滑闭曲线，$S$是过$C$的" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/%E5%8F%98%E5%88%86%E6%B3%95%E6%8E%A8%E5%AF%BC%E6%9E%81%E5%B0%8F%E6%9B%B2%E9%9D%A2%E6%96%B9%E7%A8%8B/" /><meta property="article:section" content="post" />
+
+
+
+<meta itemprop="name" content="变分法推导极小曲面方程">
+<meta itemprop="description" content="​ 本文中的公式均采用爱因斯坦求和约定 在推导极小曲面的方程之前，我们先考虑一个更一般的极值问题： 设$C$是空间以光滑闭曲线，$S$是过$C$的">
+
+<meta itemprop="wordCount" content="785">
+<meta itemprop="keywords" content="变分法,微分几何," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="变分法推导极小曲面方程"/>
+<meta name="twitter:description" content="​ 本文中的公式均采用爱因斯坦求和约定 在推导极小曲面的方程之前，我们先考虑一个更一般的极值问题： 设$C$是空间以光滑闭曲线，$S$是过$C$的"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">bobh&#39;s blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">bobh&#39;s blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">变分法推导极小曲面方程</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 0001-01-01 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents"></nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>​</p>
+<blockquote>
+<p>本文中的公式均采用爱因斯坦求和约定</p>
+</blockquote>
+<p>在推导极小曲面的方程之前，我们先考虑一个更一般的极值问题：
+设$C$是空间以光滑闭曲线，$S$是过$C$的一曲面，它的参数表示为
+$$
+x^{\alpha}=x^{\alpha}(u^1,u^2),\ \alpha=1,2,3.
+$$
+给定关于$x^{\alpha}$和$\frac{\partial x^{\alpha}}{\partial u^i}(\alpha=1,2,3,i=1,2)$的函数$L(x^{\alpha},\frac{\partial x^{\alpha}}{\partial u^i})$，考虑积分
+$$
+I=\iint_{U}L(x^{\alpha},\frac{\partial x^{\alpha}}{\partial u^i})du^1du^2,
+$$
+其中$U$为$S$中曲线$C$所包围的区域.</p>
+<p>现在问过曲线$C$的曲面$S$满足什么条件使得积分$I$取局部最小值?</p>
+<!-- more -->
+<p>考虑过曲线$C$的与$S$邻近的曲面
+$$
+\overline{S}:\overline{x}^\alpha=x^{\alpha}(u^1,u^2)+\varepsilon w^{\alpha}(u^1,u^2),
+$$
+其中$x^{\alpha}$为$C^{\infty}$类函数且在$C$上的取值为0.</p>
+<p>设$\overline{S}$上由曲线$C$包围的区域为$\overline{U}$，则有积分
+$$
+\overline{I}=\iint_{U}L(x^{\alpha}+\varepsilon w^{\alpha},\frac{\partial x^{\alpha}}{\partial u^i}+\varepsilon \frac{\partial w^{\alpha}}{\partial u^i})du^1du^2,
+$$
+由于$I=\min \overline{I}$，所以
+$$
+\frac{d\overline{I}}{d\varepsilon }|<em>{\varepsilon=0}=0,
+$$
+即
+$$
+\iint</em>{\overline{U}}(\frac{\partial L}{\partial x^{\alpha}}w^{\alpha}+\frac{\partial L}{\partial x_{i}^{\alpha}}\frac{\partial w^{\alpha}}{\partial u^i})du^1du^2=0,
+$$
+其中，$x_{i}^{\alpha}=\frac{\partial x^{\alpha}}{\partial u^{i}}.$</p>
+<p>上式又能改写成</p>
+<p>$$
+\iint w^{\alpha}(\frac{\partial L}{\partial x^{\alpha}}-\frac{\partial}{\partial u^{i}}(\frac{\partial L}{\partial x_{i}^{\alpha}}))du^1du^2+\iint \frac{\partial}{\partial u^{i}}(w^{\alpha}\frac{\partial L}{\partial x_{i}^{\alpha}})du^1du^2=0.
+$$
+由格林公式
+$$
+\iint_{U}(\frac{\partial Q}{\partial u^1}-\frac{\partial P}{\partial u^2})du^1du^2=\int_{\partial U}P(u^1,u^2)du^1+Q(u^1,u^2)du^2,
+$$
+有
+$$
+\iint [\frac{\partial}{\partial u^{1}}(w^{\alpha}\frac{\partial L}{\partial x_{1}^{\alpha}})+\frac{\partial}{\partial u^{2}}(w^{\alpha}\frac{\partial L}{\partial x_{2}^{\alpha}})]du^1du^2=\int_{C}-w^{\alpha}\frac{\partial L}{\partial x_{2}^{\alpha}}du^1+w^{\alpha}\frac{\partial L}{\partial x_{1}^{\alpha}}du^2=0.
+$$
+于是得到该极值问题的欧拉方程
+$$
+\frac{\partial}{\partial u^{i}}(\frac{\partial L}{\partial x_{i}^{\alpha}})-\frac{\partial L}{\partial x^{\alpha}}=0.
+$$
+现在我们希望找到使$C$所包围的区域$U$面积最小的曲面$S$，即$L=\sqrt{g}$，其中$g=\det(g_{ij})$.根据定义有
+$$
+g_{ij}=\vec{r}<em>i\cdot\vec{r}<em>j=\sum</em>{\alpha}\frac{\partial x^{\alpha}}{\partial u^{i}}\frac{\partial x^{\alpha}}{\partial u^{j}},
+$$
+所以
+$$
+\frac{\partial \sqrt{g}}{\partial x</em>{i}^{\alpha}}=\frac{1}{2\sqrt{g}}\frac{\partial g}{\partial g_{jk}}\frac{\partial g_{jk}}{\partial x_{i}^{\alpha}}=\sqrt{g}g^{ij}x_{i}^{\alpha},
+$$
+其中，$g^{ij}=(g^{-1})_{ij}$，</p>
+<p>所以有
+$$
+\frac{\partial}{\partial u_{i}}(\frac{\partial \sqrt{g}}{\partial x_{i}^{\alpha}})=\sqrt{g}g^{ij}(\frac{\partial^2 x^{\alpha}}{\partial u^i \partial u^i}-\Gamma_{ji}^{k}x_{k}^{\alpha})=\sqrt{g}g^{ij}L_{ij}n^{\alpha}.
+$$
+其中，$\vec{n}=(n^1,n^2,n^3)$是曲面$S$的单位法向量，后一步来自高斯方程 
+$$\vec{r}<em>{ij}=\Gamma</em>{ji}^{k}\vec{r}<em>k+L</em>{ij}\vec{n}.$$
+又
+$$
+\frac{\partial \sqrt{g}}{\partial x^{\alpha}}=0,
+$$
+而平均曲率
+$$H=\frac{1}{2}g^{ij}L_{ij}.$$
+因此欧拉方程简化为
+$$
+H=0.
+$$
+于是得到</p>
+<blockquote>
+<p><strong>定理</strong>：对于过空间光滑闭曲线$C$的曲面$S$来说，若果$C$所包围的曲面面积最小，则曲面$S$的平均曲率恒为0.即极小曲面的平均曲率为0.</p>
+</blockquote>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">bobh</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        0001-01-01
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E5%8F%98%E5%88%86%E6%B3%95/">变分法</a>
+          <a href="/tags/%E5%BE%AE%E5%88%86%E5%87%A0%E4%BD%95/">微分几何</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/%E5%8F%98%E5%88%86%E6%B3%95%E6%8E%A8%E5%AF%BC%E6%9B%B2%E9%9D%A2%E4%B8%8A%E7%9A%84%E6%B5%8B%E5%9C%B0%E7%BA%BF%E6%96%B9%E7%A8%8B/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">变分法推导曲面上的测地线方程</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/Levi-Civita%E5%B9%B3%E7%A7%BB/">
+            <span class="next-text nav-default">曲面上的Levi-Civita平移</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
+      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
+      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
+      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
+      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
+      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
+      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
+      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
+      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
+      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

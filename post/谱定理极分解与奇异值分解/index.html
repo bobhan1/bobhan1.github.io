@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>谱定理,极分解与奇异值分解 - bobh&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="bobh" /><meta name="description" content="7.A 自伴算子与正规算子 7.2 伴随 定义：设$T\in L(V,W)$,$T$的伴随是满足如下条件的函数$T^*:W\rightarrow V:$对所有$" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.96.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/%E8%B0%B1%E5%AE%9A%E7%90%86%E6%9E%81%E5%88%86%E8%A7%A3%E4%B8%8E%E5%A5%87%E5%BC%82%E5%80%BC%E5%88%86%E8%A7%A3/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="谱定理,极分解与奇异值分解" />
+<meta property="og:description" content="7.A 自伴算子与正规算子 7.2 伴随 定义：设$T\in L(V,W)$,$T$的伴随是满足如下条件的函数$T^*:W\rightarrow V:$对所有$" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/%E8%B0%B1%E5%AE%9A%E7%90%86%E6%9E%81%E5%88%86%E8%A7%A3%E4%B8%8E%E5%A5%87%E5%BC%82%E5%80%BC%E5%88%86%E8%A7%A3/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2021-08-25T00:00:00+00:00" />
+<meta property="article:modified_time" content="2021-08-25T00:00:00+00:00" />
+
+<meta itemprop="name" content="谱定理,极分解与奇异值分解">
+<meta itemprop="description" content="7.A 自伴算子与正规算子 7.2 伴随 定义：设$T\in L(V,W)$,$T$的伴随是满足如下条件的函数$T^*:W\rightarrow V:$对所有$"><meta itemprop="datePublished" content="2021-08-25T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2021-08-25T00:00:00+00:00" />
+<meta itemprop="wordCount" content="3174">
+<meta itemprop="keywords" content="线性代数," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="谱定理,极分解与奇异值分解"/>
+<meta name="twitter:description" content="7.A 自伴算子与正规算子 7.2 伴随 定义：设$T\in L(V,W)$,$T$的伴随是满足如下条件的函数$T^*:W\rightarrow V:$对所有$"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">bobh&#39;s blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">bobh&#39;s blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">谱定理,极分解与奇异值分解</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2021-08-25 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#7a-自伴算子与正规算子">7.A 自伴算子与正规算子</a></li>
+        <li><a href="#7b-谱定理">7.B 谱定理</a></li>
+        <li><a href="#7c-正算子与等距同构">7.C 正算子与等距同构</a></li>
+        <li><a href="#7d-极分解与奇异值分解">7.D 极分解与奇异值分解</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h2 id="7a-自伴算子与正规算子">7.A 自伴算子与正规算子</h2>
+<blockquote>
+<p><strong>7.2 伴随</strong></p>
+<p>定义：设$T\in L(V,W)$,$T$的伴随是满足如下条件的函数$T^*:W\rightarrow V:$对所有$v\in V$和所有$w\in W$均有$\langle Tv,w\rangle=\langle v,T^*w\rangle$</p>
+</blockquote>
+<p>要想看出上面定义的意义,我们取定$w\in W$与$T$,考虑$V$上将$v\in V$映射成$\langle Tv,w\rangle$的线性泛函$\varphi$,这个线性泛函依赖于$T$与$w$,由李斯表示定理(6.42),$V$中存在唯一的$q$使得$\varphi(v)=\langle v,q\rangle$.现在我们知道了$q=T^*w$.
+容易验证,伴随是线性映射.且$T^*$的矩阵就是$T$的矩阵的共轭转置.</p>
+<blockquote>
+<p><strong>7.11 自伴</strong></p>
+<p>定义：算子$T$称为自伴的如果$T=T^*$,即$\langle Tv,w\rangle=\langle v,Tw\rangle$</p>
+</blockquote>
+<p>伴随在$L(V)$上的作用犹如复共轭在$\bf{C}$上的作用,因此自伴算子可以和实数类比.</p>
+<blockquote>
+<p><strong>7.18 正规</strong></p>
+<p>定义：内积空间上的算子$T$称为正规的,如果它和它的伴随是交换的,即$TT^*=T^*T$</p>
+</blockquote>
+<!-- more -->
+<blockquote>
+<p><strong>7.20</strong> $T$是正规的当且仅当对任意 $v\in V$有$\Vert Tv\Vert=\Vert T^*v\Vert$</p>
+</blockquote>
+<p>$$
+TT^*=T^<em>T\iff TT^</em>-T^<em>T=0\iff \langle (TT^</em>-T^*T)v,v\rangle=0\ 
+\iff \langle T^*Tv, v\rangle=\langle TT^*v,v\rangle\iff \Vert Tv\Vert^2=\Vert T^*v\Vert^2
+$$</p>
+<h2 id="7b-谱定理">7.B 谱定理</h2>
+<blockquote>
+<p><strong>7.24 复谱定理</strong></p>
+<p>设 $\bf{F}$=$\bf{C}$ 且$T\in L(V)$,则以下条件等价：</p>
+<p>(a) $T$是正规的</p>
+<p>(b) $V$有一个由$T$的本征向量构成的规范正交基</p>
+<p>(c) $T$关于$V$的某个规范正交基有对角矩阵</p>
+</blockquote>
+<p>(b)和(c)的等价性可由5.41得到.</p>
+<p>(c)$\rightarrow$(a)： $T$在$V$的某个规范正交基下具有对角阵,$T^*$的矩阵是其共轭转置,所以$T^*$也具有对角阵,二对角阵是交换的,从而$T$是正规的.</p>
+<p>(a)$\rightarrow$(c)：首先由舒尔定理(6.38),$V$有一个规范正交基$e_1,e_2,&hellip;,e_n$使得$T$关于此基由上三角矩阵,即</p>
+<p>$$
+M(T)=\begin{pmatrix}<br>
+a_{11} &amp; \cdots &amp; a_{1n} \<br>
+\vdots &amp; \ddots &amp; \vdots \<br>
+0 &amp; \cdots &amp; a_{mn}<br>
+\end{pmatrix}
+$$</p>
+<p>所以
+$$
+\Vert Te_1\Vert^2=|a_{1,1}|^2
+$$
+且
+$$
+\Vert T^*e_1\Vert^2=\sum_{i=1}^{n}|a_{1,i}|^2.
+$$
+因为$T$是正规的,所以
+$$
+\Vert Te_1\Vert^2=\Vert T^*e_1\Vert^2.
+$$
+所以$M(T)$第一行除了$a_{1,1}$外全部为0.于是
+$$
+\Vert Te_2\Vert^2=|a_{2,1}|^2+|a_{2,2}|^2=|a_{2,2}|^2
+$$
+且
+$$
+\Vert T^*e_2\Vert^2=\sum_{i=2}^{n}|a_{2,i}|^2,
+$$
+因为
+$$
+\Vert Te_1\Vert^2=\Vert T^*e_1\Vert^2,
+$$
+所以$M(T)$第二行除了$a_{2,2}$外全部为0.如此进行下去,可得$M(T)$非对角线元素均为0,故$T$关于$V$的某个规范正交基有对角矩阵.</p>
+<blockquote>
+<p><strong>7.26</strong> 若算子$T$可逆,且$b^2&lt;4c$,则 $T^2+bT+cI$ 是可逆的</p>
+</blockquote>
+<!-- -->
+<blockquote>
+<p><strong>7.27</strong> 设$V\neq{0}$且$T\in L(V)$是自伴算子,则$T$有本征值</p>
+</blockquote>
+<p>设$V$为实内积空间,记 $n=\rm{dim} V$,取$v\in V$且$v\neq 0$则
+$$
+v,Tv,T^2v,&hellip;,T^nv
+$$
+必定线性相关,于是存在不全为零的实数,使得
+$$
+0=a_0v+a_1Tv+\cdots+a_nT^nv
+$$
+以这些$a_j$为系数作一多项式,并将其分解为(4.17)
+$$
+a_0+a_1x+\cdots+a_nx^n=c(x^2+b_1x+c_1)\cdots(x^2+b_Mx+c_M)(x-\lambda_1)\cdots(x-\lambda_m)
+$$
+其中$c$为非零实数,$b_J^2-4c_J&lt;0$,$m+M\geq 1$,所以有</p>
+<p>$$
+0=a_0v+a_1Tv+\cdots+a_nT^nv=c(T^2+b_1T+c_1I)\cdots(T^2+b_MT+c_MI)(T-\lambda_1I)\cdots(T-\lambda_mI)v
+$$
+由7.26,每个$T^2+T_Jx+c_J$都是可逆的,所以
+$$
+0=(T-\lambda_1I)\cdots(T-\lambda_mI)v
+$$
+所以至少有一个$j$使得$T-\lambda_jI$不是单的,也就是说$T$有本征值.</p>
+<blockquote>
+<p><strong>7.28 自伴算子与不变子空间</strong></p>
+<p>设$T\in L(V)$是自伴的,并设$U$是$V$在$T$下的不变子空间,则</p>
+<p>(a) $U^{\bot}$在$T$下不变</p>
+<p>(b) $T|_{U}\in L(V)$是自伴的</p>
+<p>(c) $T|_{U^\bot}\in L(U^\bot)$是自伴的</p>
+</blockquote>
+<!-- -->
+<blockquote>
+<p><strong>7.29 实谱定理</strong></p>
+<p>设 $\bf{F}$=$\bf{R}$ 且$T\in L(V)$,则以下条件等价：</p>
+<p>(a) $T$是自伴的</p>
+<p>(b) $V$有一个由$T$的本征向量构成的规范正交基</p>
+<p>(c) $T$关于$V$的某个规范正交基有对角矩阵</p>
+</blockquote>
+<p>(c)$\rightarrow$(a),(b)$\rightarrow$(c)显然.</p>
+<p>(a)$\rightarrow$(b),用归纳法证明,$\rm{dim}V=1$时显然成立.现设$\rm{dim}V&gt;1$,并假设在维数更小的实内积空间上成立.设$u$是$T$的一个本征向量且$\Vert u\Vert=1$,设$U=\rm{span}(u)$,则$U$是$V$下不变的一维子空间,由7.28(c),$T|_{U^\bot}\in L(U^\bot)$是自伴的.由归纳假设,$U^\bot$有一个由$T|_{U^\bot}$的 本征向量组成的规范正交基,把$u$添加进这个规范正交基,就得到了$V$的一个由$T$的本征向量组成的规范正交基.</p>
+<h2 id="7c-正算子与等距同构">7.C 正算子与等距同构</h2>
+<blockquote>
+<p><strong>7.36</strong> 每个正算子都有唯一的正平方根</p>
+</blockquote>
+<!-- -->
+<blockquote>
+<p><strong>7.37 等距同构</strong>
+定义：算子$T$称为等距同构如果对任意$v\in V$有$\Vert Tv\Vert=\Vert v\Vert$.也就是说,算子是等距同构当且仅当它保持范数</p>
+</blockquote>
+<h2 id="7d-极分解与奇异值分解">7.D 极分解与奇异值分解</h2>
+<p>我们曾在$\bf{C}$与$L(V)$之间做过类比,一个负数对应于一个算子,$\overline{z}$对应于$T^*$,实数对应于自伴算子.注意到非零复数都可以写成$z=(\frac{z}{|z|})\sqrt{z\overline{z}}$,这使我们想到任何算子$T\in L(V)$都可以写成等距同构与$\sqrt{T^*T}$的乘积的形式.</p>
+<blockquote>
+<p><strong>7.45 极分解</strong></p>
+<p>设$T\in L(V)$,则有一个等距同构$S\in L(V)$使得$T=S\sqrt{T^*T}$</p>
+</blockquote>
+<p>对任意 $v\in V$,有
+$$
+\Vert Tv\Vert^2=\langle T^*Tv,v\rangle=\langle \sqrt{T^*T}\sqrt{T^*T}v,v\rangle=\langle \sqrt{T^*T}v,\sqrt{T^*T}v\rangle=\Vert \sqrt{T^*T}v\Vert^2
+$$
+定义线性映射$S_1:\rm range\sqrt{\it{T^{*}T}}\rightarrow \rm range \it T$ 为$S_1(\sqrt{T^*T}v)=Tv$.</p>
+<p>证明的思路是将$S_1$扩张成一个等距同构$S\in L(V)$使得$T=S\sqrt{T^*T}$.由于$S_1$是单的,对$S_1$应用线性映射基本定理得
+$$
+\rm dim\  range\it \sqrt{T^*T}=\rm dim\ range\it T
+$$
+这表明$\rm dim\  (range\it \sqrt{T^*T}\rm )^{\bot}=\rm dim\ (range\it T\rm )^{\bot}$.取$(range\it \sqrt{T^*T}\rm )^{\bot}$的一组规范正交基$e_1,e_2,&hellip;,e_m$和$(range\it T\rm )^{\bot}$的一组规范正交基$f_1,f_2,&hellip;,f_m$,关键是这两组规范正交基长度相同.于是可以定义线性映射$S_2:(range\it \sqrt{T^*T}\rm )^{\bot}\rightarrow \ (range\it T\rm )^{\bot}$为
+$$
+S_2(a_1e_1+a_2e_2+\cdots+a_me_m)=a_1f_1+a_2f_2+\cdots+a_mf_m
+$$
+于是对任意$w\in (range\it \sqrt{T^*T}\rm )^{\bot}$有
+$$
+\Vert S_2w\Vert=\Vert w\Vert.$$
+设$S\in L(V)$且 
+$$
+S|<em>{(\rm range\it \sqrt{T^*T}\rm )^{\bot}}=S_2,S|</em>{\rm range\it \sqrt{T^*T}}=S_1.
+$$
+由于每一个$v$都可以唯一地写成
+$$
+v=u+w
+$$
+其中$u\in \rm range\it sqrt{T^*T}$,$w\in (\rm range\it \sqrt{T^*T}\rm )^{\bot}$,按照上述定义,
+$$
+Sv=S_1u+S_2w
+$$
+所以$S(\sqrt{T^*T}v)=S_1(\sqrt{T^*T}v)=Tv$,所以$T=S\sqrt{T^*T}$,下面只需证明$S$是等距同构,而由于$u,w$正交,$S_1u\in \rm range\it \sqrt{T^*T},S_2w\in (\rm range\it \sqrt{T^*T}\rm )^{\bot}$正交,有
+$$
+\Vert Sv\Vert^2=\Vert S_1u\Vert^2+\Vert S_2w\Vert^2=\Vert u\Vert^2+\Vert w\Vert^2=\Vert v\Vert^2
+$$
+得证.</p>
+<blockquote>
+<p><strong>7.49 奇异值</strong></p>
+<p>定义：算子$T$的奇异值就是$\sqrt{T^*T}$的本征值,而且每个本征值$\lambda$都要重复$\rm{dim}\ E(\lambda,\sqrt{T^*T})$次</p>
+</blockquote>
+<!-- -->
+<blockquote>
+<p><strong>7.51 奇异值分解</strong></p>
+<p>设算子$T$有奇异值,则$V$有两个规范正交基$e_1,e_2,\cdots,e_n$和$f_1,f_2,\cdots,f_n$使得对于每个$v\in V$都有$Tv=s_1\langle v,e_1\rangle f_1+\cdots+s_n\langle v,e_n\rangle f_n$</p>
+</blockquote>
+<p>对$\sqrt{T^*T}$应用谱定理可知,有$V$的规范正交基$e_1,e_2,\cdots,e_n$使得对$j=1,\cdots ,n$有$\sqrt{T^*T}e_j=s_je_j$.对每个$v\in V$有
+$$
+v=\langle v,e_1 \rangle e_1+\cdots+\langle v,e_n \rangle e_n
+$$
+将$\sqrt{T^*T}$作用到等式两端,有
+$$
+\sqrt{T^*T}v=\langle v,e_1 \rangle \sqrt{T^*T}e_1+\cdots+\langle v,e_n \rangle \sqrt{T^*T}e_n
+$$
+由极分解定理(7.45)可知,有等距同构$S\in L(V)$使得$T=S\sqrt{T^*T}$,再将$S$作用在上面等式两端,有
+$$
+Tv=\langle v,e_1 \rangle Se_1+\cdots+\langle v,e_n \rangle Se_n
+$$
+对每个$j$设$f_j=Se_j$,由于$S$是等距同构,所以$f_1,f_2,\cdots,f_n$是规范正交基,故
+$$
+Tv=s_1\langle v,e_1\rangle f_1+\cdots+s_n\langle v,e_n\rangle f_n
+$$
+奇异值分解给了我们一个难得的机会——对算子矩阵用到两个不同的基,且有</p>
+<p>$$
+M(T,(e_1,e_2,\cdots,e_n),(f_1,f_2,\cdots,f_n))=\begin{pmatrix}<br>
+s_1 &amp; \cdots &amp; 0 \<br>
+\vdots &amp; \ddots &amp; \vdots \<br>
+0 &amp; \cdots &amp; s_n<br>
+\end{pmatrix}
+$$
+也就是说,只要允许我们在处理算子的时候用两个不同的基,那么$V$上的算子关于$V$的某些规范正交基总有对角阵.</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">bobh</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2021-08-25
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0/">线性代数</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/%E5%A4%8D%E5%90%91%E9%87%8F%E7%A9%BA%E9%97%B4%E4%B8%8A%E7%9A%84%E7%AE%97%E5%AD%90/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">复向量空间上的算子</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/cppthings/">
+            <span class="next-text nav-default">C&#43;&#43;文章视频合集</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
+      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
+      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
+      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
+      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
+      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
+      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
+      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
+      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
+      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

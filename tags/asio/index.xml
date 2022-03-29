@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>asio on bobh&#39;s blog</title>
+    <link>http://localhost:1313/tags/asio/</link>
+    <description>Recent content in asio on bobh&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language><atom:link href="http://localhost:1313/tags/asio/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Asio小结</title>
+      <link>http://localhost:1313/post/asio%E5%B0%8F%E7%BB%93/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/asio%E5%B0%8F%E7%BB%93/</guid>
+      <description>Asio小结 Proactor模式 事件驱动应用程序使用Proactor模式，能够高效的分离和分派由异步操作完成而触发的服务请求，从而发挥并发的</description>
+    </item>
+    
+  </channel>
+</rss>

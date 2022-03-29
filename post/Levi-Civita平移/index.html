@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>曲面上的Levi-Civita平移 - bobh&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="bobh" /><meta name="description" content="平面上平行的概念该如何推广到曲面上呢?" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.96.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/Levi-Civita%E5%B9%B3%E7%A7%BB/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="曲面上的Levi-Civita平移" />
+<meta property="og:description" content="平面上平行的概念该如何推广到曲面上呢?" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/Levi-Civita%E5%B9%B3%E7%A7%BB/" /><meta property="article:section" content="post" />
+
+
+
+<meta itemprop="name" content="曲面上的Levi-Civita平移">
+<meta itemprop="description" content="平面上平行的概念该如何推广到曲面上呢?">
+
+<meta itemprop="wordCount" content="2241">
+<meta itemprop="keywords" content="微分几何," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="曲面上的Levi-Civita平移"/>
+<meta name="twitter:description" content="平面上平行的概念该如何推广到曲面上呢?"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">bobh&#39;s blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">bobh&#39;s blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">曲面上的Levi-Civita平移</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 0001-01-01 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#曲面上的levi-civita平移">曲面上的Levi-Civita平移</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h3 id="曲面上的levi-civita平移">曲面上的Levi-Civita平移</h3>
+<p>我们知道，曲面上的测地线相当于平面上的直线。例如直线的曲率为0，而测地线的测地曲率为0；平面上两点之间最短距离是直线，曲面上在小范围内两点之间最短距离是测地线；平面上给定一个点与一个方向后能确定一条直线，曲面上给定一个点与一个方向后也能确定一条测地线。但直线还有一个性质，即直线上的切向量都是平行的，为了把这个性质推广到曲面上，必须先把平行的概念推广到曲面上。(下文均采用Einstein求和约定)。</p>
+<p>​		设平面上$\Pi$上有一个向量$\vec{a}$，它的起点位于曲线$\Gamma$上的点$P$处，将向量$\vec{a}$沿曲线$\Gamma$平移后得到一个沿曲线$\Gamma$分布的向量场，场中的向量都是平行的，我们将这种想法推广到曲面上。设曲面$\Sigma:{\vec{r}(u^1,u^2)}$上有一条曲线$u^i=u^i(s)$，$s$为曲线的弧长，记$\vec{r_1},\vec{r_2}$是取名在点$P$处切平面的两个基向量。设曲线上有一向量场$\vec{a}(s)=a^i(s)\vec{r_i}$(不妨设$a^i(s)$为关于s的光滑函数)。若果曲面是平面，并取$(u^1,u^2)$为直角坐标系，则向量场$\vec{a}(s)$中所有向量都平行的充要条件是$\frac{d\vec{a}}{ds}=0$。因此如果曲面是曲面，讨论向量场$\vec{a}(s)$中的向量是否平行，也需先考察$\frac{d\vec{a}}{ds}$，由Gauss公式有
+$$
+\frac{\mathrm{d}\vec{a}}{\mathrm{d}s}=\frac{\mathrm{d}a^i}{\mathrm{d}s}\vec{r_i}+a^i\vec{r_{ij}}\frac{\mathrm{d}u_j}{\mathrm{d}s}=(\frac{\mathrm{d}a^k}{\mathrm{d}s}+\Gamma_{ij}^ka^i\frac{\mathrm{d}u^j}{\mathrm{d}s})\vec{r_k}+a^i\frac{\mathrm{d}u^j}{\mathrm{d}s}b_{ij}\vec{n}.
+$$
+我们将$\frac{\mathrm{d}\vec{a}}{\mathrm{d}s}$投影到曲面的切平面上得到投影向量
+$$
+(\frac{\mathrm{d}a^k}{\mathrm{d}s}+\Gamma_{ij}^ka^i\frac{\mathrm{d}u^j}{\mathrm{d}s})\vec{r_k},
+$$
+它是曲面上的向量，记
+$$
+D\vec{a}=(\mathrm{d}a^k+\Gamma_{ij}^ka^i\mathrm{d}u^j)\vec{r_k},
+$$
+称它为$\vec{a}(s)$沿曲线的协变微分。由上式知，协变微分的概念只涉及曲面的额第一基本形式，因此属于曲面的内蕴概念。其余普通微分的关系是
+$$
+D\vec{a}=\mathrm{d}\vec{a}-b_{ij}a^i\mathrm{d}u^j\vec{n}.
+$$
+在一个平面上向量场是平行向量场的充要条件是$\mathrm{d}\vec{a}=0$，将其推广到曲面上。对于曲面$\Pi$上沿某曲线$\Gamma$的向量场$\vec{a}(s)$，如果$D\vec{a}=0$，我们称$\vec{a}(s)$是沿曲线$\Gamma$的平行向量场，即该向量场中的向量在Levi-Civita意义下是平行的，这个向量场中的向量可以看做是由向量$\vec{a}(s_0)$经过平行移动得到的，这种平移叫做Levi-Civita平移。由$D\vec{a}$的表达式知，$D\vec{a}=0$的充要条件是
+$$
+\mathrm{d}a^k+\Gamma_{ij}^ka^i\mathrm{d}u^j=0(k=1,2),
+$$
+如果去曲线的方程为$u^1=u^1(t),u^2=u^2(t)$($t$不一定为弧长参数)，则向量场$\vec{a}(s)$是沿曲线$\Gamma$平行的充要条件是
+$$
+\frac{\mathrm{d}a^k}{\mathrm{d}t}+\Gamma_{ij}^ka^i\frac{\mathrm{d}u^j}{\mathrm{d}t}=0(k=1,2)
+$$
+当给定初始条件$t=t_0,a^k(t_0)=a^k_0$时，上述微分方程组由唯一解$a^k(t)$。这说明在曲线上给定一点$P(t=t_0)$和一个向量$\vec{a_0}=a^1_0\vec{r_1}+a^2_0\vec{r_2}$，可以沿曲线$\Gamma$做Levi-Civita平移，得到一个唯一的向量场。把这个向量场叫做向量$\vec{a}(s_0)$沿$\Gamma$经过平行移动得到的向量场。</p>
+<p>下面举例说明Levi-Civita平行移动的意义。</p>
+<p>设单位球面方程为
+$$
+\vec{r}(\varphi,t)=(\sin\varphi\cos t,\sin\varphi\sin t,\cos\varphi),
+$$
+在它上面的一个纬圆的曲线方程为
+$$
+\vec{r}(t)=(\sin\varphi_0\cos t,\sin\varphi_0\sin t,\cos\varphi_0)
+$$
+设
+$$
+\vec{a_0}=\vec{r}<em>1(\varphi_0,0)=(\cos\varphi_0,0,-\sin\varphi_0),
+$$
+它表示经线上的切向量，如果写成$\vec{a_0}=a_0^1\vec{r_1}+a_0^2\vec{r_2}$，则$a_0^1=1,a_0^2=1$。现在来求由$\vec{a_0}$沿曲线$\Gamma$平行移动得到的向量场。因为球面的第一基本形式为$I=\mathrm{d}\varphi^2+\sin^2\varphi dt^2$，即$E=1,F=0,G=\sin^2\varphi$，故
+$$
+\Gamma</em>{12}^2=\frac{\cos\varphi}{\sin\varphi},\Gamma_{22}^1=-\sin\varphi\cos\varphi,
+$$
+其余的$\Gamma_{ij}^k=0$，因为$\Gamma$的参数方程为$u^1(t)=\varphi_0,u^2(t)=t$，故平行移动的方程化为
+$$
+\begin{cases}
+\frac{\mathrm{d} a^1}{\mathrm{d}t}-\sin\varphi_0\cos\varphi_0 a^2=0\[2ex]
+\frac{\mathrm{d} a^2}{\mathrm{d}t}+\frac{\cos\varphi_0}{\sin\varphi_0}a^1=0
+\end{cases}
+$$
+将初始条件$a^1(0)=1,a^2(0)=0$带入得该方程组的解为
+$$
+a^1(t)=\cos(t\cos\varphi_0),a^2(t)=-\frac{\sin(t\cos\varphi_0)}{\sin\varphi_0}.
+$$
+所以$\vec{a_0}$沿曲线$\Gamma$平行移动产生的平行向量场为
+$$
+\vec{a}(t)=\cos(t\cos\varphi_0)\vec{r_1}-\frac{\sin(t\cos\varphi_0)}{\sin\varphi_0}\vec{r_2}.
+$$
+由此可知$\vec{a}(0)\neq\vec{a}(2\pi)$，即向量$\vec{a_0}$沿曲线$\Gamma$平移一周后未回到原来的位置，特别地，若取$\varphi_0=\frac{\pi}{3}$时，平移一周后$\vec{a}(0)$与$\vec{a}(2\pi)$的方向完全相反，这一点与平面的情况完全不同。由Levi-Civita的定义知，这种平移和路径有关。</p>
+<blockquote>
+<p>Levi-Civita平移的性质：若$\vec{a},\vec{b}$是曲面上沿曲线$\Gamma$的两个向量场，$f$是一个定义在曲线$\Gamma$上的光滑函数，则有</p>
+<ul>
+<li>$D(\vec{a}+\vec{b})=D(\vec{a})+D(\vec{b})$,</li>
+<li>$D(f\vec{a})=(df)\vec{a}+fD(\vec{a})$,</li>
+<li>$d(\vec{a}\cdot\vec{b})=D\vec{a}\cdot\vec{b}+\vec{a}D\vec{b}$</li>
+</ul>
+</blockquote>
+<!-- -->
+<blockquote>
+<p>推论：Levi-Civita平移保持两个向量内积不变</p>
+</blockquote>
+<!-- -->
+<blockquote>
+<p>定理：曲面$\Sigma$上一条曲线$\Gamma:u^i=u^i(s)$为测地线的充要条件为它的切向量$\vec{\alpha}(s)$在Levi-Civita平移意义下是相互平行的</p>
+</blockquote>
+<!-- -->
+<blockquote>
+<p>定理：单连通曲面$\Sigma$上，Levi-Civita平移与路径无关的充要条件为曲面$\Sigma$的Gauss曲率为0</p>
+</blockquote>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">bobh</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        0001-01-01
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E5%BE%AE%E5%88%86%E5%87%A0%E4%BD%95/">微分几何</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/%E5%8F%98%E5%88%86%E6%B3%95%E6%8E%A8%E5%AF%BC%E6%9E%81%E5%B0%8F%E6%9B%B2%E9%9D%A2%E6%96%B9%E7%A8%8B/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">变分法推导极小曲面方程</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
+      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
+      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
+      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
+      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
+      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
+      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
+      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
+      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
+      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

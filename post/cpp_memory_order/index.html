@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>C&#43;&#43; execution model and memory order - bobh&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="bobh" /><meta name="description" content="Execution Model Abstract Machine C&#43;&#43; programs describe operations that are performed on the abstract machine. C&#43;&#43; implementations define the characteristics of the abstract machine and translate operations on the abstract machine into operations on the system. Storage Model Storage is flat; no notion hierarchy (caches, etc). Objects reside in storage at a single memory location. Some objects may not have a unique memory location: Eligible empty base classes Objects marked" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.96.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/cpp_memory_order/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="C&#43;&#43; execution model and memory order" />
+<meta property="og:description" content="Execution Model Abstract Machine C&#43;&#43; programs describe operations that are performed on the abstract machine. C&#43;&#43; implementations define the characteristics of the abstract machine and translate operations on the abstract machine into operations on the system. Storage Model Storage is flat; no notion hierarchy (caches, etc). Objects reside in storage at a single memory location. Some objects may not have a unique memory location: Eligible empty base classes Objects marked" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/cpp_memory_order/" /><meta property="article:section" content="post" />
+
+
+
+<meta itemprop="name" content="C&#43;&#43; execution model and memory order">
+<meta itemprop="description" content="Execution Model Abstract Machine C&#43;&#43; programs describe operations that are performed on the abstract machine. C&#43;&#43; implementations define the characteristics of the abstract machine and translate operations on the abstract machine into operations on the system. Storage Model Storage is flat; no notion hierarchy (caches, etc). Objects reside in storage at a single memory location. Some objects may not have a unique memory location: Eligible empty base classes Objects marked">
+
+<meta itemprop="wordCount" content="2954">
+<meta itemprop="keywords" content="C&#43;&#43;,memory order," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="C&#43;&#43; execution model and memory order"/>
+<meta name="twitter:description" content="Execution Model Abstract Machine C&#43;&#43; programs describe operations that are performed on the abstract machine. C&#43;&#43; implementations define the characteristics of the abstract machine and translate operations on the abstract machine into operations on the system. Storage Model Storage is flat; no notion hierarchy (caches, etc). Objects reside in storage at a single memory location. Some objects may not have a unique memory location: Eligible empty base classes Objects marked"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">bobh&#39;s blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">bobh&#39;s blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">C&#43;&#43; execution model and memory order</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 0001-01-01 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#execution-model">Execution Model</a>
+      <ul>
+        <li><a href="#abstract-machine">Abstract Machine</a></li>
+        <li><a href="#storage-model">Storage Model</a></li>
+        <li><a href="#threads-of-execution">Threads of Execution</a></li>
+        <li><a href="#expression">Expression</a></li>
+        <li><a href="#evaluations">Evaluations</a></li>
+        <li><a href="#sequenced-before">Sequenced-Before</a></li>
+        <li><a href="#statements">Statements</a></li>
+        <li><a href="#initializer-lists">Initializer Lists</a></li>
+        <li><a href="#synchronizes-with">Synchronizes With</a></li>
+        <li><a href="#execution-steps">Execution Steps</a></li>
+        <li><a href="#forward-progress">Forward Progress</a></li>
+        <li><a href="#boost-blocking">Boost Blocking</a></li>
+      </ul>
+    </li>
+    <li><a href="#memory-order">memory order</a>
+      <ul>
+        <li><a href="#ordering-constraints">ordering constraints</a></li>
+        <li><a href="#acquire-release语义">acquire-release语义</a></li>
+        <li><a href="#传递性">传递性</a></li>
+        <li><a href="#释放序列">释放序列</a></li>
+        <li><a href="#关于stdmemory_order_consume">关于<code>std::memory_order_consume</code></a></li>
+        <li><a href="#fences">Fences</a></li>
+        <li><a href="#thread-fence">thread fence</a></li>
+        <li><a href="#signal-fence">signal fence</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="execution-model">Execution Model</h1>
+<h2 id="abstract-machine">Abstract Machine</h2>
+<ul>
+<li>C++ programs describe operations that are performed on the abstract machine. C++ implementations define the characteristics of the abstract machine and translate operations on the abstract machine into operations on the system.</li>
+</ul>
+<h2 id="storage-model">Storage Model</h2>
+<ul>
+<li>Storage is flat; no notion hierarchy (caches, etc). Objects reside in storage at a single memory location.</li>
+<li>Some objects may not have a unique memory location:
+<ul>
+<li>
+<ul>
+<li>Eligible empty base classes</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>Objects marked <code>[[no_unique_address]]</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>An implementation is allowed to store two objects at the same machine address or not store an object at all.</li>
+<li>An object cannot have more than one memory location.</li>
+<li>Every thread in a program can potentially access every object and function in a program.</li>
+</ul>
+<h2 id="threads-of-execution">Threads of Execution</h2>
+<ul>
+<li>
+<p>A thread of execution is a single flow of control in a program which evaluates a function call; threads may run concurrently.</p>
+</li>
+<li>
+<p>Variables with static storage duration are initialized as a consequence of program initiation.</p>
+</li>
+<li>
+<p>Variables with thread storage duration are initialized as a consequence of thread execution.</p>
+</li>
+</ul>
+<h2 id="expression">Expression</h2>
+<ul>
+<li>
+<p>An expression is a sequence of operators and operands that specifies a computation.</p>
+</li>
+<li>
+<p>Subexpressions are a part of a larger expression.</p>
+</li>
+<li>
+<p>Full expressions are not subexpressions.</p>
+</li>
+<li>
+<p>Full expressions may include subexpressions that are not lexically part of the expression.</p>
+</li>
+</ul>
+<h2 id="evaluations">Evaluations</h2>
+<ul>
+<li>
+<p>Evaluation of an expression includes value computations and the initiation of side effects.</p>
+</li>
+<li>
+<p>Side effects change the environment:</p>
+<ul>
+<li>Reading a volatile object or modifying any object.</li>
+<li>Calling a library I/O function.</li>
+<li>Calling a function that does any of the above.</li>
+</ul>
+</li>
+<li>
+<p>Value computations are pure and have no observable effect.</p>
+</li>
+<li>
+<p>Completion of the execution of an evaluation does not imply completion of its side effects.</p>
+</li>
+</ul>
+<h2 id="sequenced-before">Sequenced-Before</h2>
+<ul>
+<li>
+<p>Given any two evaluations A and B within the same thread of execution, if A is sequenced before B, then the execution of A shall precede the execution of B.</p>
+</li>
+<li>
+<p>Each full expression is sequenced before the next full expression in program order.</p>
+</li>
+<li>
+<p>If A and B are indeterminately sequenced, then either A is sequenced before B or B is sequenced before A, but it is unspecified which. E.g. A and B are not interleaved.</p>
+</li>
+<li>
+<p>If A and B are unsequenced, then A is not sequenced before B and B is not sequenced before A. E.g. A and B may be interleaved.</p>
+</li>
+</ul>
+<h2 id="statements">Statements</h2>
+<ul>
+<li>
+<p>Statements are compositions of full expressions.</p>
+</li>
+<li>
+<p>When calling a function…</p>
+<ul>
+<li>Every evaluation within the function and every evaluation not within the function are indeterminately sequenced.</li>
+<li>The expression designating the function is sequenced before the argument expressions.</li>
+<li>Each argument expression is indeterminately sequenced with all other argument expressions.</li>
+<li>Every expression in the body of the function is sequenced after the expression designating the function and every argument expression of the function .</li>
+</ul>
+</li>
+</ul>
+<h2 id="initializer-lists">Initializer Lists</h2>
+<ul>
+<li>Each element of a brace initializer is sequenced before the all subsequent elements.</li>
+</ul>
+<h2 id="synchronizes-with">Synchronizes With</h2>
+<ul>
+<li>
+<p>Two library operations A and B may be related by the synchronizes-with relation.</p>
+</li>
+<li>
+<p>Asymmetric: A synchronizes with B does not imply that B synchronizes with A</p>
+</li>
+<li>
+<p>Given any two evaluations A and B… If A happens before B:</p>
+<ul>
+<li>A is sequenced before B, or</li>
+<li>A synchronizes with B, or</li>
+<li>For some evaluation X, A happens before X and X happens before B.</li>
+</ul>
+</li>
+</ul>
+<h2 id="execution-steps">Execution Steps</h2>
+<ul>
+<li>
+<p>The evaluations executed by threads are delineated by execution steps.</p>
+</li>
+<li>
+<p>An execution step is::</p>
+<ul>
+<li>Termination of the thread.</li>
+<li>An access of a volatile object.</li>
+<li>Completion of:
+<ul>
+<li>A library I/O function call.</li>
+<li>A synchronization operation.</li>
+<li>An atomic operation.</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>Implementations may assume that all threads will eventually perform an execution step.</p>
+</li>
+</ul>
+<h2 id="forward-progress">Forward Progress</h2>
+<ul>
+<li>
+<p>Some atomic operations may fail spuriously due to interference from other threads.</p>
+</li>
+<li>
+<p>Implementations are encouraged, but not required, to prevent spurious failures from indefinitely delaying progress.</p>
+</li>
+<li>
+<p>Block: Wait for a condition to be satisfied before continuing execution.</p>
+</li>
+<li>
+<p>Blocking library functions are considered to continuously execute execution steps while waiting for their condition to be satisfied. Thus, blocking makes progress.</p>
+</li>
+<li>
+<p>Forward progress guarantees that something observable should eventually happens.</p>
+</li>
+<li>
+<p>There are three forward progress guarantees:</p>
+<ul>
+<li>Concurrent forward progress
+<ul>
+<li>The thread will make progress, regardless of whether other threads are making progress.</li>
+<li>Examples:
+<ul>
+<li>Preemptive OS thread scheduling</li>
+<li>Unbounded thread pool</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Parallel forward progress
+<ul>
+<li>Once the thread has executed its first execution step, the thread will make progress.</li>
+<li>Examples:
+<ul>
+<li>Run-to-completion user-space tasking</li>
+<li>Threads on modern NVIDIA GPUs</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Weakly parallel forward progress
+<ul>
+<li>The thread is not guaranteed to make progress.</li>
+<li>Examples:
+<ul>
+<li>Non-preemptive OS thread scheduling</li>
+<li>Suspendable user-space tasking
+<ul>
+<li>Work-stealing task schedulers</li>
+<li>Fibers</li>
+</ul>
+</li>
+<li>Thread-less asynchrony
+<ul>
+<li>Lazy execution</li>
+<li>C++ coroutines</li>
+</ul>
+</li>
+<li>Threads on legacy GPUs</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="boost-blocking">Boost Blocking</h2>
+<ul>
+<li>Block on a thread with weaker forward progress while preserving the calling thread’s forward progress.</li>
+<li>When a thread P boost blocks on a set S of other threads, the forward progress guarantees of at least one of the threads in S is temporarily upgraded to P’s forward progress guarantee. Repeat until the blocking condition is satisfied.</li>
+<li>Boost blocking ensures your children threads make progress, not your siblings.</li>
+</ul>
+<h1 id="memory-order">memory order</h1>
+<h2 id="ordering-constraints">ordering constraints</h2>
+<p>C++中有三种ordering constraint</p>
+<ul>
+<li>Sequential consistency: <code>memory_order_seq_cst</code></li>
+<li>Acquire-release:<code>memory_order_consume</code>, <code>memory_order_acquire</code>, <code>memory_order_release</code>, and <code>memory_order_acq_rel</code></li>
+<li>Relaxed: <code>memory_order_relaxed</code></li>
+</ul>
+<h2 id="acquire-release语义">acquire-release语义</h2>
+<p>有acquire-release语义的不同线程之间并不存在全局的同步，同步只发生在同一个原子变量的的原子操作上，具体来说，一个线程中对一个原子变量的写操作会和另一个线程中对同一个原子变量的读操作发生同步。acquire-release语义基于一个基本思想：在同一个原子变量上同步的一个release操作和一个acquire操作建立了一个顺序约束，即所有读写操作不能被重排到release操作之后，同时读写操作不能被重拍到acquire操作之前。</p>
+<img src="\imgs\release_semantic.png" style="zoom: 80%;" />
+<img src="\imgs\acquire_semantic.png" style="zoom:80%;" />
+<h2 id="传递性">传递性</h2>
+<p>之前我们说过，在同一个原子变量上同步的一个release操作和一个acquire操作建立了一个顺序约束，这样一来，如果不同线程操作的是同一个原子变量，我们便可以利用这种机制来进行不同线程间的同步。但如果要同步的线程之间没有共享的原子变量呢？我们可以利用acquire-release的传递性来借助另一个线程进行同步，我们来看一个例子（省略了分别用三个线程执行这三个函数的代码）。</p>
+<p><img src="%5Cimgs%5C%E4%BC%A0%E9%80%92%E6%80%A7.png" alt=""></p>
+<p>在上面的代码中，</p>
+<ul>
+<li>蓝色箭头表示sequenced-before关系，即同一线程中的操作按照他们在源码中的出现顺序执行。</li>
+<li>红色箭头表示synchronizes-with关系，这是在不同线程之间共享的原子变量上的acquire-release语义带来的。以第一个和第二个线程为例，它们之间的synchronizes-with关系保证了<strong>只要</strong>语句<code>dataProduced.store(true,std::memory_order_release)</code>发生在<code>dataPrduced.load(std::memory_order_acquire)</code>之前，那么所有在<code>dataProduced.store(true,std::memory_order_release)</code>之前的操作产生的影响对发生在<code>dataPrduced.load(std::memory_order_acquire)</code>之后的操作都是可见的。</li>
+</ul>
+<blockquote>
+<p>注意： 我们必须将<code>dataPrduced.load(std::memory_order_acquire)</code>放在<code>while</code>循环中来确保acquire操作确实发生在release操作之后，即保证synchronizes-with的条件为真，才能使得这种传递性生效。</p>
+</blockquote>
+<p>最终他们一起保证了<code>myShaerdWoke[1]=2</code>和<code>mySharedWork={1,0,3}</code>之间是happens-before的关系。</p>
+<h2 id="释放序列">释放序列</h2>
+<p>标准中的描述：</p>
+<blockquote>
+<p>A release sequence headed by a release operation A on an atomic object M is a maximal contiguous sub-sequence of side effects in the modification order of M, where the first operation is A, and every subsequent operation * is performed by the same thread that performed A, or * is an atomic read-modify-write operation.</p>
+</blockquote>
+<p>下面来看一个例子</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;atomic&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;thread&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;iostream&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp">#include</span> <span class="cpf">&lt;mutex&gt;</span><span class="cp">
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>
+</span></span><span class="line"><span class="cl"><span class="n">std</span><span class="o">::</span><span class="n">atomic</span><span class="o">&lt;</span><span class="kt">int</span><span class="o">&gt;</span> <span class="n">atom</span><span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="n">somethingShared</span><span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="o">::</span><span class="n">chrono_literals</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">writeShared</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">    <span class="n">somethingShared</span> <span class="o">=</span> <span class="mi">2011</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">atom</span><span class="p">.</span><span class="n">store</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">memory_order_release</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">readShared</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">    <span class="k">while</span> <span class="p">(</span> <span class="o">!</span><span class="p">(</span><span class="n">atom</span><span class="p">.</span><span class="n">fetch_sub</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">memory_order_acquire</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">){</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">this_thread</span><span class="o">::</span><span class="n">sleep_for</span><span class="p">(</span><span class="mi">100</span><span class="n">ms</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;somethingShared: &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">somethingShared</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="kr">thread</span> <span class="n">t1</span><span class="p">(</span><span class="n">writeShared</span><span class="p">);</span>    
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="kr">thread</span> <span class="n">t2</span><span class="p">(</span><span class="n">readShared</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="kr">thread</span> <span class="n">t3</span><span class="p">(</span><span class="n">readShared</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">t1</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">t2</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">t3</span><span class="p">.</span><span class="n">join</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;atom: &#34;</span> <span class="o">&lt;&lt;</span> <span class="n">atom</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在这个例子中，t1线程和t2线程之间由在atom上的acquire-release语义获得了synchronizes-with关系从而能够同步。但是<code>fetch_and_sub</code>作为一个 读-修改-写 操作，我们只是指定了它的读是acquire的，并没有规定它的写是release的，但由于释放序列的规则，t2和t3之间依然能够建立synchronized-with的关系，所以最终atom的输出始终为0。</p>
+<h2 id="关于stdmemory_order_consume">关于<code>std::memory_order_consume</code></h2>
+<p>不建议使用<code>std::memory_order_consume</code>，C++17已经考虑修改<code>std::memory_order_consume</code></p>
+<p>的语义，并且目前没有编译器支持它。</p>
+<h2 id="fences">Fences</h2>
+<p>C++支持两种类型的屏障：</p>
+<ul>
+<li><code>std::atomic_thread_fence</code>：用于同步不同线程间对相同内存的访问</li>
+<li><code>std::atomic_signal_fence</code>：用于同步一个线程上的signal handler和其他代码</li>
+</ul>
+<p>内存屏障可以使得一些特定顺序地读写操作在重排时不会传过屏障。</p>
+<h2 id="thread-fence">thread fence</h2>
+<p>有三种类型的屏障：<code>std::atomic_thread_fence()/std::atomic_thread_fence(std::memory_order_acq_rel)</code>、<code>std::atomic_thread_fence(std::memory_order_acquire)</code>、<code>std::atomic_thread_fence(std::memory_order_release)</code>。当他们作用在两个操作(读读、读写、写读、写写)之间时，分别有如下效果。</p>
+<img src="\imgs\full_fence.png" style="zoom: 67%;" />
+<img src="\imgs\acquire_fence.png" style="zoom:67%;" />
+<img src="\imgs\release_fence.png" style="zoom:67%;" />
+<p>下面是一个使用线程间内存屏障的例子：</p>
+<img src="\imgs\acquire_release_fence.png" style="zoom:67%;" />
+<p>在这个例子中，acquire-release fence组织了所有原子和非原子操作在被重排时穿过内存屏障，<code>consumer()</code>当中的<code>while</code>循环使得acquire fence synchronizes-with <code>producer()</code>中的release fence，最终使得release fence之前所有非原子操作和relaxed的原子操作产生效果对acquire fence之后的代码都是可见的。</p>
+<p>需要注意的是，使用这种内存屏障比在原子操作上使用对应内存序的原子操作开销更大。</p>
+<h2 id="signal-fence">signal fence</h2>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">bobh</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        0001-01-01
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/C&#43;&#43;/">C&#43;&#43;</a>
+          <a href="/tags/memory-order/">memory order</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/Boostsml%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Boost.SML使用指南</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/C&#43;&#43;20coroutine/">
+            <span class="next-text nav-default">C&#43;&#43;20协程</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
+      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
+      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
+      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
+      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
+      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
+      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
+      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
+      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
+      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

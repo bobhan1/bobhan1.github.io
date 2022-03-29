@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>C&#43;&#43;文章视频合集 - bobh&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="bobh" /><meta name="description" content="C&#43;&#43; links: Coroutines 一个关于C&#43;&#43;20 coroutine的文章和视频的合集。 C&#43;&#43; links: atomics, lock free, memory model ViennaGameJobSystem 一个专为教学向游戏引擎的开发作业系统，兼容C&#43;&#43;20协程，代码" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.96.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/cppthings/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="C&#43;&#43;文章视频合集" />
+<meta property="og:description" content="C&#43;&#43; links: Coroutines 一个关于C&#43;&#43;20 coroutine的文章和视频的合集。 C&#43;&#43; links: atomics, lock free, memory model ViennaGameJobSystem 一个专为教学向游戏引擎的开发作业系统，兼容C&#43;&#43;20协程，代码" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/cppthings/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2020-12-01T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-12-01T00:00:00+00:00" />
+
+<meta itemprop="name" content="C&#43;&#43;文章视频合集">
+<meta itemprop="description" content="C&#43;&#43; links: Coroutines 一个关于C&#43;&#43;20 coroutine的文章和视频的合集。 C&#43;&#43; links: atomics, lock free, memory model ViennaGameJobSystem 一个专为教学向游戏引擎的开发作业系统，兼容C&#43;&#43;20协程，代码"><meta itemprop="datePublished" content="2020-12-01T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-12-01T00:00:00+00:00" />
+<meta itemprop="wordCount" content="384">
+<meta itemprop="keywords" content="C&#43;&#43;," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="C&#43;&#43;文章视频合集"/>
+<meta name="twitter:description" content="C&#43;&#43; links: Coroutines 一个关于C&#43;&#43;20 coroutine的文章和视频的合集。 C&#43;&#43; links: atomics, lock free, memory model ViennaGameJobSystem 一个专为教学向游戏引擎的开发作业系统，兼容C&#43;&#43;20协程，代码"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">bobh&#39;s blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">bobh&#39;s blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">C&#43;&#43;文章视频合集</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-12-01 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents"></nav>
+  </div>
+</div>
+    <div class="post-content">
+      <ul>
+<li><a href="https://gist.github.com/MattPD/9b55db49537a90545a90447392ad3aeb">C++ links: Coroutines</a></li>
+</ul>
+<p>一个关于C++20 coroutine的文章和视频的合集。</p>
+<!-- more -->
+<ul>
+<li>
+<p><a href="https://github.com/MattPD/cpplinks/blob/master/atomics.lockfree.memory_model.md">C++ links: atomics, lock free, memory model</a></p>
+</li>
+<li>
+<p><a href="https://github.com/hlavacs/ViennaGameJobSystem">ViennaGameJobSystem</a></p>
+</li>
+</ul>
+<p>一个专为教学向游戏引擎的开发作业系统，兼容C++20协程，代码结构清晰，注释很全，适合学习。</p>
+<p>作者在cppcon2021上关于这个项目的介绍视频: <a href="https://www.bilibili.com/video/BV1ha411k7pa?p=136">[cppcon2021]Combining Co-Routines and Functions into a Job System</a>。</p>
+<ul>
+<li><a href="https://preshing.com/20210315/how-cpp-resolves-a-function-call/">How C++ Resolves a Function Call</a></li>
+</ul>
+<p>一篇介绍C++函数调用重载决议的文章。</p>
+<ul>
+<li><a href="https://www.bilibili.com/video/BV1YA411J7Pe?p=40">[cppcon2020]Just-in-Time Compilation: The Next Big Thing? - Ben Deane &amp; Kris Jusiak</a></li>
+</ul>
+<p>一个关于C++ JIT的视频，介绍了如何利用clang-JIT来充分结合编译期和运行期信息使C++发挥更强大的功能，并展示了一些有趣的玩法。</p>
+<p>项目地址<a href="https://github.com/hfinkel/llvm-project-cxxjit">llvm-project-cxxjit</a></p>
+<ul>
+<li>
+<p><a href="https://pvs-studio.com/en/blog/posts/cpp/0909/">Design and evolution of constexpr in C++</a></p>
+</li>
+<li>
+<p><a href="https://zhuanlan.zhihu.com/p/431032074">c++ execution 与 coroutine （一) : CPO与tag_invoke</a></p>
+</li>
+<li>
+<p><a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2021/p2444r0.pdf">The Asio asynchronous model</a></p>
+</li>
+<li>
+<p><a href="https://devblogs.microsoft.com/cppblog/exploring-clang-tooling-part-2-examining-the-clang-ast-with-clang-query/">Exploring Clang Tooling Part 2: Examining the Clang AST with clang-query</a></p>
+</li>
+<li>
+<p><a href="https://www.researchgate.net/publication/238437962_C_and_the_Perils_of_Double-Checked_Locking">C++ and the Perils of Double-Checked Locks</a></p>
+</li>
+</ul>
+<p>指出了为了解决Singleton模式的常规实现不是线程安全的的双检查锁原论文存在的问题并提出了解决方案。</p>
+<ul>
+<li><a href="https://corecppil.github.io/CoreCpp2019/Presentations/Bryce_C++_Execution_Model.pdf">The C++ Execution Model</a></li>
+</ul>
+<p>一个介绍C++抽象机的presentation</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">bobh</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2020-12-01
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/C&#43;&#43;/">C&#43;&#43;</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/%E8%B0%B1%E5%AE%9A%E7%90%86%E6%9E%81%E5%88%86%E8%A7%A3%E4%B8%8E%E5%A5%87%E5%BC%82%E5%80%BC%E5%88%86%E8%A7%A3/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">谱定理,极分解与奇异值分解</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/archive/">
+            <span class="next-text nav-default">资源链接合集</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
+      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
+      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
+      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
+      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
+      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
+      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
+      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
+      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
+      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
+      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
+      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2017 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
