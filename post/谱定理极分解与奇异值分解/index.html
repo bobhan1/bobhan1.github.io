@@ -35,7 +35,7 @@
 
 
 
-<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link href="/sass/main.min.2a71e62d7ea35a3a3f92c3c16c456852aaec63713de5cd5dbadb28e7480fd599.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
@@ -49,7 +49,7 @@
 <meta itemprop="name" content="谱定理,极分解与奇异值分解">
 <meta itemprop="description" content="7.A 自伴算子与正规算子 7.2 伴随 定义：设$T\in L(V,W)$,$T$的伴随是满足如下条件的函数$T^*:W\rightarrow V:$对所有$"><meta itemprop="datePublished" content="2021-08-25T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2021-08-25T00:00:00+00:00" />
-<meta itemprop="wordCount" content="3174">
+<meta itemprop="wordCount" content="3178">
 <meta itemprop="keywords" content="线性代数," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="谱定理,极分解与奇异值分解"/>
 <meta name="twitter:description" content="7.A 自伴算子与正规算子 7.2 伴随 定义：设$T\in L(V,W)$,$T$的伴随是满足如下条件的函数$T^*:W\rightarrow V:$对所有$"/>
@@ -78,13 +78,15 @@
 <nav id="mobile-menu" class="mobile-menu slideout-menu">
   <ul class="mobile-menu-list">
     <a href="/">
-        <li class="mobile-menu-item">Home</li>
+        <li class="mobile-menu-item">首页</li>
       </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
+        <li class="mobile-menu-item">归档</li>
       </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
+        <li class="mobile-menu-item">标签</li>
       </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
       </a>
   </ul>
 
@@ -106,13 +108,15 @@
 <nav class="site-navbar">
   <ul id="menu" class="menu">
     <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
+        <a class="menu-item-link" href="/">首页</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
+        <a class="menu-item-link" href="/post/">归档</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
+        <a class="menu-item-link" href="/tags/">标签</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
       </li>
   </ul>
 </nav>
@@ -141,10 +145,10 @@
   <ul>
     <li>
       <ul>
-        <li><a href="#7a-自伴算子与正规算子">7.A 自伴算子与正规算子</a></li>
-        <li><a href="#7b-谱定理">7.B 谱定理</a></li>
-        <li><a href="#7c-正算子与等距同构">7.C 正算子与等距同构</a></li>
-        <li><a href="#7d-极分解与奇异值分解">7.D 极分解与奇异值分解</a></li>
+        <li><a href="#7a-自伴算子与正规算子"><strong>7.A 自伴算子与正规算子</strong></a></li>
+        <li><a href="#7b-谱定理"><strong>7.B 谱定理</strong></a></li>
+        <li><a href="#7c-正算子与等距同构"><strong>7.C 正算子与等距同构</strong></a></li>
+        <li><a href="#7d-极分解与奇异值分解"><strong>7.D 极分解与奇异值分解</strong></a></li>
       </ul>
     </li>
   </ul>
@@ -152,7 +156,7 @@
   </div>
 </div>
     <div class="post-content">
-      <h2 id="7a-自伴算子与正规算子">7.A 自伴算子与正规算子</h2>
+      <h2 id="7a-自伴算子与正规算子"><strong>7.A 自伴算子与正规算子</strong></h2>
 <blockquote>
 <p><strong>7.2 伴随</strong></p>
 <p>定义：设$T\in L(V,W)$,$T$的伴随是满足如下条件的函数$T^*:W\rightarrow V:$对所有$v\in V$和所有$w\in W$均有$\langle Tv,w\rangle=\langle v,T^*w\rangle$</p>
@@ -173,10 +177,12 @@
 <p><strong>7.20</strong> $T$是正规的当且仅当对任意 $v\in V$有$\Vert Tv\Vert=\Vert T^*v\Vert$</p>
 </blockquote>
 <p>$$
-TT^*=T^<em>T\iff TT^</em>-T^<em>T=0\iff \langle (TT^</em>-T^*T)v,v\rangle=0\ 
+TT^*=T^*T\iff TT^*-T^*T=0 \iff \langle (TT^*-T^*T)v,v\rangle=0 \
+$$
+$$
 \iff \langle T^*Tv, v\rangle=\langle TT^*v,v\rangle\iff \Vert Tv\Vert^2=\Vert T^*v\Vert^2
 $$</p>
-<h2 id="7b-谱定理">7.B 谱定理</h2>
+<h2 id="7b-谱定理"><strong>7.B 谱定理</strong></h2>
 <blockquote>
 <p><strong>7.24 复谱定理</strong></p>
 <p>设 $\bf{F}$=$\bf{C}$ 且$T\in L(V)$,则以下条件等价：</p>
@@ -264,7 +270,7 @@ $$
 </blockquote>
 <p>(c)$\rightarrow$(a),(b)$\rightarrow$(c)显然.</p>
 <p>(a)$\rightarrow$(b),用归纳法证明,$\rm{dim}V=1$时显然成立.现设$\rm{dim}V&gt;1$,并假设在维数更小的实内积空间上成立.设$u$是$T$的一个本征向量且$\Vert u\Vert=1$,设$U=\rm{span}(u)$,则$U$是$V$下不变的一维子空间,由7.28(c),$T|_{U^\bot}\in L(U^\bot)$是自伴的.由归纳假设,$U^\bot$有一个由$T|_{U^\bot}$的 本征向量组成的规范正交基,把$u$添加进这个规范正交基,就得到了$V$的一个由$T$的本征向量组成的规范正交基.</p>
-<h2 id="7c-正算子与等距同构">7.C 正算子与等距同构</h2>
+<h2 id="7c-正算子与等距同构"><strong>7.C 正算子与等距同构</strong></h2>
 <blockquote>
 <p><strong>7.36</strong> 每个正算子都有唯一的正平方根</p>
 </blockquote>
@@ -273,7 +279,7 @@ $$
 <p><strong>7.37 等距同构</strong>
 定义：算子$T$称为等距同构如果对任意$v\in V$有$\Vert Tv\Vert=\Vert v\Vert$.也就是说,算子是等距同构当且仅当它保持范数</p>
 </blockquote>
-<h2 id="7d-极分解与奇异值分解">7.D 极分解与奇异值分解</h2>
+<h2 id="7d-极分解与奇异值分解"><strong>7.D 极分解与奇异值分解</strong></h2>
 <p>我们曾在$\bf{C}$与$L(V)$之间做过类比,一个负数对应于一个算子,$\overline{z}$对应于$T^*$,实数对应于自伴算子.注意到非零复数都可以写成$z=(\frac{z}{|z|})\sqrt{z\overline{z}}$,这使我们想到任何算子$T\in L(V)$都可以写成等距同构与$\sqrt{T^*T}$的乘积的形式.</p>
 <blockquote>
 <p><strong>7.45 极分解</strong></p>
@@ -297,7 +303,7 @@ $$
 \Vert S_2w\Vert=\Vert w\Vert.$$
 设$S\in L(V)$且 
 $$
-S|<em>{(\rm range\it \sqrt{T^*T}\rm )^{\bot}}=S_2,S|</em>{\rm range\it \sqrt{T^*T}}=S_1.
+S|_{(\rm range\it \sqrt{T^*T}\rm )^{\bot}}=S_2,S|_{\rm range\it \sqrt{T^*T}}=S_1.
 $$
 由于每一个$v$都可以唯一地写成
 $$
@@ -369,9 +375,9 @@ $$
           <a href="/tags/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0/">线性代数</a>
           </div>
       <nav class="post-nav">
-        <a class="prev" href="/post/%E5%A4%8D%E5%90%91%E9%87%8F%E7%A9%BA%E9%97%B4%E4%B8%8A%E7%9A%84%E7%AE%97%E5%AD%90/">
+        <a class="prev" href="/post/Levi-Civita%E5%B9%B3%E7%A7%BB/">
             <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">复向量空间上的算子</span>
+            <span class="prev-text nav-default">曲面上的Levi-Civita平移</span>
             <span class="prev-text nav-mobile">上一篇</span>
           </a>
         <a class="next" href="/post/cppthings/">
@@ -394,21 +400,8 @@ $$
 
     <footer id="footer" class="footer">
       <div class="social-links">
-      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
-      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
-      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
-      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
-      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
-      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
-      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
-      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
-      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
-      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
-      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
-      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
-      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
-      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+      <a href="mailto:bh2444151092@outlook.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/bobhan1" class="iconfont icon-github" title="github"></a>
   <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
 
@@ -426,7 +419,7 @@ $$
 
   <span class="copyright-year">
     &copy; 
-    2017 - 
+    2019 - 
     2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
   </span>
 </div>

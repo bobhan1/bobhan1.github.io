@@ -6,7 +6,43 @@
     <description>Recent content in C&#43;&#43; on bobh&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Tue, 01 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/C++/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 27 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/C++/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>C&#43;&#43; execution model and memory order</title>
+      <link>http://localhost:1313/post/cpp_memory_order/</link>
+      <pubDate>Sun, 27 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/cpp_memory_order/</guid>
+      <description>本文介绍了C++抽象机与memory order的相关知识</description>
+    </item>
+    
+    <item>
+      <title>Boost.SML使用指南</title>
+      <link>http://localhost:1313/post/Boostsml%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/</link>
+      <pubDate>Sat, 06 Nov 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/Boostsml%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/</guid>
+      <description>[Boost::ext].SML是一个轻量级的，header only且高性能的状态机语言库，它使得我们可以用十分清晰简洁的代码去构建一个状态</description>
+    </item>
+    
+    <item>
+      <title>一个利用Boost::pfr展示结构体内存布局的pretty printer</title>
+      <link>http://localhost:1313/post/struct_layout_pretty_printer/</link>
+      <pubDate>Sat, 06 Nov 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/struct_layout_pretty_printer/</guid>
+      <description>直接贴代码，注意MSVC需要将alignments前的constexpr去掉才能过编译。godbot 其实只用了boost::pfr::str</description>
+    </item>
+    
+    <item>
+      <title>C&#43;&#43;中的内存对齐</title>
+      <link>http://localhost:1313/post/C&#43;&#43;%E4%B8%AD%E7%9A%84%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/</link>
+      <pubDate>Thu, 26 Aug 2021 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/C&#43;&#43;%E4%B8%AD%E7%9A%84%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/</guid>
+      <description>本文介绍了内存对齐相关知识以及C++中内存对齐的相关操作</description>
+    </item>
+    
     <item>
       <title>C&#43;&#43;文章视频合集</title>
       <link>http://localhost:1313/post/cppthings/</link>
@@ -14,42 +50,6 @@
       
       <guid>http://localhost:1313/post/cppthings/</guid>
       <description>C++ links: Coroutines 一个关于C++20 coroutine的文章和视频的合集。 C++ links: atomics, lock free, memory model ViennaGameJobSystem 一个专为教学向游戏引擎的开发作业系统，兼容C++20协程，代码</description>
-    </item>
-    
-    <item>
-      <title>Boost.SML使用指南</title>
-      <link>http://localhost:1313/post/Boostsml%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>http://localhost:1313/post/Boostsml%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/</guid>
-      <description>[Boost::ext].SML是一个轻量级的，header only且高性能的状态机语言库，它使得我们可以用十分清晰简洁的代码去构建一个状态</description>
-    </item>
-    
-    <item>
-      <title>C&#43;&#43; execution model and memory order</title>
-      <link>http://localhost:1313/post/cpp_memory_order/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>http://localhost:1313/post/cpp_memory_order/</guid>
-      <description>Execution Model Abstract Machine C++ programs describe operations that are performed on the abstract machine. C++ implementations define the characteristics of the abstract machine and translate operations on the abstract machine into operations on the system. Storage Model Storage is flat; no notion hierarchy (caches, etc). Objects reside in storage at a single memory location. Some objects may not have a unique memory location: Eligible empty base classes Objects marked</description>
-    </item>
-    
-    <item>
-      <title>C&#43;&#43;中的内存对齐</title>
-      <link>http://localhost:1313/post/C&#43;&#43;%E4%B8%AD%E7%9A%84%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>http://localhost:1313/post/C&#43;&#43;%E4%B8%AD%E7%9A%84%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/</guid>
-      <description>C++中的内存对齐 内存对齐简介 内存对齐，是一个数据所能存放的内存地址的属性，它是一个无符号整数，且必须是2的幂。一个数据类型的内存对齐为$n</description>
-    </item>
-    
-    <item>
-      <title>一个利用Boost::pfr展示结构体内存布局的pretty printer</title>
-      <link>http://localhost:1313/post/struct_layout_pretty_printer/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>http://localhost:1313/post/struct_layout_pretty_printer/</guid>
-      <description>直接贴代码，注意MSVC需要将alignments前的constexpr去掉才能过编译。godbot 其实只用了boost::pfr::str</description>
     </item>
     
   </channel>

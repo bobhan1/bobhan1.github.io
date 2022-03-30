@@ -13,7 +13,7 @@
       <pubDate>Sat, 01 Jan 2022 00:00:00 +0000</pubDate>
       
       <guid>http://localhost:1313/post/%E5%BC%A0%E9%87%8F%E7%9A%84%E6%9E%84%E9%80%A0/</guid>
-      <description>基本概念 定义 对偶向量空间 设$V$是$n$维向量空间,令$V^{*}=L(V;R)$,则$V^{*}$是$n$维向量空间,且与$R^n$线性同</description>
+      <description>本文介绍了张量的构造方法和一些性质</description>
     </item>
     
   </channel>

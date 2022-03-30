@@ -5,14 +5,15 @@
     <link>http://localhost:1313/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/</link>
     <description>Recent content in 内存管理 on bobh&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en</language><atom:link href="http://localhost:1313/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/index.xml" rel="self" type="application/rss+xml" />
+    <language>en</language>
+    <lastBuildDate>Thu, 26 Aug 2021 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/%E5%86%85%E5%AD%98%E7%AE%A1%E7%90%86/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>C&#43;&#43;中的内存对齐</title>
       <link>http://localhost:1313/post/C&#43;&#43;%E4%B8%AD%E7%9A%84%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 26 Aug 2021 00:00:00 +0000</pubDate>
       
       <guid>http://localhost:1313/post/C&#43;&#43;%E4%B8%AD%E7%9A%84%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/</guid>
-      <description>C++中的内存对齐 内存对齐简介 内存对齐，是一个数据所能存放的内存地址的属性，它是一个无符号整数，且必须是2的幂。一个数据类型的内存对齐为$n</description>
+      <description>本文介绍了内存对齐相关知识以及C++中内存对齐的相关操作</description>
     </item>
     
   </channel>

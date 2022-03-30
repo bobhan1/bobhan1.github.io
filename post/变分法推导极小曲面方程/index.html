@@ -35,7 +35,7 @@
 
 
 
-<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link href="/sass/main.min.2a71e62d7ea35a3a3f92c3c16c456852aaec63713de5cd5dbadb28e7480fd599.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
@@ -43,12 +43,12 @@
 <meta property="og:description" content="​ 本文中的公式均采用爱因斯坦求和约定 在推导极小曲面的方程之前，我们先考虑一个更一般的极值问题： 设$C$是空间以光滑闭曲线，$S$是过$C$的" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://localhost:1313/post/%E5%8F%98%E5%88%86%E6%B3%95%E6%8E%A8%E5%AF%BC%E6%9E%81%E5%B0%8F%E6%9B%B2%E9%9D%A2%E6%96%B9%E7%A8%8B/" /><meta property="article:section" content="post" />
-
-
+<meta property="article:published_time" content="2021-09-03T00:00:00+00:00" />
+<meta property="article:modified_time" content="2021-09-03T00:00:00+00:00" />
 
 <meta itemprop="name" content="变分法推导极小曲面方程">
-<meta itemprop="description" content="​ 本文中的公式均采用爱因斯坦求和约定 在推导极小曲面的方程之前，我们先考虑一个更一般的极值问题： 设$C$是空间以光滑闭曲线，$S$是过$C$的">
-
+<meta itemprop="description" content="​ 本文中的公式均采用爱因斯坦求和约定 在推导极小曲面的方程之前，我们先考虑一个更一般的极值问题： 设$C$是空间以光滑闭曲线，$S$是过$C$的"><meta itemprop="datePublished" content="2021-09-03T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2021-09-03T00:00:00+00:00" />
 <meta itemprop="wordCount" content="785">
 <meta itemprop="keywords" content="变分法,微分几何," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="变分法推导极小曲面方程"/>
@@ -78,13 +78,15 @@
 <nav id="mobile-menu" class="mobile-menu slideout-menu">
   <ul class="mobile-menu-list">
     <a href="/">
-        <li class="mobile-menu-item">Home</li>
+        <li class="mobile-menu-item">首页</li>
       </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
+        <li class="mobile-menu-item">归档</li>
       </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
+        <li class="mobile-menu-item">标签</li>
       </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
       </a>
   </ul>
 
@@ -106,13 +108,15 @@
 <nav class="site-navbar">
   <ul id="menu" class="menu">
     <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
+        <a class="menu-item-link" href="/">首页</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
+        <a class="menu-item-link" href="/post/">归档</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
+        <a class="menu-item-link" href="/tags/">标签</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
       </li>
   </ul>
 </nav>
@@ -128,7 +132,7 @@
       <h1 class="post-title">变分法推导极小曲面方程</h1>
 
       <div class="post-meta">
-        <span class="post-time"> 0001-01-01 </span>
+        <span class="post-time"> 2021-09-03 </span>
         
         
       </div>
@@ -168,11 +172,11 @@ $$
 $$
 由于$I=\min \overline{I}$，所以
 $$
-\frac{d\overline{I}}{d\varepsilon }|<em>{\varepsilon=0}=0,
+\frac{d\overline{I}}{d\varepsilon }|_{\varepsilon=0}=0,
 $$
 即
 $$
-\iint</em>{\overline{U}}(\frac{\partial L}{\partial x^{\alpha}}w^{\alpha}+\frac{\partial L}{\partial x_{i}^{\alpha}}\frac{\partial w^{\alpha}}{\partial u^i})du^1du^2=0,
+\iint_{\overline{U}}(\frac{\partial L}{\partial x^{\alpha}}w^{\alpha}+\frac{\partial L}{\partial x_{i}^{\alpha}}\frac{\partial w^{\alpha}}{\partial u^i})du^1du^2=0,
 $$
 其中，$x_{i}^{\alpha}=\frac{\partial x^{\alpha}}{\partial u^{i}}.$</p>
 <p>上式又能改写成</p>
@@ -193,11 +197,11 @@ $$
 $$
 现在我们希望找到使$C$所包围的区域$U$面积最小的曲面$S$，即$L=\sqrt{g}$，其中$g=\det(g_{ij})$.根据定义有
 $$
-g_{ij}=\vec{r}<em>i\cdot\vec{r}<em>j=\sum</em>{\alpha}\frac{\partial x^{\alpha}}{\partial u^{i}}\frac{\partial x^{\alpha}}{\partial u^{j}},
+g_{ij}=\vec{r}_i\cdot\vec{r}_j=\sum_{\alpha}\frac{\partial x^{\alpha}}{\partial u^{i}}\frac{\partial x^{\alpha}}{\partial u^{j}},
 $$
 所以
 $$
-\frac{\partial \sqrt{g}}{\partial x</em>{i}^{\alpha}}=\frac{1}{2\sqrt{g}}\frac{\partial g}{\partial g_{jk}}\frac{\partial g_{jk}}{\partial x_{i}^{\alpha}}=\sqrt{g}g^{ij}x_{i}^{\alpha},
+\frac{\partial \sqrt{g}}{\partial x_{i}^{\alpha}}=\frac{1}{2\sqrt{g}}\frac{\partial g}{\partial g_{jk}}\frac{\partial g_{jk}}{\partial x_{i}^{\alpha}}=\sqrt{g}g^{ij}x_{i}^{\alpha},
 $$
 其中，$g^{ij}=(g^{-1})_{ij}$，</p>
 <p>所以有
@@ -205,7 +209,7 @@ $$
 \frac{\partial}{\partial u_{i}}(\frac{\partial \sqrt{g}}{\partial x_{i}^{\alpha}})=\sqrt{g}g^{ij}(\frac{\partial^2 x^{\alpha}}{\partial u^i \partial u^i}-\Gamma_{ji}^{k}x_{k}^{\alpha})=\sqrt{g}g^{ij}L_{ij}n^{\alpha}.
 $$
 其中，$\vec{n}=(n^1,n^2,n^3)$是曲面$S$的单位法向量，后一步来自高斯方程 
-$$\vec{r}<em>{ij}=\Gamma</em>{ji}^{k}\vec{r}<em>k+L</em>{ij}\vec{n}.$$
+$$\vec{r}_{ij}=\Gamma_{ji}^{k}\vec{r}_k+L_{ij}\vec{n}.$$
 又
 $$
 \frac{\partial \sqrt{g}}{\partial x^{\alpha}}=0,
@@ -231,7 +235,7 @@ $$
   <p class="copyright-item">
     <span class="item-title">上次更新</span>
     <span class="item-content">
-        0001-01-01
+        2021-09-03
         
     </span>
   </p>
@@ -244,13 +248,13 @@ $$
           <a href="/tags/%E5%BE%AE%E5%88%86%E5%87%A0%E4%BD%95/">微分几何</a>
           </div>
       <nav class="post-nav">
-        <a class="prev" href="/post/%E5%8F%98%E5%88%86%E6%B3%95%E6%8E%A8%E5%AF%BC%E6%9B%B2%E9%9D%A2%E4%B8%8A%E7%9A%84%E6%B5%8B%E5%9C%B0%E7%BA%BF%E6%96%B9%E7%A8%8B/">
+        <a class="prev" href="/post/openGL%E7%AC%94%E8%AE%B0/">
             <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">变分法推导曲面上的测地线方程</span>
+            <span class="prev-text nav-default">openGL入门笔记</span>
             <span class="prev-text nav-mobile">上一篇</span>
           </a>
-        <a class="next" href="/post/Levi-Civita%E5%B9%B3%E7%A7%BB/">
-            <span class="next-text nav-default">曲面上的Levi-Civita平移</span>
+        <a class="next" href="/post/%E5%8F%98%E5%88%86%E6%B3%95%E6%8E%A8%E5%AF%BC%E6%9B%B2%E9%9D%A2%E4%B8%8A%E7%9A%84%E6%B5%8B%E5%9C%B0%E7%BA%BF%E6%96%B9%E7%A8%8B/">
+            <span class="next-text nav-default">变分法推导曲面上的测地线方程</span>
             <span class="next-text nav-mobile">下一篇</span>
             <i class="iconfont icon-right"></i>
           </a>
@@ -269,21 +273,8 @@ $$
 
     <footer id="footer" class="footer">
       <div class="social-links">
-      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
-      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
-      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
-      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
-      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
-      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
-      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
-      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
-      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
-      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
-      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
-      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
-      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
-      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+      <a href="mailto:bh2444151092@outlook.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/bobhan1" class="iconfont icon-github" title="github"></a>
   <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
 
@@ -301,7 +292,7 @@ $$
 
   <span class="copyright-year">
     &copy; 
-    2017 - 
+    2019 - 
     2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
   </span>
 </div>

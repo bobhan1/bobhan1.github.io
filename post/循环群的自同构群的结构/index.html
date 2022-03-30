@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="bobh" /><meta name="description" content="本文探究了循环群的自同构群的结构. 定义(循环群) 如果一个群$G$可以由其中的一个元素生成，则$G$称为循环群. 由于无限循环群同构于$\lan" /><meta name="keywords" content="Hugo, theme, even" />
+<meta name="author" content="bobh" /><meta name="description" content="本文探究了循环群的自同构群的结构" /><meta name="keywords" content="Hugo, theme, even" />
 
 
 
@@ -35,24 +35,24 @@
 
 
 
-<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link href="/sass/main.min.2a71e62d7ea35a3a3f92c3c16c456852aaec63713de5cd5dbadb28e7480fd599.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
 <meta property="og:title" content="循环群的自同构群的结构" />
-<meta property="og:description" content="本文探究了循环群的自同构群的结构. 定义(循环群) 如果一个群$G$可以由其中的一个元素生成，则$G$称为循环群. 由于无限循环群同构于$\lan" />
+<meta property="og:description" content="本文探究了循环群的自同构群的结构" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://localhost:1313/post/%E5%BE%AA%E7%8E%AF%E7%BE%A4%E7%9A%84%E8%87%AA%E5%90%8C%E6%9E%84%E7%BE%A4%E7%9A%84%E7%BB%93%E6%9E%84/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2021-12-01T00:00:00+00:00" />
 <meta property="article:modified_time" content="2021-12-01T00:00:00+00:00" />
 
 <meta itemprop="name" content="循环群的自同构群的结构">
-<meta itemprop="description" content="本文探究了循环群的自同构群的结构. 定义(循环群) 如果一个群$G$可以由其中的一个元素生成，则$G$称为循环群. 由于无限循环群同构于$\lan"><meta itemprop="datePublished" content="2021-12-01T00:00:00+00:00" />
+<meta itemprop="description" content="本文探究了循环群的自同构群的结构"><meta itemprop="datePublished" content="2021-12-01T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2021-12-01T00:00:00+00:00" />
-<meta itemprop="wordCount" content="3706">
+<meta itemprop="wordCount" content="3707">
 <meta itemprop="keywords" content="群论,抽象代数," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="循环群的自同构群的结构"/>
-<meta name="twitter:description" content="本文探究了循环群的自同构群的结构. 定义(循环群) 如果一个群$G$可以由其中的一个元素生成，则$G$称为循环群. 由于无限循环群同构于$\lan"/>
+<meta name="twitter:description" content="本文探究了循环群的自同构群的结构"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -78,13 +78,15 @@
 <nav id="mobile-menu" class="mobile-menu slideout-menu">
   <ul class="mobile-menu-list">
     <a href="/">
-        <li class="mobile-menu-item">Home</li>
+        <li class="mobile-menu-item">首页</li>
       </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
+        <li class="mobile-menu-item">归档</li>
       </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
+        <li class="mobile-menu-item">标签</li>
       </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
       </a>
   </ul>
 
@@ -106,13 +108,15 @@
 <nav class="site-navbar">
   <ul id="menu" class="menu">
     <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
+        <a class="menu-item-link" href="/">首页</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
+        <a class="menu-item-link" href="/post/">归档</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
+        <a class="menu-item-link" href="/tags/">标签</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
       </li>
   </ul>
 </nav>
@@ -199,22 +203,22 @@ $$
 <p><strong>引理</strong> 对于任意奇数$a=2k+1$，均有$a^{2^{\alpha-2}}\equiv 1(\mod 2^{\alpha}).$</p>
 </blockquote>
 <p><strong>证明</strong> 
-$$a^{2^{\alpha-2}}=(2k+1)^{\alpha-2}\equiv 1+\binom{2^{\alpha-2}}{1}(2k)+\binom{2^{\alpha-2}}{2}(2k)^2\equiv1+2^{\alpha-1}(k+(2^{\alpha-2}-1)k^2)\equiv1(\mod 2^{\alpha})\$$</p>
+$$ a^{2^{\alpha-2}}=(2k+1)^{\alpha-2}\equiv 1+\binom{2^{\alpha-2}}{1}(2k)+\binom{2^{\alpha-2}}{2}(2k)^2\equiv1+2^{\alpha-1}(k+(2^{\alpha-2}-1)k^2)\equiv1(\mod 2^{\alpha})$$</p>
 <p>上述引理说明对于任意奇数$a$，有$ord_{2^{\alpha}}(a)|2^{\alpha-2}$并且$ord_{2^{\alpha}}(a)$一定为$2^{\lambda}$的形式.下面证明$ord
 _{2^{\alpha}}(5)=2^{\alpha-2}$，显然，这只需要证明当$\alpha\geq 3$时，$5^{2^{\alpha-3}}\not\equiv 1(\mod 2^{\alpha})$.我们将用归纳法证明.</p>
 <blockquote>
 <p><strong>命题</strong> 当$\alpha\geq 3$时，$5^{2^{\alpha-3}}\not\equiv 1(\mod 2^{\alpha})$.</p>
 </blockquote>
 <p><strong>证明</strong> 当$\alpha=3$时，显然成立.现假设当$\alpha=k\geq 3$时成立，则当$\alpha=k+1$时，由引理及归纳假设有
-$$5^{2^{k-3}}=1+(2L+1)2^{k-1},\$$
+$$5^{2^{k-3}}=1+(2L+1)2^{k-1},$$
 所以
-$$5^{2^{k-2}}=1+(2L+1)^{2}2^{2k-2}+(2L+1)2^{k}\$$
+$$5^{2^{k-2}}=1+(2L+1)^{2}2^{2k-2}+(2L+1)2^{k}$$
 又由于$k\geq 3$，故$2k-2\geq k+1$，故有$5^{2^{k-2}}\equiv1(\mod 2^{k+1}).$
 综上，当$\alpha\geq 3$时，$5^{2^{\alpha-3}}\not\equiv 1(\mod 2^{\alpha})$.</p>
 <p>因为$ord_{2^\alpha}(5)=2^{\alpha-2}$，所以在$Z_{2^{\alpha}}^*$中，$5^1,5^{2},\cdots,5^{2^{\alpha-2}}$两两不同，$-5^1,-5^{2},\cdots,-5^{2^{\alpha-2}}$也两两不同.显然
-$$5^{k_1}\equiv1(\mod 2^{\alpha}),-5^{k_2}\equiv-1(\mod 2^{\alpha}).\$$
+$$5^{k_1}\equiv1(\mod 2^{\alpha}),-5^{k_2}\equiv-1(\mod 2^{\alpha}).$$
 故
-$$5^{k_1}\not\equiv-5^{k_2}(\mod 2^{\alpha}).\$$
+$$5^{k_1}\not\equiv-5^{k_2}(\mod 2^{\alpha}).$$
 所以，$\pm5^1,\pm5^{2},\cdots,\pm5^{2^{\alpha-2}}$刚好构成$Z_{2^{\alpha}}^*$的全部元素，即$Z_{2^{\alpha}}^*$同构于$Z_2\bigoplus Z_{2^{\alpha-2}}$.</p>
 <p>综上，我们有如下结论：</p>
 <p>当$n=2^{e_0}\prod_{i=1}^{k}p_i^{e_i}(e_0\geq 2)$时，$Aut(Z_n)$同构于$(\bigoplus_{i=1}^{k}Z_{(p_i-1)p_i^{e_i-1}})\bigoplus{Z_{2^{e_0-2}}}\bigoplus Z_2$.</p>
@@ -248,8 +252,8 @@ $$5^{k_1}\not\equiv-5^{k_2}(\mod 2^{\alpha}).\$$
             <span class="prev-text nav-default">张量</span>
             <span class="prev-text nav-mobile">上一篇</span>
           </a>
-        <a class="next" href="/post/%E5%A4%8D%E5%90%91%E9%87%8F%E7%A9%BA%E9%97%B4%E4%B8%8A%E7%9A%84%E7%AE%97%E5%AD%90/">
-            <span class="next-text nav-default">复向量空间上的算子</span>
+        <a class="next" href="/post/Boostsml%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/">
+            <span class="next-text nav-default">Boost.SML使用指南</span>
             <span class="next-text nav-mobile">下一篇</span>
             <i class="iconfont icon-right"></i>
           </a>
@@ -268,21 +272,8 @@ $$5^{k_1}\not\equiv-5^{k_2}(\mod 2^{\alpha}).\$$
 
     <footer id="footer" class="footer">
       <div class="social-links">
-      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
-      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
-      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
-      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
-      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
-      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
-      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
-      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
-      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
-      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
-      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
-      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
-      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
-      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+      <a href="mailto:bh2444151092@outlook.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/bobhan1" class="iconfont icon-github" title="github"></a>
   <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
 
@@ -300,7 +291,7 @@ $$5^{k_1}\not\equiv-5^{k_2}(\mod 2^{\alpha}).\$$
 
   <span class="copyright-year">
     &copy; 
-    2017 - 
+    2019 - 
     2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
   </span>
 </div>

@@ -5,14 +5,15 @@
     <link>http://localhost:1313/tags/memory-order/</link>
     <description>Recent content in memory order on bobh&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
-    <language>en</language><atom:link href="http://localhost:1313/tags/memory-order/index.xml" rel="self" type="application/rss+xml" />
+    <language>en</language>
+    <lastBuildDate>Sun, 27 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/memory-order/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>C&#43;&#43; execution model and memory order</title>
       <link>http://localhost:1313/post/cpp_memory_order/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <pubDate>Sun, 27 Mar 2022 00:00:00 +0000</pubDate>
       
       <guid>http://localhost:1313/post/cpp_memory_order/</guid>
-      <description>Execution Model Abstract Machine C++ programs describe operations that are performed on the abstract machine. C++ implementations define the characteristics of the abstract machine and translate operations on the abstract machine into operations on the system. Storage Model Storage is flat; no notion hierarchy (caches, etc). Objects reside in storage at a single memory location. Some objects may not have a unique memory location: Eligible empty base classes Objects marked</description>
+      <description>本文介绍了C++抽象机与memory order的相关知识</description>
     </item>
     
   </channel>

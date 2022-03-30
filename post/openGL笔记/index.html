@@ -35,7 +35,7 @@
 
 
 
-<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link href="/sass/main.min.2a71e62d7ea35a3a3f92c3c16c456852aaec63713de5cd5dbadb28e7480fd599.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
@@ -43,12 +43,12 @@
 <meta property="og:description" content="本文介绍了openGL渲染管线、视图和实例化等知识，随后实现了一个绘制立方体的程序" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://localhost:1313/post/openGL%E7%AC%94%E8%AE%B0/" /><meta property="article:section" content="post" />
-
-
+<meta property="article:published_time" content="2021-09-28T00:00:00+00:00" />
+<meta property="article:modified_time" content="2021-09-28T00:00:00+00:00" />
 
 <meta itemprop="name" content="openGL入门笔记">
-<meta itemprop="description" content="本文介绍了openGL渲染管线、视图和实例化等知识，随后实现了一个绘制立方体的程序">
-
+<meta itemprop="description" content="本文介绍了openGL渲染管线、视图和实例化等知识，随后实现了一个绘制立方体的程序"><meta itemprop="datePublished" content="2021-09-28T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2021-09-28T00:00:00+00:00" />
 <meta itemprop="wordCount" content="2911">
 <meta itemprop="keywords" content="openGL,计算机图形学," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="openGL入门笔记"/>
@@ -78,13 +78,15 @@
 <nav id="mobile-menu" class="mobile-menu slideout-menu">
   <ul class="mobile-menu-list">
     <a href="/">
-        <li class="mobile-menu-item">Home</li>
+        <li class="mobile-menu-item">首页</li>
       </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
+        <li class="mobile-menu-item">归档</li>
       </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
+        <li class="mobile-menu-item">标签</li>
       </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
       </a>
   </ul>
 
@@ -106,13 +108,15 @@
 <nav class="site-navbar">
   <ul id="menu" class="menu">
     <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
+        <a class="menu-item-link" href="/">首页</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
+        <a class="menu-item-link" href="/post/">归档</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
+        <a class="menu-item-link" href="/tags/">标签</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
       </li>
   </ul>
 </nav>
@@ -128,7 +132,7 @@
       <h1 class="post-title">openGL入门笔记</h1>
 
       <div class="post-meta">
-        <span class="post-time"> 0001-01-01 </span>
+        <span class="post-time"> 2021-09-28 </span>
         
         
       </div>
@@ -141,17 +145,17 @@
   <ul>
     <li>
       <ul>
-        <li><a href="#opengl管线">openGL管线</a></li>
-        <li><a href="#视图">视图</a>
+        <li><a href="#opengl管线"><strong>openGL管线</strong></a></li>
+        <li><a href="#视图"><strong>视图</strong></a>
           <ul>
-            <li><a href="#模型变换">模型变换</a></li>
-            <li><a href="#视图变换">视图变换</a></li>
-            <li><a href="#投影变换">投影变换</a></li>
+            <li><a href="#模型变换"><strong>模型变换</strong></a></li>
+            <li><a href="#视图变换"><strong>视图变换</strong></a></li>
+            <li><a href="#投影变换"><strong>投影变换</strong></a></li>
           </ul>
         </li>
-        <li><a href="#3d立方体程序">3D立方体程序</a>
+        <li><a href="#3d立方体程序"><strong>3D立方体程序</strong></a>
           <ul>
-            <li><a href="#实例化">实例化</a></li>
+            <li><a href="#实例化"><strong>实例化</strong></a></li>
           </ul>
         </li>
       </ul>
@@ -161,7 +165,7 @@
   </div>
 </div>
     <div class="post-content">
-      <h2 id="opengl管线">openGL管线</h2>
+      <h2 id="opengl管线"><strong>openGL管线</strong></h2>
 <p>绝大多数openGL实现都有着相似的操作顺序，这一系列相关的处理阶段称为openGL渲染管线。我们可以把openGL看做是一些列机器的组合，它的输入是我们提供的数据，这些数据就像在流水线上一样依次被不同的机器进行处理，在一个执行完前一个阶段的操作后就被送入到后一个阶段进行下一次操作，最终成为在屏幕上显示的像素点。我们无法改变这些操作进行的顺序，只能通过openGL提供的API改变它的状态从而改变每个阶段对数据进行的操作来得到不同的效果。下图展示了openGL管线简化后的概览。其中，蓝色阴影的部分可以通过GLSL进行编程。</p>
 <div style="text-align:center;">
 <img src="/imgs/openGlpipeline.png" style="zoom:50%;" />
@@ -169,10 +173,10 @@
 <blockquote>
 <p>在openGL 3.1之前，openGL为我们提供了固定功能的管线，在openGL 3.1之后，固定功能的管线被废弃并删除了，我们至少需要提供顶点着色器和片段着色器的GLSL代码。</p>
 </blockquote>
-<h2 id="视图">视图</h2>
-<h3 id="模型变换">模型变换</h3>
+<h2 id="视图"><strong>视图</strong></h2>
+<h3 id="模型变换"><strong>模型变换</strong></h3>
 <p>模型变换的目的是设置模型的位置和方向，模型上的点一般以该模型的局部坐标系为参考系，通过将模型变换矩阵$\pmb{M}$作用在这些点上从而实现对模型进行旋转、移动和缩放。</p>
-<h3 id="视图变换">视图变换</h3>
+<h3 id="视图变换"><strong>视图变换</strong></h3>
 <div style="text-align:center;">
     <img src="\imgs\stableCamera.png" width="300"/>
      <img src="\imgs\cameraview.png" width="300"/>
@@ -186,14 +190,14 @@ $$
 P_c=MVP_w
 $$
 复杂模型和场景通常是由简单的小模型分层组合构建的，我们通常只知道一个模型相对于另一个特定模型的位置，于是这形成了一种树形依赖关系，利用矩阵堆栈可以轻松完成这种分层构建的操作。</p>
-<h3 id="投影变换">投影变换</h3>
+<h3 id="投影变换"><strong>投影变换</strong></h3>
 <p>投影变换就好像是为照相机选择镜头，它的目的是确定视野，并因此决定哪些物体位域视野之内以及他们能被看到的程度。除了考虑视野外，投影变换还决定了物体是如何投影到屏幕上的，一种类型是透视投影，它类似于我们在生活中看到的景象。另一种是正射投影，一般用于CAD软件中。</p>
 <p>我们通过纵横比、视场、近剪裁平面(投影平面)和远剪裁平面这四个参数来生成透视投影的变换矩阵。处于远近剪裁平面之间的物体被投影到近剪裁平面上。</p>
 <div style="text-align:center;">
     <img src="\imgs\viewvolume.png" width="500"/>
      <img src="\imgs\perspectivematrix.png" width="200" />
 </div>
-<h2 id="3d立方体程序">3D立方体程序</h2>
+<h2 id="3d立方体程序"><strong>3D立方体程序</strong></h2>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt">  1
@@ -494,7 +498,7 @@ $$
 <div style="text-align:center;">
 <img src="\imgs\result1.png" style="zoom: 67%;" />
 </div>
-<h3 id="实例化">实例化</h3>
+<h3 id="实例化"><strong>实例化</strong></h3>
 <p>当我们个渲染同一个对象的多个副本时，可以使用openGL的实例化绘制。使用实例化时，顶点着色器可以访问内置变量<code>gl_InstanceID</code>，它表示正在处理对象的第几个实例。为了使用实例化来绘制立方体，我们需要将构建不同模型矩阵的计算移到顶点着色器中。修改后的顶点着色器代码如下：</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -698,7 +702,7 @@ $$
   <p class="copyright-item">
     <span class="item-title">上次更新</span>
     <span class="item-content">
-        0001-01-01
+        2021-09-28
         
     </span>
   </p>
@@ -711,13 +715,13 @@ $$
           <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6/">计算机图形学</a>
           </div>
       <nav class="post-nav">
-        <a class="prev" href="/post/C&#43;&#43;%E4%B8%AD%E7%9A%84%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/">
+        <a class="prev" href="/post/C&#43;&#43;20coroutine/">
             <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">C&#43;&#43;中的内存对齐</span>
+            <span class="prev-text nav-default">C&#43;&#43;20协程</span>
             <span class="prev-text nav-mobile">上一篇</span>
           </a>
-        <a class="next" href="/post/struct_layout_pretty_printer/">
-            <span class="next-text nav-default">一个利用Boost::pfr展示结构体内存布局的pretty printer</span>
+        <a class="next" href="/post/%E5%8F%98%E5%88%86%E6%B3%95%E6%8E%A8%E5%AF%BC%E6%9E%81%E5%B0%8F%E6%9B%B2%E9%9D%A2%E6%96%B9%E7%A8%8B/">
+            <span class="next-text nav-default">变分法推导极小曲面方程</span>
             <span class="next-text nav-mobile">下一篇</span>
             <i class="iconfont icon-right"></i>
           </a>
@@ -736,21 +740,8 @@ $$
 
     <footer id="footer" class="footer">
       <div class="social-links">
-      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
-      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
-      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
-      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
-      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
-      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
-      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
-      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
-      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
-      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
-      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
-      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
-      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
-      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+      <a href="mailto:bh2444151092@outlook.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/bobhan1" class="iconfont icon-github" title="github"></a>
   <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
 
@@ -768,7 +759,7 @@ $$
 
   <span class="copyright-year">
     &copy; 
-    2017 - 
+    2019 - 
     2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
   </span>
 </div>

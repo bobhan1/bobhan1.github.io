@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="bobh" /><meta name="description" content="基本概念 定义 对偶向量空间 设$V$是$n$维向量空间,令$V^{*}=L(V;R)$,则$V^{*}$是$n$维向量空间,且与$R^n$线性同" /><meta name="keywords" content="Hugo, theme, even" />
+<meta name="author" content="bobh" /><meta name="description" content="本文介绍了张量的构造方法和一些性质" /><meta name="keywords" content="Hugo, theme, even" />
 
 
 
@@ -35,24 +35,24 @@
 
 
 
-<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link href="/sass/main.min.2a71e62d7ea35a3a3f92c3c16c456852aaec63713de5cd5dbadb28e7480fd599.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
 <meta property="og:title" content="张量" />
-<meta property="og:description" content="基本概念 定义 对偶向量空间 设$V$是$n$维向量空间,令$V^{*}=L(V;R)$,则$V^{*}$是$n$维向量空间,且与$R^n$线性同" />
+<meta property="og:description" content="本文介绍了张量的构造方法和一些性质" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://localhost:1313/post/%E5%BC%A0%E9%87%8F%E7%9A%84%E6%9E%84%E9%80%A0/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2022-01-01T00:00:00+00:00" />
 <meta property="article:modified_time" content="2022-01-01T00:00:00+00:00" />
 
 <meta itemprop="name" content="张量">
-<meta itemprop="description" content="基本概念 定义 对偶向量空间 设$V$是$n$维向量空间,令$V^{*}=L(V;R)$,则$V^{*}$是$n$维向量空间,且与$R^n$线性同"><meta itemprop="datePublished" content="2022-01-01T00:00:00+00:00" />
+<meta itemprop="description" content="本文介绍了张量的构造方法和一些性质"><meta itemprop="datePublished" content="2022-01-01T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2022-01-01T00:00:00+00:00" />
-<meta itemprop="wordCount" content="3693">
+<meta itemprop="wordCount" content="3697">
 <meta itemprop="keywords" content="张量," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="张量"/>
-<meta name="twitter:description" content="基本概念 定义 对偶向量空间 设$V$是$n$维向量空间,令$V^{*}=L(V;R)$,则$V^{*}$是$n$维向量空间,且与$R^n$线性同"/>
+<meta name="twitter:description" content="本文介绍了张量的构造方法和一些性质"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -78,13 +78,15 @@
 <nav id="mobile-menu" class="mobile-menu slideout-menu">
   <ul class="mobile-menu-list">
     <a href="/">
-        <li class="mobile-menu-item">Home</li>
+        <li class="mobile-menu-item">首页</li>
       </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
+        <li class="mobile-menu-item">归档</li>
       </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
+        <li class="mobile-menu-item">标签</li>
       </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
       </a>
   </ul>
 
@@ -106,13 +108,15 @@
 <nav class="site-navbar">
   <ul id="menu" class="menu">
     <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
+        <a class="menu-item-link" href="/">首页</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
+        <a class="menu-item-link" href="/post/">归档</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
+        <a class="menu-item-link" href="/tags/">标签</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
       </li>
   </ul>
 </nav>
@@ -217,22 +221,22 @@ $n$维欧式向量空间$(V,g)$中,$V$和$V^ * $自然同构.</p>
 </blockquote>
 <h2 id="r阶反变s阶协变的张量">$r$阶反变,$s$阶协变的张量</h2>
 <p>将上面的概念推广,我们得到$(r,s)$型的张量空间
-$$L(\overbrace{V^{<em>},\cdots,V^</em>}^{r},\overbrace{V,\cdots,V}^{s};V)=V_s^r.$$</p>
+$$L(\overbrace{V^{*},\cdots,V^*}^{r},\overbrace{V,\cdots,V}^{s};V)=V_s^r.$$</p>
 <p>设$V$的一个基底为${e_i}$,在$V^{*}$中对应的对偶基底为${e^i}$,则$V_s^r$的基底为
 $${e_{i_1}\otimes\cdots\otimes e_{i_r}\otimes e^{j_1}\otimes\cdots\otimes e^{j_s}}.$$
 任意$(r,s)$型张量$\tau\in V_s^r$可表示为
 $$\tau=\tau_{j_1\cdots j_{s}}^{i_{1}\cdots i_{r}}e_{i_1}\otimes\cdots\otimes e_{i_r}\otimes e^{j_1}\otimes\cdots\otimes e^{j_s},$$
 其中
 $$\tau_{j_1\cdots j_{s}}^{i_{1}\cdots i_{r}}=\tau(e^{i_1},\cdots,e^{i_r},e_{j_1},\cdots,e_{j_s}).$$</p>
-<p>若在$V$中取另一组基底${\widetilde{e}<em>i},\widetilde{e}<em>k=a_k^i e_i$,其在$V^ * $中相应的对偶基底${\widetilde{e}^i}$满足$e^j=a^j_l \widetilde{e}^l$,记$(b_k^l)$是$(a_l^j)$的逆矩阵,则张量$\tau$的分量的变换公式为
-$$\widetilde{\tau}</em>{j_1\cdots j_s}^{r_1\cdots i_r}=\tau(\widetilde{e}^{i_1},\cdots,\widetilde{e}^{i_r},\widetilde{e}</em>{j_1},c\cdots,\widetilde{e}<em>{j_s})=b</em>{k_1\cdots k_r}^{i_1\cdots i_r}a_{j_1\cdots j_s}^{l_1\cdots l_s}\tau_{l_1\cdots l_s}^{k_1\cdots k_r}.$$</p>
+<p>若在$V$中取另一组基底${\widetilde{e}_i},\widetilde{e}_k=a_k^i e_i$,其在$V^ * $中相应的对偶基底${\widetilde{e}^i}$满足$e^j=a^j_l \widetilde{e}^l$,记$(b_k^l)$是$(a_l^j)$的逆矩阵,则张量$\tau$的分量的变换公式为
+$$\widetilde{\tau}_{j_1\cdots j_s}^{r_1\cdots i_r}=\tau(\widetilde{e}^{i_1},\cdots,\widetilde{e}^{i_r},\widetilde{e}_{j_1},c\cdots,\widetilde{e}_{j_s})=b_{k_1\cdots k_r}^{i_1\cdots i_r}a_{j_1\cdots j_s}^{l_1\cdots l_s}\tau_{l_1\cdots l_s}^{k_1\cdots k_r}.$$</p>
 <h2 id="张量的缩并">张量的缩并</h2>
-<p>张量积的作用是将低阶张量相乘得到高阶张量,张量的缩并将一个$(r,s)$型张量变成一个$(r-1,s-1)$型的张量.取$V$中的一组基底${\widetilde{e}<em>i},\widetilde{e}<em>k=a_k^i e_i$,其在$V^{*}$中相应的对偶基底${\widetilde{e}^i}$满足$e^j=a^j_l \widetilde{e}^l$,对$\tau\in V_s^r,\alpha^i\in V^ * ,v_i\in V$,定义映射
-$$\sigma:\overbrace{V^{<em>} \times\cdots\times V^{</em>} }^{r-1}\times\overbrace{V\times \cdots\times V}^{s-1}\to R$$
+<p>张量积的作用是将低阶张量相乘得到高阶张量,张量的缩并将一个$(r,s)$型张量变成一个$(r-1,s-1)$型的张量.取$V$中的一组基底${\widetilde{e}_i},\widetilde{e}_k=a_k^i e_i$,其在$V^{*}$中相应的对偶基底${\widetilde{e}^i}$满足$e^j=a^j_l \widetilde{e}^l$,对$\tau\in V_s^r,\alpha^i\in V^ * ,v_i\in V$,定义映射
+$$\sigma:\overbrace{V^{*} \times\cdots\times V^{*} }^{r-1}\times\overbrace{V\times \cdots\times V}^{s-1}\to R$$
 为
-$$\sigma(\alpha^1,\cdots,\alpha^{r-1},v_1,\cdots,v</em>{s-1})=\tau(e^i,\alpha^1,\cdots,\alpha^{r-1},e_i,v_1,\cdots,v</em>{s-1}).$$
+$$\sigma(\alpha^1,\cdots,\alpha^{r-1},v_1,\cdots,v_{s-1})=\tau(e^i,\alpha^1,\cdots,\alpha^{r-1},e_i,v_1,\cdots,v_{s-1}).$$
 显然,$\sigma$是$(r-1,s-1)$型张量,且由于
-$$\tau(\widetilde{e}^i,\alpha^1,\cdots,\alpha^{r-1},\widetilde{e}<em>i,v_1,\cdots,v</em>{s-1})=\tau(\widetilde{e}^i,\alpha^1,\cdots,\alpha^{r-1},a_i^j e_j,v_1,\cdots,v_{s-1})$$
+$$\tau(\widetilde{e}^i,\alpha^1,\cdots,\alpha^{r-1},\widetilde{e}_i,v_1,\cdots,v_{s-1})=\tau(\widetilde{e}^i,\alpha^1,\cdots,\alpha^{r-1},a_i^j e_j,v_1,\cdots,v_{s-1})$$
 $$=\tau(a_i^j\widetilde{e}^i,\alpha^1,\cdots,\alpha^{r-1},e_j,v_1,\cdots,v_{s-1})=\tau(e^j,\alpha^1,\cdots,\alpha^{r-1},e_j,v_1,\cdots,v_{s-1}),$$
 故$\sigma$与$V$中基底的选择无关.</p>
 <p>张量$\sigma$称为$\tau$关于第一个反变指标和第一个协变指标的缩并,记为$C_1^1(r)=\sigma$.可见,他就是将它的分量的第一个反变指标和第一个逆变指标取相同的值求和的结果.</p>
@@ -267,9 +271,9 @@ $$tr(A_i^j)=A_i^i=r_i^i=C_1^1(r)$$
           <a href="/tags/%E5%BC%A0%E9%87%8F/">张量</a>
           </div>
       <nav class="post-nav">
-        <a class="prev" href="/post/test/">
+        <a class="prev" href="/post/cpp_memory_order/">
             <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">Test</span>
+            <span class="prev-text nav-default">C&#43;&#43; execution model and memory order</span>
             <span class="prev-text nav-mobile">上一篇</span>
           </a>
         <a class="next" href="/post/%E5%BE%AA%E7%8E%AF%E7%BE%A4%E7%9A%84%E8%87%AA%E5%90%8C%E6%9E%84%E7%BE%A4%E7%9A%84%E7%BB%93%E6%9E%84/">
@@ -292,21 +296,8 @@ $$tr(A_i^j)=A_i^i=r_i^i=C_1^1(r)$$
 
     <footer id="footer" class="footer">
       <div class="social-links">
-      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
-      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
-      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
-      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
-      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
-      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
-      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
-      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
-      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
-      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
-      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
-      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
-      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
-      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+      <a href="mailto:bh2444151092@outlook.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/bobhan1" class="iconfont icon-github" title="github"></a>
   <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
 
@@ -324,7 +315,7 @@ $$tr(A_i^j)=A_i^i=r_i^i=C_1^1(r)$$
 
   <span class="copyright-year">
     &copy; 
-    2017 - 
+    2019 - 
     2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
   </span>
 </div>

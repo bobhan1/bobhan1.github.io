@@ -35,7 +35,7 @@
 
 
 
-<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link href="/sass/main.min.2a71e62d7ea35a3a3f92c3c16c456852aaec63713de5cd5dbadb28e7480fd599.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
@@ -43,12 +43,12 @@
 <meta property="og:description" content="[Boost::ext].SML是一个轻量级的，header only且高性能的状态机语言库，它使得我们可以用十分清晰简洁的代码去构建一个状态" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://localhost:1313/post/Boostsml%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/" /><meta property="article:section" content="post" />
-
-
+<meta property="article:published_time" content="2021-11-06T00:00:00+00:00" />
+<meta property="article:modified_time" content="2021-11-06T00:00:00+00:00" />
 
 <meta itemprop="name" content="Boost.SML使用指南">
-<meta itemprop="description" content="[Boost::ext].SML是一个轻量级的，header only且高性能的状态机语言库，它使得我们可以用十分清晰简洁的代码去构建一个状态">
-
+<meta itemprop="description" content="[Boost::ext].SML是一个轻量级的，header only且高性能的状态机语言库，它使得我们可以用十分清晰简洁的代码去构建一个状态"><meta itemprop="datePublished" content="2021-11-06T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2021-11-06T00:00:00+00:00" />
 <meta itemprop="wordCount" content="5337">
 <meta itemprop="keywords" content="C&#43;&#43;," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Boost.SML使用指南"/>
@@ -78,13 +78,15 @@
 <nav id="mobile-menu" class="mobile-menu slideout-menu">
   <ul class="mobile-menu-list">
     <a href="/">
-        <li class="mobile-menu-item">Home</li>
+        <li class="mobile-menu-item">首页</li>
       </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
+        <li class="mobile-menu-item">归档</li>
       </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
+        <li class="mobile-menu-item">标签</li>
       </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
       </a>
   </ul>
 
@@ -106,13 +108,15 @@
 <nav class="site-navbar">
   <ul id="menu" class="menu">
     <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
+        <a class="menu-item-link" href="/">首页</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
+        <a class="menu-item-link" href="/post/">归档</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
+        <a class="menu-item-link" href="/tags/">标签</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
       </li>
   </ul>
 </nav>
@@ -128,7 +132,7 @@
       <h1 class="post-title">Boost.SML使用指南</h1>
 
       <div class="post-meta">
-        <span class="post-time"> 0001-01-01 </span>
+        <span class="post-time"> 2021-11-06 </span>
         
         
       </div>
@@ -141,18 +145,18 @@
   <ul>
     <li>
       <ul>
-        <li><a href="#states-events-transitions-and-state-machines">States, Events, Transitions and State Machines</a></li>
-        <li><a href="#actions-and-guards">Actions and Guards</a></li>
-        <li><a href="#data">Data</a></li>
-        <li><a href="#deferprocess">Defer/Process</a></li>
-        <li><a href="#orthogonal-regions">Orthogonal Regions</a></li>
-        <li><a href="#history">History</a></li>
-        <li><a href="#runtime-dispatcher">Runtime Dispatcher</a></li>
-        <li><a href="#error-handling">Error Handling</a></li>
-        <li><a href="#testing">Testing</a></li>
-        <li><a href="#logging">Logging</a></li>
-        <li><a href="#policy">Policy</a></li>
-        <li><a href="#应用一个模拟服务器demo的实现">应用：一个模拟服务器demo的实现</a></li>
+        <li><a href="#states-events-transitions-and-state-machines"><strong>States, Events, Transitions and State Machines</strong></a></li>
+        <li><a href="#actions-and-guards"><strong>Actions and Guards</strong></a></li>
+        <li><a href="#data"><strong>Data</strong></a></li>
+        <li><a href="#deferprocess"><strong>Defer/Process</strong></a></li>
+        <li><a href="#orthogonal-regions"><strong>Orthogonal Regions</strong></a></li>
+        <li><a href="#history"><strong>History</strong></a></li>
+        <li><a href="#runtime-dispatcher"><strong>Runtime Dispatcher</strong></a></li>
+        <li><a href="#error-handling"><strong>Error Handling</strong></a></li>
+        <li><a href="#testing"><strong>Testing</strong></a></li>
+        <li><a href="#logging"><strong>Logging</strong></a></li>
+        <li><a href="#policy"><strong>Policy</strong></a></li>
+        <li><a href="#应用一个模拟服务器demo的实现"><strong>应用：一个模拟服务器demo的实现</strong></a></li>
       </ul>
     </li>
   </ul>
@@ -165,7 +169,7 @@
 <p>相比于<a href="https://www.boost.org/doc/libs/1_77_0/libs/msm/doc/HTML/index.html"><code>Boost::MSM</code></a>和<a href="https://www.boost.org/doc/libs/1_77_0/libs/statechart/doc/index.html"><code>Boost::statechart</code></a>，它更为轻量和高效，从作者给出的<a href="https://boost-ext.github.io/sml/benchmarks.html">benchmark</a>来看，在编译时间，执行时间，可执行文件大小，代码长度等方面<code>[Boost::ext].SML</code>都完胜后者。而相比于传统的<code>if/else</code>和<code>enum+switch/case</code>的方式，它有着更好的拓展性和可读性。关于这几种方式之间更详细的benchmark对比可以参考作者在cppcon2018上的<a href="https://www.bilibili.com/video/BV1kW41117uw?p=5">presentation</a>。</p>
 <p>本文将结合例子展示<code>[Boost::ext].SML</code>的基本用法。</p>
 <p>本文中的例子来自官方<a href="https://boost-ext.github.io/sml/tutorial.html">tutorial</a>/<a href="https://boost-ext.github.io/sml/examples.html">example</a>和作者的presentation。状态图中基本概念的详细定义可以参考<a href="https://www.boost.org/doc/libs/1_60_0/libs/msm/doc/HTML/ch02s02.html">UML Short Guide</a>，关于<code>[Boost::ext]/SML</code>中各个概念更详细的语义约束(concept)，可以参考<a href="https://boost-ext.github.io/sml/user_guide.html">user guide</a>。</p>
-<h2 id="states-events-transitions-and-state-machines">States, Events, Transitions and State Machines</h2>
+<h2 id="states-events-transitions-and-state-machines"><strong>States, Events, Transitions and State Machines</strong></h2>
 <p>事件是状态机状态转移的条件之一，在SML中，事件与状态都是用特定的类型来标识的。用<code>*&quot;sinit_state&quot;_s</code>表示一个状态机的起始状态。转移可以写成前缀式或后缀式。</p>
 <blockquote>
 <p>GCC/Clang中的非标准拓展功能使得我们可以使用<code>&quot;state&quot;_s,&quot;state&quot;_e</code>这种方式来标识状态和事件，而在MSVC中则只能使用<code>sml::state&lt;class state&gt;,sml::event&lt;my_event&gt;</code>来标识。</p>
@@ -296,7 +300,7 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="actions-and-guards">Actions and Guards</h2>
+</div><h2 id="actions-and-guards"><strong>Actions and Guards</strong></h2>
 <p>guard可以用来限制状态机的状态转移，只有当guard中的布尔表达式为真时，才会发生相应的状态转移。action相当于触发器，当状态机沿某条转移边转移时，会执行相应的动作。我们还可以用括号和逗号将多个事件串联起来。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -629,7 +633,7 @@
 </span></span></code></pre></td></tr></table>
 </div>
 </div><p>最后，在<code>pool_type_impl</code>中通过SFINAE匹配到对应的构造函数上并完成真正的构造。</p>
-<h2 id="data">Data</h2>
+<h2 id="data"><strong>Data</strong></h2>
 <p>这个例子展示了状态机中数据的不同类型。通过event进入状态机的是临时数据，而状态机的成员变量则是所有状态的共享数据。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -747,7 +751,7 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="deferprocess">Defer/Process</h2>
+</div><h2 id="deferprocess"><strong>Defer/Process</strong></h2>
 <p>当状态机处于某些状态时，我们希望它不处理外来事件，而是将这些事件保存起来，之后再去处理。比如，当某个能响应外部请求的系统被我们人为挂起时，我们希望将直到它解挂前这段时间内的外部请求保存起来，当系统被解挂后再去处理。我们需要用<code>sml::defer_queue</code>来完成上述功能。在状态发生转移后，<code>sml::defer_queue</code>中的事件会依照先进先出的原则依次被转移边check()，当<code>deferred events</code>不能发生转移时，它将继续留在<code>sml::derfer_queue</code>中。注意这里<code>sml::defer_queue</code>不能用<code>std::queue</code>实例化，只能用<code>std::deque</code>否则会报错。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -833,7 +837,7 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="orthogonal-regions">Orthogonal Regions</h2>
+</div><h2 id="orthogonal-regions"><strong>Orthogonal Regions</strong></h2>
 <p>一个状态机中可以同时存在多个不相交的区域，这使得我们同时可以从不同的维度去控制状态机。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -907,7 +911,7 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="history">History</h2>
+</div><h2 id="history"><strong>History</strong></h2>
 <p>通过<code>&quot;idle&quot;_s(H)</code>可以将一个状态机标识为history模式(同时它也是该状态机的初始状态)。标识为history模式意味着每次进入该状态机时被激活的状态是最近使用的状态(上一次离开时的最后的激活状态)。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -1001,7 +1005,7 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="runtime-dispatcher">Runtime Dispatcher</h2>
+</div><h2 id="runtime-dispatcher"><strong>Runtime Dispatcher</strong></h2>
 <p>我们可以通过给事件标号，然后在运行时通过标号来表示发生的事件进行转移。既可以通过定义静态常量来标号，也可以通过继承<code>sml::utility::id</code>来进行标号。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -1093,7 +1097,7 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="error-handling">Error Handling</h2>
+</div><h2 id="error-handling"><strong>Error Handling</strong></h2>
 <p>我们可以在状态转移表中定制状态机发生异常时的行为，这里异常既可以是<code>std::exception</code>，也可以是某些不正常的转移。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -1177,7 +1181,7 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="testing">Testing</h2>
+</div><h2 id="testing"><strong>Testing</strong></h2>
 <p><code>[Boost::ext].SML</code>为我们提供了<code>set_current_states</code>成员函数来方便我们更好地测试与调试。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -1263,9 +1267,9 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="logging">Logging</h2>
+</div><h2 id="logging"><strong>Logging</strong></h2>
 <p><code>[Boost::ext].SML</code>还为我们提供了日志功能让我们更方便的跟踪和debug。详见最后一个例子。</p>
-<h2 id="policy">Policy</h2>
+<h2 id="policy"><strong>Policy</strong></h2>
 <p><code>[Boost::ext].SML</code>为我们提供了四种dispatch的实现方式，分别是jump table,switch/case,if/else和fold expression，我们可以在创建状态机时指定其中的任意一个。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -1410,7 +1414,7 @@
 </span></span><span class="line"><span class="cl"><span class="p">};</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="应用一个模拟服务器demo的实现">应用：一个模拟服务器demo的实现</h2>
+</div><h2 id="应用一个模拟服务器demo的实现"><strong>应用：一个模拟服务器demo的实现</strong></h2>
 <p>最后，让我们来看一个综合性的例子，在这个例子中，我们需要实现如下的状态机：</p>
 <div style="text-align:center;">
 <img src="/imgs/系统状态机.png" style="zoom:50%;" />
@@ -1712,7 +1716,7 @@
   <p class="copyright-item">
     <span class="item-title">上次更新</span>
     <span class="item-content">
-        0001-01-01
+        2021-11-06
         
     </span>
   </p>
@@ -1724,13 +1728,13 @@
           <a href="/tags/C&#43;&#43;/">C&#43;&#43;</a>
           </div>
       <nav class="post-nav">
-        <a class="prev" href="/post/asio%E5%B0%8F%E7%BB%93/">
+        <a class="prev" href="/post/%E5%BE%AA%E7%8E%AF%E7%BE%A4%E7%9A%84%E8%87%AA%E5%90%8C%E6%9E%84%E7%BE%A4%E7%9A%84%E7%BB%93%E6%9E%84/">
             <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">Asio小结</span>
+            <span class="prev-text nav-default">循环群的自同构群的结构</span>
             <span class="prev-text nav-mobile">上一篇</span>
           </a>
-        <a class="next" href="/post/cpp_memory_order/">
-            <span class="next-text nav-default">C&#43;&#43; execution model and memory order</span>
+        <a class="next" href="/post/struct_layout_pretty_printer/">
+            <span class="next-text nav-default">一个利用Boost::pfr展示结构体内存布局的pretty printer</span>
             <span class="next-text nav-mobile">下一篇</span>
             <i class="iconfont icon-right"></i>
           </a>
@@ -1749,21 +1753,8 @@
 
     <footer id="footer" class="footer">
       <div class="social-links">
-      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
-      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
-      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
-      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
-      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
-      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
-      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
-      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
-      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
-      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
-      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
-      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
-      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
-      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+      <a href="mailto:bh2444151092@outlook.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/bobhan1" class="iconfont icon-github" title="github"></a>
   <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
 
@@ -1781,7 +1772,7 @@
 
   <span class="copyright-year">
     &copy; 
-    2017 - 
+    2019 - 
     2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
   </span>
 </div>

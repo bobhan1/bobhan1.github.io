@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="bobh" /><meta name="description" content="Execution Model Abstract Machine C&#43;&#43; programs describe operations that are performed on the abstract machine. C&#43;&#43; implementations define the characteristics of the abstract machine and translate operations on the abstract machine into operations on the system. Storage Model Storage is flat; no notion hierarchy (caches, etc). Objects reside in storage at a single memory location. Some objects may not have a unique memory location: Eligible empty base classes Objects marked" /><meta name="keywords" content="Hugo, theme, even" />
+<meta name="author" content="bobh" /><meta name="description" content="本文介绍了C&#43;&#43;抽象机与memory order的相关知识" /><meta name="keywords" content="Hugo, theme, even" />
 
 
 
@@ -35,24 +35,24 @@
 
 
 
-<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link href="/sass/main.min.2a71e62d7ea35a3a3f92c3c16c456852aaec63713de5cd5dbadb28e7480fd599.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
 <meta property="og:title" content="C&#43;&#43; execution model and memory order" />
-<meta property="og:description" content="Execution Model Abstract Machine C&#43;&#43; programs describe operations that are performed on the abstract machine. C&#43;&#43; implementations define the characteristics of the abstract machine and translate operations on the abstract machine into operations on the system. Storage Model Storage is flat; no notion hierarchy (caches, etc). Objects reside in storage at a single memory location. Some objects may not have a unique memory location: Eligible empty base classes Objects marked" />
+<meta property="og:description" content="本文介绍了C&#43;&#43;抽象机与memory order的相关知识" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://localhost:1313/post/cpp_memory_order/" /><meta property="article:section" content="post" />
-
-
+<meta property="article:published_time" content="2022-03-27T00:00:00+00:00" />
+<meta property="article:modified_time" content="2022-03-27T00:00:00+00:00" />
 
 <meta itemprop="name" content="C&#43;&#43; execution model and memory order">
-<meta itemprop="description" content="Execution Model Abstract Machine C&#43;&#43; programs describe operations that are performed on the abstract machine. C&#43;&#43; implementations define the characteristics of the abstract machine and translate operations on the abstract machine into operations on the system. Storage Model Storage is flat; no notion hierarchy (caches, etc). Objects reside in storage at a single memory location. Some objects may not have a unique memory location: Eligible empty base classes Objects marked">
-
+<meta itemprop="description" content="本文介绍了C&#43;&#43;抽象机与memory order的相关知识"><meta itemprop="datePublished" content="2022-03-27T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2022-03-27T00:00:00+00:00" />
 <meta itemprop="wordCount" content="2954">
 <meta itemprop="keywords" content="C&#43;&#43;,memory order," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="C&#43;&#43; execution model and memory order"/>
-<meta name="twitter:description" content="Execution Model Abstract Machine C&#43;&#43; programs describe operations that are performed on the abstract machine. C&#43;&#43; implementations define the characteristics of the abstract machine and translate operations on the abstract machine into operations on the system. Storage Model Storage is flat; no notion hierarchy (caches, etc). Objects reside in storage at a single memory location. Some objects may not have a unique memory location: Eligible empty base classes Objects marked"/>
+<meta name="twitter:description" content="本文介绍了C&#43;&#43;抽象机与memory order的相关知识"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -78,13 +78,15 @@
 <nav id="mobile-menu" class="mobile-menu slideout-menu">
   <ul class="mobile-menu-list">
     <a href="/">
-        <li class="mobile-menu-item">Home</li>
+        <li class="mobile-menu-item">首页</li>
       </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
+        <li class="mobile-menu-item">归档</li>
       </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
+        <li class="mobile-menu-item">标签</li>
       </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
       </a>
   </ul>
 
@@ -106,13 +108,15 @@
 <nav class="site-navbar">
   <ul id="menu" class="menu">
     <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
+        <a class="menu-item-link" href="/">首页</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
+        <a class="menu-item-link" href="/post/">归档</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
+        <a class="menu-item-link" href="/tags/">标签</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
       </li>
   </ul>
 </nav>
@@ -128,7 +132,7 @@
       <h1 class="post-title">C&#43;&#43; execution model and memory order</h1>
 
       <div class="post-meta">
-        <span class="post-time"> 0001-01-01 </span>
+        <span class="post-time"> 2022-03-27 </span>
         
         
       </div>
@@ -182,16 +186,8 @@
 <li>Storage is flat; no notion hierarchy (caches, etc). Objects reside in storage at a single memory location.</li>
 <li>Some objects may not have a unique memory location:
 <ul>
-<li>
-<ul>
 <li>Eligible empty base classes</li>
-</ul>
-</li>
-<li>
-<ul>
 <li>Objects marked <code>[[no_unique_address]]</code></li>
-</ul>
-</li>
 </ul>
 </li>
 <li>An implementation is allowed to store two objects at the same machine address or not store an object at all.</li>
@@ -535,7 +531,7 @@
   <p class="copyright-item">
     <span class="item-title">上次更新</span>
     <span class="item-content">
-        0001-01-01
+        2022-03-27
         
     </span>
   </p>
@@ -548,13 +544,9 @@
           <a href="/tags/memory-order/">memory order</a>
           </div>
       <nav class="post-nav">
-        <a class="prev" href="/post/Boostsml%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/">
-            <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">Boost.SML使用指南</span>
-            <span class="prev-text nav-mobile">上一篇</span>
-          </a>
-        <a class="next" href="/post/C&#43;&#43;20coroutine/">
-            <span class="next-text nav-default">C&#43;&#43;20协程</span>
+        
+        <a class="next" href="/post/%E5%BC%A0%E9%87%8F%E7%9A%84%E6%9E%84%E9%80%A0/">
+            <span class="next-text nav-default">张量</span>
             <span class="next-text nav-mobile">下一篇</span>
             <i class="iconfont icon-right"></i>
           </a>
@@ -573,21 +565,8 @@
 
     <footer id="footer" class="footer">
       <div class="social-links">
-      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
-      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
-      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
-      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
-      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
-      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
-      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
-      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
-      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
-      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
-      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
-      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
-      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
-      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+      <a href="mailto:bh2444151092@outlook.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/bobhan1" class="iconfont icon-github" title="github"></a>
   <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
 
@@ -605,7 +584,7 @@
 
   <span class="copyright-year">
     &copy; 
-    2017 - 
+    2019 - 
     2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
   </span>
 </div>

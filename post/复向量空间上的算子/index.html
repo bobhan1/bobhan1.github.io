@@ -35,7 +35,7 @@
 
 
 
-<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link href="/sass/main.min.2a71e62d7ea35a3a3f92c3c16c456852aaec63713de5cd5dbadb28e7480fd599.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
@@ -49,7 +49,7 @@
 <meta itemprop="name" content="复向量空间上的算子">
 <meta itemprop="description" content="8.A 广义本征向量和幂零算子 8.2 递增的零空间序列 $$ {0}={\rm null}\ T^0\subset {\rm null}\ T^1\subset \cdots {\rm null}\ T^k\subset {\rm null}\ T^{k&#43;1}\subset\cdots $$ 8.3 零空间序列中的等式 设$m$是非负整数使得${\rm null}\ T^m={\rm null}\ T^{m&#43;"><meta itemprop="datePublished" content="2021-08-25T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2021-08-25T00:00:00+00:00" />
-<meta itemprop="wordCount" content="3558">
+<meta itemprop="wordCount" content="3554">
 <meta itemprop="keywords" content="线性代数," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="复向量空间上的算子"/>
 <meta name="twitter:description" content="8.A 广义本征向量和幂零算子 8.2 递增的零空间序列 $$ {0}={\rm null}\ T^0\subset {\rm null}\ T^1\subset \cdots {\rm null}\ T^k\subset {\rm null}\ T^{k&#43;1}\subset\cdots $$ 8.3 零空间序列中的等式 设$m$是非负整数使得${\rm null}\ T^m={\rm null}\ T^{m&#43;"/>
@@ -78,13 +78,15 @@
 <nav id="mobile-menu" class="mobile-menu slideout-menu">
   <ul class="mobile-menu-list">
     <a href="/">
-        <li class="mobile-menu-item">Home</li>
+        <li class="mobile-menu-item">首页</li>
       </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
+        <li class="mobile-menu-item">归档</li>
       </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
+        <li class="mobile-menu-item">标签</li>
       </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
       </a>
   </ul>
 
@@ -106,13 +108,15 @@
 <nav class="site-navbar">
   <ul id="menu" class="menu">
     <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
+        <a class="menu-item-link" href="/">首页</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
+        <a class="menu-item-link" href="/post/">归档</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
+        <a class="menu-item-link" href="/tags/">标签</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
       </li>
   </ul>
 </nav>
@@ -141,10 +145,10 @@
   <ul>
     <li>
       <ul>
-        <li><a href="#8a-广义本征向量和幂零算子">8.A 广义本征向量和幂零算子</a></li>
-        <li><a href="#8b-算子的分解">8.B 算子的分解</a></li>
-        <li><a href="#8c-特征多项式和极小多项式">8.C 特征多项式和极小多项式</a></li>
-        <li><a href="#8d-若尔当型">8.D 若尔当型</a></li>
+        <li><a href="#8a-广义本征向量和幂零算子"><strong>8.A 广义本征向量和幂零算子</strong></a></li>
+        <li><a href="#8b-算子的分解"><strong>8.B 算子的分解</strong></a></li>
+        <li><a href="#8c-特征多项式和极小多项式"><strong>8.C 特征多项式和极小多项式</strong></a></li>
+        <li><a href="#8d-若尔当型"><strong>8.D 若尔当型</strong></a></li>
       </ul>
     </li>
   </ul>
@@ -152,7 +156,7 @@
   </div>
 </div>
     <div class="post-content">
-      <h2 id="8a-广义本征向量和幂零算子">8.A 广义本征向量和幂零算子</h2>
+      <h2 id="8a-广义本征向量和幂零算子"><strong>8.A 广义本征向量和幂零算子</strong></h2>
 <blockquote>
 <p><strong>8.2 递增的零空间序列</strong>
 $$
@@ -245,7 +249,7 @@ $$
 </blockquote>
 <p>首先取$\rm null\it N$的一个基,将它扩充成$\rm null\it N^2$的基,如此下去,最终得到$V$的一个基(由8.18得$\rm null \it N^{\rm dimV}=V$).</p>
 <p>现在我们来考虑这个矩阵,第一列（或许前几列）全部由零构成,因为相应的基向量包含于$\rm null\it N$.下一组基向量来自于$\rm null\it N^2$,任意这样的向量被$N$作用后都是$\rm null \it N$中的向量,也就是说,得到的向量是前面向量的线性组合,因此这些列中所有非零元素一定出现在对角线上方.如此继续下去即证明了该矩阵对角线和对角线下方的元素均为零.</p>
-<h2 id="8b-算子的分解">8.B 算子的分解</h2>
+<h2 id="8b-算子的分解"><strong>8.B 算子的分解</strong></h2>
 <blockquote>
 <p><strong>8.20</strong> 若$p\in P(F)$,则${\rm null}\ p(T)$ 和$\rm range\it\ p(T)$在$T$下不变</p>
 </blockquote>
@@ -253,7 +257,7 @@ $$
 <blockquote>
 <p><strong>8.21 复向量空间上算子的刻画</strong></p>
 </blockquote>
-<p>若$V$是复向量空间,$T\in L(V)$,设$\lambda_1,\lambda_2,\cd&gt; ots,\lambda_m$是$T$的不同的本征值,则</p>
+<p>若$V$是复向量空间,$T\in L(V)$,设$\lambda_1,\lambda_2,\cdots,\lambda_m$是$T$的不同的本征值,则</p>
 <blockquote>
 <p>(a) $V=G( \lambda_1,T)\oplus\cdots\oplus G(\lambda_m,T)$</p>
 <p>(b) 每个$G( \lambda_j,T)$在$T$下保持不变</p>
@@ -325,15 +329,15 @@ $$</p>
 <!--每个$(T- \lambda_j I)|_{G( \lambda_j,T)}$都是幂零的(8.12(c)),对每个$j$,取$G( \lambda_j,T)$的一个基,使得-->
 <p>每个
 $$
-(T-\lambda_j I)|<em>{G( \lambda_j,T)}
+(T-\lambda_j I)|_{G( \lambda_j,T)}
 $$
 都是幂零的(8.12(c)),对每个$j$,取$G( \lambda_j,T)$的一个基,使得
 $$
-(T-\lambda_jI)|</em>{G(\lambda_j,T)}
+(T-\lambda_jI)|_{G(\lambda_j,T)}
 $$
 关于这个基的矩阵对角线及其下方的元素均为零(8.19).于是
 $$
-T|<em>{G(\lambda_j,T)}=(T-\lambda_jI)|</em>{G(\lambda_j,T)}+\lambda_j|_{G(\lambda_j,T)}.
+T|_{G(\lambda_j,T)}=(T-\lambda_jI)|_{G(\lambda_j,T)}+\lambda_j|_{G(\lambda_j,T)}.
 $$
 就有上面$A_j$的形式.将这些基放在一起就构成$V$的一个基,于是$T$关于这组基就有如上的形式.</p>
 <blockquote>
@@ -343,8 +347,8 @@ $$
 <blockquote>
 <p><strong>8.33</strong> $V$是复向量空间,$T\in L(V)$是可逆的,则$T$有平方根</p>
 </blockquote>
-<h2 id="8c-特征多项式和极小多项式">8.C 特征多项式和极小多项式</h2>
-<h2 id="8d-若尔当型">8.D 若尔当型</h2>
+<h2 id="8c-特征多项式和极小多项式"><strong>8.C 特征多项式和极小多项式</strong></h2>
+<h2 id="8d-若尔当型"><strong>8.D 若尔当型</strong></h2>
 <blockquote>
 <p><strong>8.55</strong> 设$N\in L(V)$是幂零的,则存在向量$v_1,v_2,\cdots,v_n\in V$和非负整数$m_1,m_2,\cdots,m_n$,使得
 (a) $N^{m_1}v_1,&hellip;,Nv_1,v_1,&hellip;,N^{m_n}v_n,&hellip;,Nv_n,v_n$是$V$的基
@@ -403,7 +407,7 @@ $$</p>
 </blockquote>
 <!-- -->
 <blockquote>
-<p>8.60 若尔当型
+<p><strong>8.60 若尔当型</strong>
 定义：$V$是复向量空间,$T\in L(V)$,则$V$有一个基是$T$的若尔当基</p>
 </blockquote>
 <p>首先考虑幂零算子$N$与8.55中给出的向量$v_1,v_2,\cdots,v_n\in V$,注意到对于每个$j$,$N$都将组$N^{m_j}v_j,&hellip;,Nv_j$的第一个向量映成0,并且将这个组中除了第一个向量之外的其余向量都映成了前一个向量.也就是说,$N$关于这个基友分块对角矩阵,且对角线上的每个矩阵都形如
@@ -422,11 +426,11 @@ V=G(\lambda_1,T)\oplus\cdots\oplus G(\lambda_m,T)
 $$
 其中每个
 $$
-(T-\lambda_jI)|<em>{G(\lambda_j,T)}
+(T-\lambda_jI)|_{G(\lambda_j,T)}
 $$
 都是幂零的(8.21),于是每个$G( \lambda_j,T)$的某个基是
 $$
-(T-\lambda_jI)|</em>{G(\lambda_j,T)}
+(T-\lambda_jI)|_{G(\lambda_j,T)}
 $$
 的若尔当基,讲这些基组合起来就得到$V$的一个关于$T$的若尔当基.</p>
 
@@ -452,13 +456,13 @@ $$
           <a href="/tags/%E7%BA%BF%E6%80%A7%E4%BB%A3%E6%95%B0/">线性代数</a>
           </div>
       <nav class="post-nav">
-        <a class="prev" href="/post/%E5%BE%AA%E7%8E%AF%E7%BE%A4%E7%9A%84%E8%87%AA%E5%90%8C%E6%9E%84%E7%BE%A4%E7%9A%84%E7%BB%93%E6%9E%84/">
+        <a class="prev" href="/post/C&#43;&#43;%E4%B8%AD%E7%9A%84%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/">
             <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">循环群的自同构群的结构</span>
+            <span class="prev-text nav-default">C&#43;&#43;中的内存对齐</span>
             <span class="prev-text nav-mobile">上一篇</span>
           </a>
-        <a class="next" href="/post/%E8%B0%B1%E5%AE%9A%E7%90%86%E6%9E%81%E5%88%86%E8%A7%A3%E4%B8%8E%E5%A5%87%E5%BC%82%E5%80%BC%E5%88%86%E8%A7%A3/">
-            <span class="next-text nav-default">谱定理,极分解与奇异值分解</span>
+        <a class="next" href="/post/Levi-Civita%E5%B9%B3%E7%A7%BB/">
+            <span class="next-text nav-default">曲面上的Levi-Civita平移</span>
             <span class="next-text nav-mobile">下一篇</span>
             <i class="iconfont icon-right"></i>
           </a>
@@ -477,21 +481,8 @@ $$
 
     <footer id="footer" class="footer">
       <div class="social-links">
-      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
-      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
-      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
-      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
-      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
-      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
-      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
-      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
-      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
-      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
-      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
-      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
-      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
-      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+      <a href="mailto:bh2444151092@outlook.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/bobhan1" class="iconfont icon-github" title="github"></a>
   <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
 
@@ -509,7 +500,7 @@ $$
 
   <span class="copyright-year">
     &copy; 
-    2017 - 
+    2019 - 
     2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
   </span>
 </div>

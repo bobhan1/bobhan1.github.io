@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="bobh" /><meta name="description" content="C&#43;&#43; coroutine TS 概述 Coroutine TS提供了一种通用机制，使得我们可以通过实现符合特定接口的类型来灵活地定制协程的行为，利用这套机制，我们可以对协程的流程实现细粒" /><meta name="keywords" content="Hugo, theme, even" />
+<meta name="author" content="bobh" /><meta name="description" content="本文小结了C&#43;&#43; coroutine TS中的关键概念，并结合几个具体的例子说明了它们的用法" /><meta name="keywords" content="Hugo, theme, even" />
 
 
 
@@ -35,24 +35,24 @@
 
 
 
-<link href="/sass/main.min.b5a744db6de49a86cadafb3b70f555ab443f83c307a483402259e94726b045ff.css" rel="stylesheet">
+<link href="/sass/main.min.2a71e62d7ea35a3a3f92c3c16c456852aaec63713de5cd5dbadb28e7480fd599.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
 
 
 <meta property="og:title" content="C&#43;&#43;20协程" />
-<meta property="og:description" content="C&#43;&#43; coroutine TS 概述 Coroutine TS提供了一种通用机制，使得我们可以通过实现符合特定接口的类型来灵活地定制协程的行为，利用这套机制，我们可以对协程的流程实现细粒" />
+<meta property="og:description" content="本文小结了C&#43;&#43; coroutine TS中的关键概念，并结合几个具体的例子说明了它们的用法" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://localhost:1313/post/C&#43;&#43;20coroutine/" /><meta property="article:section" content="post" />
-
-
+<meta property="article:published_time" content="2021-10-11T00:00:00+00:00" />
+<meta property="article:modified_time" content="2021-10-11T00:00:00+00:00" />
 
 <meta itemprop="name" content="C&#43;&#43;20协程">
-<meta itemprop="description" content="C&#43;&#43; coroutine TS 概述 Coroutine TS提供了一种通用机制，使得我们可以通过实现符合特定接口的类型来灵活地定制协程的行为，利用这套机制，我们可以对协程的流程实现细粒">
-
+<meta itemprop="description" content="本文小结了C&#43;&#43; coroutine TS中的关键概念，并结合几个具体的例子说明了它们的用法"><meta itemprop="datePublished" content="2021-10-11T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2021-10-11T00:00:00+00:00" />
 <meta itemprop="wordCount" content="8941">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="C&#43;&#43;20协程"/>
-<meta name="twitter:description" content="C&#43;&#43; coroutine TS 概述 Coroutine TS提供了一种通用机制，使得我们可以通过实现符合特定接口的类型来灵活地定制协程的行为，利用这套机制，我们可以对协程的流程实现细粒"/>
+<meta name="twitter:description" content="本文小结了C&#43;&#43; coroutine TS中的关键概念，并结合几个具体的例子说明了它们的用法"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -78,13 +78,15 @@
 <nav id="mobile-menu" class="mobile-menu slideout-menu">
   <ul class="mobile-menu-list">
     <a href="/">
-        <li class="mobile-menu-item">Home</li>
+        <li class="mobile-menu-item">首页</li>
       </a><a href="/post/">
-        <li class="mobile-menu-item">Archives</li>
+        <li class="mobile-menu-item">归档</li>
       </a><a href="/tags/">
-        <li class="mobile-menu-item">Tags</li>
+        <li class="mobile-menu-item">标签</li>
       </a><a href="/categories/">
-        <li class="mobile-menu-item">Categories</li>
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
       </a>
   </ul>
 
@@ -106,13 +108,15 @@
 <nav class="site-navbar">
   <ul id="menu" class="menu">
     <li class="menu-item">
-        <a class="menu-item-link" href="/">Home</a>
+        <a class="menu-item-link" href="/">首页</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/post/">Archives</a>
+        <a class="menu-item-link" href="/post/">归档</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/tags/">Tags</a>
+        <a class="menu-item-link" href="/tags/">标签</a>
       </li><li class="menu-item">
-        <a class="menu-item-link" href="/categories/">Categories</a>
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
       </li>
   </ul>
 </nav>
@@ -128,7 +132,7 @@
       <h1 class="post-title">C&#43;&#43;20协程</h1>
 
       <div class="post-meta">
-        <span class="post-time"> 0001-01-01 </span>
+        <span class="post-time"> 2021-10-11 </span>
         
         
       </div>
@@ -141,15 +145,15 @@
   <ul>
     <li>
       <ul>
-        <li><a href="#c-coroutine-ts-概述">C++ coroutine TS 概述</a></li>
-        <li><a href="#co_awaitawaitable和awaiter"><code>co_await</code>,<code>awaitable</code>和<code>awaiter</code></a>
+        <li><a href="#c-coroutine-ts-概述"><strong>C++ coroutine TS 概述</strong></a></li>
+        <li><a href="#co_awaitawaitable和awaiter"><strong><code>co_await</code>,<code>awaitable</code>和<code>awaiter</code></strong></a>
           <ul>
-            <li><a href="#example">Example</a></li>
+            <li><a href="#example"><strong>Example</strong></a></li>
           </ul>
         </li>
-        <li><a href="#promise_type"><code>promise_type</code></a></li>
-        <li><a href="#coroutine_handle和协程帧"><code>coroutine_handle</code>和协程帧</a></li>
-        <li><a href="#协程在线程间切换时的数据安全问题">协程在线程间切换时的数据安全问题</a></li>
+        <li><a href="#promise_type"><strong><code>promise_type</code></strong></a></li>
+        <li><a href="#coroutine_handle和协程帧"><strong><code>coroutine_handle</code>和协程帧</strong></a></li>
+        <li><a href="#协程在线程间切换时的数据安全问题"><strong>协程在线程间切换时的数据安全问题</strong></a></li>
       </ul>
     </li>
   </ul>
@@ -157,7 +161,7 @@
   </div>
 </div>
     <div class="post-content">
-      <h2 id="c-coroutine-ts-概述">C++ coroutine TS 概述</h2>
+      <h2 id="c-coroutine-ts-概述"><strong>C++ coroutine TS 概述</strong></h2>
 <p>Coroutine TS提供了一种通用机制，使得我们可以通过实现符合特定接口的类型来灵活地定制协程的行为，利用这套机制，我们可以对协程的流程实现细粒度的控制（这也使得它对于使用者来说有些过于繁重）。我们实现特定接口并使用关键字使得函数成为协程，然后编译器在特定位置插入代码并对其进行转换并将协程体转化为状态机使得重入的效率更高。同时，它使得我们能够将业务逻辑从框架中抽离出来，使得代码结构更加清晰。简单来说，协程可以看做是编译器支持的回调包装器。</p>
 <p>如果函数的定义进行了下列操作之一，那么它是协程：</p>
 <ul>
@@ -169,7 +173,7 @@
 <p><code>promise_type</code>指定了定制协程本身的方法。我们可以灵活地定制协程被调用时做什么，协程返回时做什么(包括一般意义上返回和异常之后返回)，还可以定制协程中调用<code>co_await</code>和<code>co_yield</code>时的行为。它从内部操控协程，并且充当调用者和协程之间的通信信道，协程通过<code>promise_type</code>对象提交结果到外部（类似<code>promise/future</code>当中<code>promise</code>的用法），协程中的异常也通过它来传递并处理。</p>
 <p><code>awaiter</code>接口指定了控制<code>co_wait</code>表达式语义的方法。当一个值被<code>co_await</code>时，代码被转换成一系列对<code>awaiter</code>对象上的方法的调用，这些调用允许它指定：是否挂起当前协程，在它挂起后执行一些逻辑来调度(/安排)协程以便稍后恢复，并在协程恢复后执行一些逻辑，以生成<code>co_await</code>表达式的结果。</p>
 <p><code>coroutine_handle</code>代表了协程帧的非拥有句柄，它可以用于恢复协程的执行或者销毁协程帧。协程帧包含了协程的状态，包括<code>promise_type</code>对象、值传递的函数参数、挂起点的位置以及局部变量和生命周期跨越挂起点的临时变量。当协程被挂起时，这些在栈帧上对象被复制到堆上的协程帧中，而当协程恢复时，它们又会重新从协程帧中复制会栈帧上(该过程可能被编译器优化掉)。由于协程的状态是持续存在的，其生命周期是独立的的，所以需要一个额外的对象管理其生命周期，使其生命周期和执行过程解绑，而这正是<code>coroutine_handle</code>的职责，它就是一个指向协程帧的类型擦除指针，给我们提供了从外部控制协程的能力。</p>
-<h2 id="co_awaitawaitable和awaiter"><code>co_await</code>,<code>awaitable</code>和<code>awaiter</code></h2>
+<h2 id="co_awaitawaitable和awaiter"><strong><code>co_await</code>,<code>awaitable</code>和<code>awaiter</code></strong></h2>
 <p>任何包含使用<code>co_await</code>运算符的函数体都将被编译为一个协程，支持<code>co_await</code>运算符的类型被称为<code>awaitable</code>类型。我么可以通过重载<code>co_await</code>操作符或在<code>promise_type</code>中实现<code>await_transform</code>来定制<code>co_await</code>的行为。</p>
 <p>标准库定义了两个平凡的<code>awaitable</code>类型：<code>std::suspend_always</code>和 <code>std::suspend_never</code>如下：</p>
 <div class="highlight"><div class="chroma">
@@ -287,7 +291,7 @@
 </div><p>对于返回值为<code>void</code>版本的<code>await_suspend()</code>，当对<code>await_suspend()</code>的调用返回时无条件转回执行协程的主调函数/调用<code>resume</code>者。而返回值为<code>bool</code>类型的版本则允许<code>awaiter</code>对象有条件地不返回主调函数/resumer而立即恢复协程。</p>
 <p>如果 <code>await_suspend</code> 返回某个其他协程的<code>coroutine_handle</code>，那么恢复该句柄，注意这可以连锁进行，并最终导致当前协程恢复。</p>
 <p>下面我们通过一个例子来深入理解<code>co_await</code>的作用。</p>
-<h3 id="example">Example</h3>
+<h3 id="example"><strong>Example</strong></h3>
 <p>在这个例子中，有多个并发执行的协程等待，直到某个线程调用<code>set()</code>方法，此时任何等待的协程都将恢复。如果已经有某个线程调用过<code>set()</code>方法，那么协程将会不挂起而继续执行。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -546,7 +550,7 @@
 </span></span></code></pre></td></tr></table>
 </div>
 </div><p>在<code>set()</code>方法中，我们希望通过将当前状态与特殊的“set”值——<code>this</code>交换，从而转换到set状态，然后检查旧值是什么。如果有任何等待的协程，那么我们希望在返回之前依次恢复它们中的每一个。</p>
-<h2 id="promise_type"><code>promise_type</code></h2>
+<h2 id="promise_type"><strong><code>promise_type</code></strong></h2>
 <p><code>promise_type</code>从内部控制协程，它定义了协程本身的绝大多数行为，同时我们可以通过<code>promise_type</code>跟踪并控制协程的状态。一个含有<code>promise_type</code>的包装类可能有如下定义</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -928,7 +932,7 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="coroutine_handle和协程帧"><code>coroutine_handle</code>和协程帧</h2>
+</div><h2 id="coroutine_handle和协程帧"><strong><code>coroutine_handle</code>和协程帧</strong></h2>
 <p><code>coroutine_handle</code>是协程帧的非拥有句柄，协程帧包含了必要的协程状态(<code>promise_type</code>对象、值传递的函数参数、挂起点的位置以及局部变量和生命周期跨越挂起点的临时变量)，于是我们可以通过<code>coroutine_handle</code>来恢复协程的执行或者销毁协程帧。</p>
 <p>下面是<code>coruotine_handle</code>的接口。</p>
 <div class="highlight"><div class="chroma">
@@ -1168,7 +1172,7 @@
 </span></span></code></pre></td></tr></table>
 </div>
 </div><p>在这个例子中，<code>couter3()</code>的<code>for</code>循环中的<code>i</code>是该协程生命周期跨过挂起点的临时变量，在每次协程挂起前我们指向它的指针放入<code>promise_type</code>中，之后再在主函数中访问它。正如前面所说，生命周期跨过挂起点的临时变量会放在堆上，所以知道我们调用<code>h.destroy()</code>之前他们都是可以访问的。</p>
-<h2 id="协程在线程间切换时的数据安全问题">协程在线程间切换时的数据安全问题</h2>
+<h2 id="协程在线程间切换时的数据安全问题"><strong>协程在线程间切换时的数据安全问题</strong></h2>
 <p>我们知道，<code>co_await</code>运算符让我们能够在协程挂起和执行权返回主调函数/resumer之前执行额外代码。这允许一个awaiter对象在协程挂起后初始化一个异步操作，将挂起的协程的<code>coroutine_handle</code>传递给后续能安全恢复(挂起的协程)的操作，该操作完成时就可以恢复协程(可能是在另一个线程中)，并且这当中不需要额外的同步语句。同时由于 <code>await_suspend()</code> 在当前线程上持续执行， <code>await_suspend()</code> 应该把<code>*this</code>当作已被销毁并且在柄被发布到其他线程后不再访问它。这是因为一旦我们将协程句柄发布给其它线程，那么其它线程可能会在<code>await_suspend()</code>方法返回之前恢复协程，这可能会导致(其它线程中的)协程与(当前线程中的协程的)<code>await_suspend()</code>方法的剩余部分并发地执行。</p>
 <p>而协程恢复时第一件要做的事就是调用<code>await_resume()</code>方法来获取结果，之后，它大概率会立即销毁<code>awaiter</code>对象(也就是调用<code>await_suspend()</code>的<code>this</code>指针)。（在另一个线程上恢复的）协程接下来可能会在当前线程中的<code>await_suspend()</code>返回之前会执行到结束，销毁协程和<code>promise</code>对象。</p>
 <p>所以，一旦有可能在另一个线程中并发恢复当前协程，我们需要保证在<code>await_suspend()</code>方法中避免访问<code>this</code>指针或协程的<code>promise</code>对象，因为这些可能已经(在另外的线程中)被销毁。一般来说，在操作开始和协程被安排在未来某点恢复之后能安全访问的内容就是<code>await_suspend()</code>内的局部变量，下面我们看一个具体的例子。</p>
@@ -1274,7 +1278,7 @@
   <p class="copyright-item">
     <span class="item-title">上次更新</span>
     <span class="item-content">
-        0001-01-01
+        2021-10-11
         
     </span>
   </p>
@@ -1284,13 +1288,13 @@
 <footer class="post-footer">
       
       <nav class="post-nav">
-        <a class="prev" href="/post/cpp_memory_order/">
+        <a class="prev" href="/post/struct_layout_pretty_printer/">
             <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">C&#43;&#43; execution model and memory order</span>
+            <span class="prev-text nav-default">一个利用Boost::pfr展示结构体内存布局的pretty printer</span>
             <span class="prev-text nav-mobile">上一篇</span>
           </a>
-        <a class="next" href="/post/C&#43;&#43;%E4%B8%AD%E7%9A%84%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90/">
-            <span class="next-text nav-default">C&#43;&#43;中的内存对齐</span>
+        <a class="next" href="/post/openGL%E7%AC%94%E8%AE%B0/">
+            <span class="next-text nav-default">openGL入门笔记</span>
             <span class="next-text nav-mobile">下一篇</span>
             <i class="iconfont icon-right"></i>
           </a>
@@ -1309,21 +1313,8 @@
 
     <footer id="footer" class="footer">
       <div class="social-links">
-      <a href="mailto:your@email.com" class="iconfont icon-email" title="email"></a>
-      <a href="http://localhost:1313" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
-      <a href="http://localhost:1313" class="iconfont icon-twitter" title="twitter"></a>
-      <a href="http://localhost:1313" class="iconfont icon-facebook" title="facebook"></a>
-      <a href="http://localhost:1313" class="iconfont icon-linkedin" title="linkedin"></a>
-      <a href="http://localhost:1313" class="iconfont icon-google" title="google"></a>
-      <a href="http://localhost:1313" class="iconfont icon-github" title="github"></a>
-      <a href="http://localhost:1313" class="iconfont icon-weibo" title="weibo"></a>
-      <a href="http://localhost:1313" class="iconfont icon-zhihu" title="zhihu"></a>
-      <a href="http://localhost:1313" class="iconfont icon-douban" title="douban"></a>
-      <a href="http://localhost:1313" class="iconfont icon-pocket" title="pocket"></a>
-      <a href="http://localhost:1313" class="iconfont icon-tumblr" title="tumblr"></a>
-      <a href="http://localhost:1313" class="iconfont icon-instagram" title="instagram"></a>
-      <a href="http://localhost:1313" class="iconfont icon-gitlab" title="gitlab"></a>
-      <a href="http://localhost:1313" class="iconfont icon-bilibili" title="bilibili"></a>
+      <a href="mailto:bh2444151092@outlook.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/bobhan1" class="iconfont icon-github" title="github"></a>
   <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
 </div>
 
@@ -1341,7 +1332,7 @@
 
   <span class="copyright-year">
     &copy; 
-    2017 - 
+    2019 - 
     2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
   </span>
 </div>
