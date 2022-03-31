@@ -196,73 +196,41 @@
 </ul>
 <h2 id="threads-of-execution"><strong>Threads of Execution</strong></h2>
 <ul>
-<li>
-<p>A thread of execution is a single flow of control in a program which evaluates a function call; threads may run concurrently.</p>
-</li>
-<li>
-<p>Variables with static storage duration are initialized as a consequence of program initiation.</p>
-</li>
-<li>
-<p>Variables with thread storage duration are initialized as a consequence of thread execution.</p>
-</li>
+<li>A thread of execution is a single flow of control in a program which evaluates a function call; threads may run concurrently.</li>
+<li>Variables with static storage duration are initialized as a consequence of program initiation.</li>
+<li>Variables with thread storage duration are initialized as a consequence of thread execution.</li>
 </ul>
 <h2 id="expression"><strong>Expression</strong></h2>
 <ul>
-<li>
-<p>An expression is a sequence of operators and operands that specifies a computation.</p>
-</li>
-<li>
-<p>Subexpressions are a part of a larger expression.</p>
-</li>
-<li>
-<p>Full expressions are not subexpressions.</p>
-</li>
-<li>
-<p>Full expressions may include subexpressions that are not lexically part of the expression.</p>
-</li>
+<li>An expression is a sequence of operators and operands that specifies a computation.</li>
+<li>Subexpressions are a part of a larger expression.</li>
+<li>Full expressions are not subexpressions.</li>
+<li>Full expressions may include subexpressions that are not lexically part of the expression.</li>
 </ul>
 <h2 id="evaluations"><strong>Evaluations</strong></h2>
 <ul>
-<li>
-<p>Evaluation of an expression includes value computations and the initiation of side effects.</p>
-</li>
-<li>
-<p>Side effects change the environment:</p>
+<li>Evaluation of an expression includes value computations and the initiation of side effects.</li>
+<li>Side effects change the environment:
 <ul>
 <li>Reading a volatile object or modifying any object.</li>
 <li>Calling a library I/O function.</li>
 <li>Calling a function that does any of the above.</li>
 </ul>
 </li>
-<li>
-<p>Value computations are pure and have no observable effect.</p>
-</li>
-<li>
-<p>Completion of the execution of an evaluation does not imply completion of its side effects.</p>
-</li>
+<li>Value computations are pure and have no observable effect.</li>
+<li>Completion of the execution of an evaluation does not imply completion of its side effects.</li>
 </ul>
 <h2 id="sequenced-before"><strong>Sequenced-Before</strong></h2>
 <ul>
-<li>
-<p>Given any two evaluations A and B within the same thread of execution, if A is sequenced before B, then the execution of A shall precede the execution of B.</p>
-</li>
-<li>
-<p>Each full expression is sequenced before the next full expression in program order.</p>
-</li>
-<li>
-<p>If A and B are indeterminately sequenced, then either A is sequenced before B or B is sequenced before A, but it is unspecified which. E.g. A and B are not interleaved.</p>
-</li>
-<li>
-<p>If A and B are unsequenced, then A is not sequenced before B and B is not sequenced before A. E.g. A and B may be interleaved.</p>
-</li>
+<li>Given any two evaluations A and B within the same thread of execution, if A is sequenced before B, then the execution of A shall precede the execution of B.</li>
+<li>Each full expression is sequenced before the next full expression in program order.</li>
+<li>If A and B are indeterminately sequenced, then either A is sequenced before B or B is sequenced before A, but it is unspecified which. E.g. A and B are not interleaved.</li>
+<li>If A and B are unsequenced, then A is not sequenced before B and B is not sequenced before A. E.g. A and B may be interleaved.</li>
 </ul>
 <h2 id="statements"><strong>Statements</strong></h2>
 <ul>
-<li>
-<p>Statements are compositions of full expressions.</p>
-</li>
-<li>
-<p>When calling a function…</p>
+<li>Statements are compositions of full expressions.</li>
+<li>When calling a function…
 <ul>
 <li>Every evaluation within the function and every evaluation not within the function are indeterminately sequenced.</li>
 <li>The expression designating the function is sequenced before the argument expressions.</li>
@@ -277,14 +245,9 @@
 </ul>
 <h2 id="synchronizes-with"><strong>Synchronizes With</strong></h2>
 <ul>
-<li>
-<p>Two library operations A and B may be related by the synchronizes-with relation.</p>
-</li>
-<li>
-<p>Asymmetric: A synchronizes with B does not imply that B synchronizes with A</p>
-</li>
-<li>
-<p>Given any two evaluations A and B… If A happens before B:</p>
+<li>Two library operations A and B may be related by the synchronizes-with relation.</li>
+<li>Asymmetric: A synchronizes with B does not imply that B synchronizes with A</li>
+<li>Given any two evaluations A and B… If A happens before B:
 <ul>
 <li>A is sequenced before B, or</li>
 <li>A synchronizes with B, or</li>
