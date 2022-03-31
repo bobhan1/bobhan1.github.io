@@ -143,32 +143,32 @@
   <div class="post-toc-content always-active">
     <nav id="TableOfContents">
   <ul>
-    <li><a href="#execution-model">Execution Model</a>
+    <li><a href="#execution-model"><strong>Execution Model</strong></a>
       <ul>
-        <li><a href="#abstract-machine">Abstract Machine</a></li>
-        <li><a href="#storage-model">Storage Model</a></li>
-        <li><a href="#threads-of-execution">Threads of Execution</a></li>
-        <li><a href="#expression">Expression</a></li>
-        <li><a href="#evaluations">Evaluations</a></li>
-        <li><a href="#sequenced-before">Sequenced-Before</a></li>
-        <li><a href="#statements">Statements</a></li>
-        <li><a href="#initializer-lists">Initializer Lists</a></li>
-        <li><a href="#synchronizes-with">Synchronizes With</a></li>
-        <li><a href="#execution-steps">Execution Steps</a></li>
-        <li><a href="#forward-progress">Forward Progress</a></li>
-        <li><a href="#boost-blocking">Boost Blocking</a></li>
+        <li><a href="#abstract-machine"><strong>Abstract Machine</strong></a></li>
+        <li><a href="#storage-model"><strong>Storage Model</strong></a></li>
+        <li><a href="#threads-of-execution"><strong>Threads of Execution</strong></a></li>
+        <li><a href="#expression"><strong>Expression</strong></a></li>
+        <li><a href="#evaluations"><strong>Evaluations</strong></a></li>
+        <li><a href="#sequenced-before"><strong>Sequenced-Before</strong></a></li>
+        <li><a href="#statements"><strong>Statements</strong></a></li>
+        <li><a href="#initializer-lists"><strong>Initializer Lists</strong></a></li>
+        <li><a href="#synchronizes-with"><strong>Synchronizes With</strong></a></li>
+        <li><a href="#execution-steps"><strong>Execution Steps</strong></a></li>
+        <li><a href="#forward-progress"><strong>Forward Progress</strong></a></li>
+        <li><a href="#boost-blocking"><strong>Boost Blocking</strong></a></li>
       </ul>
     </li>
-    <li><a href="#memory-order">memory order</a>
+    <li><a href="#memory-order"><strong>memory order</strong></a>
       <ul>
-        <li><a href="#ordering-constraints">ordering constraints</a></li>
-        <li><a href="#acquire-release语义">acquire-release语义</a></li>
-        <li><a href="#传递性">传递性</a></li>
-        <li><a href="#释放序列">释放序列</a></li>
-        <li><a href="#关于stdmemory_order_consume">关于<code>std::memory_order_consume</code></a></li>
-        <li><a href="#fences">Fences</a></li>
-        <li><a href="#thread-fence">thread fence</a></li>
-        <li><a href="#signal-fence">signal fence</a></li>
+        <li><a href="#ordering-constraints"><strong>ordering constraints</strong></a></li>
+        <li><a href="#acquire-release语义"><strong>acquire-release语义</strong></a></li>
+        <li><a href="#传递性"><strong>传递性</strong></a></li>
+        <li><a href="#释放序列"><strong>释放序列</strong></a></li>
+        <li><a href="#关于stdmemory_order_consume"><strong>关于<code>std::memory_order_consume</code></strong></a></li>
+        <li><a href="#fences"><strong>Fences</strong></a></li>
+        <li><a href="#thread-fence"><strong>thread fence</strong></a></li>
+        <li><a href="#signal-fence"><strong>signal fence</strong></a></li>
       </ul>
     </li>
   </ul>
@@ -176,12 +176,12 @@
   </div>
 </div>
     <div class="post-content">
-      <h1 id="execution-model">Execution Model</h1>
-<h2 id="abstract-machine">Abstract Machine</h2>
+      <h1 id="execution-model"><strong>Execution Model</strong></h1>
+<h2 id="abstract-machine"><strong>Abstract Machine</strong></h2>
 <ul>
 <li>C++ programs describe operations that are performed on the abstract machine. C++ implementations define the characteristics of the abstract machine and translate operations on the abstract machine into operations on the system.</li>
 </ul>
-<h2 id="storage-model">Storage Model</h2>
+<h2 id="storage-model"><strong>Storage Model</strong></h2>
 <ul>
 <li>Storage is flat; no notion hierarchy (caches, etc). Objects reside in storage at a single memory location.</li>
 <li>Some objects may not have a unique memory location:
@@ -194,7 +194,7 @@
 <li>An object cannot have more than one memory location.</li>
 <li>Every thread in a program can potentially access every object and function in a program.</li>
 </ul>
-<h2 id="threads-of-execution">Threads of Execution</h2>
+<h2 id="threads-of-execution"><strong>Threads of Execution</strong></h2>
 <ul>
 <li>
 <p>A thread of execution is a single flow of control in a program which evaluates a function call; threads may run concurrently.</p>
@@ -206,7 +206,7 @@
 <p>Variables with thread storage duration are initialized as a consequence of thread execution.</p>
 </li>
 </ul>
-<h2 id="expression">Expression</h2>
+<h2 id="expression"><strong>Expression</strong></h2>
 <ul>
 <li>
 <p>An expression is a sequence of operators and operands that specifies a computation.</p>
@@ -221,7 +221,7 @@
 <p>Full expressions may include subexpressions that are not lexically part of the expression.</p>
 </li>
 </ul>
-<h2 id="evaluations">Evaluations</h2>
+<h2 id="evaluations"><strong>Evaluations</strong></h2>
 <ul>
 <li>
 <p>Evaluation of an expression includes value computations and the initiation of side effects.</p>
@@ -241,7 +241,7 @@
 <p>Completion of the execution of an evaluation does not imply completion of its side effects.</p>
 </li>
 </ul>
-<h2 id="sequenced-before">Sequenced-Before</h2>
+<h2 id="sequenced-before"><strong>Sequenced-Before</strong></h2>
 <ul>
 <li>
 <p>Given any two evaluations A and B within the same thread of execution, if A is sequenced before B, then the execution of A shall precede the execution of B.</p>
@@ -256,7 +256,7 @@
 <p>If A and B are unsequenced, then A is not sequenced before B and B is not sequenced before A. E.g. A and B may be interleaved.</p>
 </li>
 </ul>
-<h2 id="statements">Statements</h2>
+<h2 id="statements"><strong>Statements</strong></h2>
 <ul>
 <li>
 <p>Statements are compositions of full expressions.</p>
@@ -271,11 +271,11 @@
 </ul>
 </li>
 </ul>
-<h2 id="initializer-lists">Initializer Lists</h2>
+<h2 id="initializer-lists"><strong>Initializer Lists</strong></h2>
 <ul>
 <li>Each element of a brace initializer is sequenced before the all subsequent elements.</li>
 </ul>
-<h2 id="synchronizes-with">Synchronizes With</h2>
+<h2 id="synchronizes-with"><strong>Synchronizes With</strong></h2>
 <ul>
 <li>
 <p>Two library operations A and B may be related by the synchronizes-with relation.</p>
@@ -292,7 +292,7 @@
 </ul>
 </li>
 </ul>
-<h2 id="execution-steps">Execution Steps</h2>
+<h2 id="execution-steps"><strong>Execution Steps</strong></h2>
 <ul>
 <li>
 <p>The evaluations executed by threads are delineated by execution steps.</p>
@@ -315,7 +315,7 @@
 <p>Implementations may assume that all threads will eventually perform an execution step.</p>
 </li>
 </ul>
-<h2 id="forward-progress">Forward Progress</h2>
+<h2 id="forward-progress"><strong>Forward Progress</strong></h2>
 <ul>
 <li>
 <p>Some atomic operations may fail spuriously due to interference from other threads.</p>
@@ -383,25 +383,25 @@
 </ul>
 </li>
 </ul>
-<h2 id="boost-blocking">Boost Blocking</h2>
+<h2 id="boost-blocking"><strong>Boost Blocking</strong></h2>
 <ul>
 <li>Block on a thread with weaker forward progress while preserving the calling thread’s forward progress.</li>
 <li>When a thread P boost blocks on a set S of other threads, the forward progress guarantees of at least one of the threads in S is temporarily upgraded to P’s forward progress guarantee. Repeat until the blocking condition is satisfied.</li>
 <li>Boost blocking ensures your children threads make progress, not your siblings.</li>
 </ul>
-<h1 id="memory-order">memory order</h1>
-<h2 id="ordering-constraints">ordering constraints</h2>
+<h1 id="memory-order"><strong>memory order</strong></h1>
+<h2 id="ordering-constraints"><strong>ordering constraints</strong></h2>
 <p>C++中有三种ordering constraint</p>
 <ul>
 <li>Sequential consistency: <code>memory_order_seq_cst</code></li>
 <li>Acquire-release:<code>memory_order_consume</code>, <code>memory_order_acquire</code>, <code>memory_order_release</code>, and <code>memory_order_acq_rel</code></li>
 <li>Relaxed: <code>memory_order_relaxed</code></li>
 </ul>
-<h2 id="acquire-release语义">acquire-release语义</h2>
+<h2 id="acquire-release语义"><strong>acquire-release语义</strong></h2>
 <p>有acquire-release语义的不同线程之间并不存在全局的同步，同步只发生在同一个原子变量的的原子操作上，具体来说，一个线程中对一个原子变量的写操作会和另一个线程中对同一个原子变量的读操作发生同步。acquire-release语义基于一个基本思想：在同一个原子变量上同步的一个release操作和一个acquire操作建立了一个顺序约束，即所有读写操作不能被重排到release操作之后，同时读写操作不能被重拍到acquire操作之前。</p>
 <img src="\imgs\release_semantic.png" style="zoom: 80%;" />
 <img src="\imgs\acquire_semantic.png" style="zoom:80%;" />
-<h2 id="传递性">传递性</h2>
+<h2 id="传递性"><strong>传递性</strong></h2>
 <p>之前我们说过，在同一个原子变量上同步的一个release操作和一个acquire操作建立了一个顺序约束，这样一来，如果不同线程操作的是同一个原子变量，我们便可以利用这种机制来进行不同线程间的同步。但如果要同步的线程之间没有共享的原子变量呢？我们可以利用acquire-release的传递性来借助另一个线程进行同步，我们来看一个例子（省略了分别用三个线程执行这三个函数的代码）。</p>
 <p><img src="%5Cimgs%5C%E4%BC%A0%E9%80%92%E6%80%A7.png" alt=""></p>
 <p>在上面的代码中，</p>
@@ -413,7 +413,7 @@
 <p>注意： 我们必须将<code>dataPrduced.load(std::memory_order_acquire)</code>放在<code>while</code>循环中来确保acquire操作确实发生在release操作之后，即保证synchronizes-with的条件为真，才能使得这种传递性生效。</p>
 </blockquote>
 <p>最终他们一起保证了<code>myShaerdWoke[1]=2</code>和<code>mySharedWork={1,0,3}</code>之间是happens-before的关系。</p>
-<h2 id="释放序列">释放序列</h2>
+<h2 id="释放序列"><strong>释放序列</strong></h2>
 <p>标准中的描述：</p>
 <blockquote>
 <p>A release sequence headed by a release operation A on an atomic object M is a maximal contiguous sub-sequence of side effects in the modification order of M, where the first operation is A, and every subsequent operation * is performed by the same thread that performed A, or * is an atomic read-modify-write operation.</p>
@@ -500,17 +500,17 @@
 </span></span></code></pre></td></tr></table>
 </div>
 </div><p>在这个例子中，t1线程和t2线程之间由在atom上的acquire-release语义获得了synchronizes-with关系从而能够同步。但是<code>fetch_and_sub</code>作为一个 读-修改-写 操作，我们只是指定了它的读是acquire的，并没有规定它的写是release的，但由于释放序列的规则，t2和t3之间依然能够建立synchronized-with的关系，所以最终atom的输出始终为0。</p>
-<h2 id="关于stdmemory_order_consume">关于<code>std::memory_order_consume</code></h2>
+<h2 id="关于stdmemory_order_consume"><strong>关于<code>std::memory_order_consume</code></strong></h2>
 <p>不建议使用<code>std::memory_order_consume</code>，C++17已经考虑修改<code>std::memory_order_consume</code></p>
 <p>的语义，并且目前没有编译器支持它。</p>
-<h2 id="fences">Fences</h2>
+<h2 id="fences"><strong>Fences</strong></h2>
 <p>C++支持两种类型的屏障：</p>
 <ul>
 <li><code>std::atomic_thread_fence</code>：用于同步不同线程间对相同内存的访问</li>
 <li><code>std::atomic_signal_fence</code>：用于同步一个线程上的signal handler和其他代码</li>
 </ul>
 <p>内存屏障可以使得一些特定顺序地读写操作在重排时不会传过屏障。</p>
-<h2 id="thread-fence">thread fence</h2>
+<h2 id="thread-fence"><strong>thread fence</strong></h2>
 <p>有三种类型的屏障：<code>std::atomic_thread_fence()/std::atomic_thread_fence(std::memory_order_acq_rel)</code>、<code>std::atomic_thread_fence(std::memory_order_acquire)</code>、<code>std::atomic_thread_fence(std::memory_order_release)</code>。当他们作用在两个操作(读读、读写、写读、写写)之间时，分别有如下效果。</p>
 <img src="\imgs\full_fence.png" style="zoom: 67%;" />
 <img src="\imgs\acquire_fence.png" style="zoom:67%;" />
@@ -519,7 +519,7 @@
 <img src="\imgs\acquire_release_fence.png" style="zoom:67%;" />
 <p>在这个例子中，acquire-release fence组织了所有原子和非原子操作在被重排时穿过内存屏障，<code>consumer()</code>当中的<code>while</code>循环使得acquire fence synchronizes-with <code>producer()</code>中的release fence，最终使得release fence之前所有非原子操作和relaxed的原子操作产生效果对acquire fence之后的代码都是可见的。</p>
 <p>需要注意的是，使用这种内存屏障比在原子操作上使用对应内存序的原子操作开销更大。</p>
-<h2 id="signal-fence">signal fence</h2>
+<h2 id="signal-fence"><strong>signal fence</strong></h2>
 
     </div>
 
