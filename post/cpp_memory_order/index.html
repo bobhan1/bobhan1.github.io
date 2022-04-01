@@ -49,7 +49,7 @@
 <meta itemprop="name" content="C&#43;&#43; execution model and memory order">
 <meta itemprop="description" content="本文介绍了C&#43;&#43;抽象机与memory order的相关知识"><meta itemprop="datePublished" content="2022-03-27T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2022-03-27T00:00:00+00:00" />
-<meta itemprop="wordCount" content="3352">
+<meta itemprop="wordCount" content="3438">
 <meta itemprop="keywords" content="C&#43;&#43;,memory order," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="C&#43;&#43; execution model and memory order"/>
 <meta name="twitter:description" content="本文介绍了C&#43;&#43;抽象机与memory order的相关知识"/>
@@ -178,6 +178,7 @@
 </div>
     <div class="post-content">
       <h1 id="execution-model"><strong>Execution Model</strong></h1>
+<p>为了更好地理解memory_order相关的内容，首先介绍C++抽象机和execution model的知识。</p>
 <h2 id="abstract-machine"><strong>Abstract Machine</strong></h2>
 <ul>
 <li>C++ programs describe operations that are performed on the abstract machine. C++ implementations define the characteristics of the abstract machine and translate operations on the abstract machine into operations on the system.</li>
@@ -360,6 +361,7 @@
 <li>Boost blocking ensures your children threads make progress, not your siblings.</li>
 </ul>
 <h1 id="memory-order"><strong>memory order</strong></h1>
+<p><a href="https://www.cl.cam.ac.uk/~pes20/cpp/popl085ap-sewell.pdf">C++并发模型的数学模型</a>，给出了讨论并发时的各种名词的确切定义。</p>
 <h2 id="ordering-constraints"><strong>ordering constraints</strong></h2>
 <p>C++中有三种ordering constraint</p>
 <ul>
