@@ -49,7 +49,7 @@
 <meta itemprop="name" content="C&#43;&#43; execution model and memory order">
 <meta itemprop="description" content="本文介绍了C&#43;&#43;抽象机与memory order的相关知识"><meta itemprop="datePublished" content="2022-03-27T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2022-03-27T00:00:00+00:00" />
-<meta itemprop="wordCount" content="3165">
+<meta itemprop="wordCount" content="3352">
 <meta itemprop="keywords" content="C&#43;&#43;,memory order," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="C&#43;&#43; execution model and memory order"/>
 <meta name="twitter:description" content="本文介绍了C&#43;&#43;抽象机与memory order的相关知识"/>
@@ -169,6 +169,7 @@
         <li><a href="#fences"><strong>Fences</strong></a></li>
         <li><a href="#thread-fence"><strong>thread fence</strong></a></li>
         <li><a href="#signal-fence"><strong>signal fence</strong></a></li>
+        <li><a href="#原子操作对实际生成的cpu指令序列的影响"><strong>原子操作对实际生成的CPU指令序列的影响</strong></a></li>
       </ul>
     </li>
   </ul>
@@ -489,7 +490,7 @@
 <p>在这个例子中，acquire-release fence组织了所有原子和非原子操作在被重排时穿过内存屏障，<code>consumer()</code>当中的<code>while</code>循环使得acquire fence synchronizes-with <code>producer()</code>中的release fence，最终使得release fence之前所有非原子操作和relaxed的原子操作产生效果对acquire fence之后的代码都是可见的。</p>
 <p>需要注意的是，使用这种内存屏障比在原子操作上使用对应内存序的原子操作开销更大。</p>
 <h2 id="signal-fence"><strong>signal fence</strong></h2>
-<p><code>std::atomic_signal_fence</code>能够在一个线程和在相同线程上执行的signal_handler之间对非原子和realxed类型的原子变量的访问建立同步关系。下面是一个例子。</p>
+<p><a href="https://en.cppreference.com/w/cpp/atomic/atomic_signal_fence"><code>std::atomic_signal_fence</code></a>能够在一个线程和在相同线程上执行的signal_handler之间对非原子和realxed类型的原子变量的访问建立同步关系。下面是一个例子。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -531,6 +532,9 @@
 </span></span></code></pre></td></tr></table>
 </div>
 </div><p>由于std::atomic_signal_fence之间建立了acquire-release屏障，<code>assert</code>断言永远不会触发。</p>
+<h2 id="原子操作对实际生成的cpu指令序列的影响"><strong>原子操作对实际生成的CPU指令序列的影响</strong></h2>
+<p>在x86和amd64架构上，除了<code>std::memory_order::seq_cst</code>外的<code>std::atomic_thread_fence</code>并不影响CPU指令生成，而只影响编译器代码处理。</p>
+<p>关于C++11中各种memory_order的原子操作和内存屏障对编译器代码处理和在各种指令集架构上CPU指令生成的实际影响，参见<a href="https://www.cl.cam.ac.uk/~pes20/cpp/cpp0xmappings.html">C/C++11 mappings to processors</a></p>
 
     </div>
 

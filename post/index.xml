@@ -139,7 +139,7 @@
       <pubDate>Tue, 01 Dec 2020 00:00:00 +0000</pubDate>
       
       <guid>http://localhost:1313/post/cppthings/</guid>
-      <description>C++ links: Coroutines 一个关于C++20 coroutine的文章和视频的合集。 C++ links: atomics, lock free, memory model ViennaGameJobSystem 一个专为教学向游戏引擎的开发作业系统，兼容C++20协程，代码</description>
+      <description>一个关于C++20 coroutine的文章和视频的合集。 C++ links: Coroutines C++ links: atomics, lock free, memory model 一个专为教学向游戏引擎的开发作业系统，兼容C++20协程，代码结</description>
     </item>
     
     <item>
