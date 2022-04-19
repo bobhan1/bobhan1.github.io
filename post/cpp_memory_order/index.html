@@ -375,7 +375,7 @@
 <img src="\imgs\acquire_semantic.png" style="zoom:80%;" />
 <h2 id="传递性"><strong>传递性</strong></h2>
 <p>之前我们说过，在同一个原子变量上同步的一个release操作和一个acquire操作建立了一个顺序约束，这样一来，如果不同线程操作的是同一个原子变量，我们便可以利用这种机制来进行不同线程间的同步。但如果要同步的线程之间没有共享的原子变量呢？我们可以利用acquire-release的传递性来借助另一个线程进行同步，我们来看一个例子（省略了分别用三个线程执行这三个函数的代码）。</p>
-<p><img src="%5Cimgs%5C%E4%BC%A0%E9%80%92%E6%80%A7.png" alt=""></p>
+<img src="\imgs\transitivity.png" style="zoom:80%;" />
 <p>在上面的代码中，</p>
 <ul>
 <li>蓝色箭头表示sequenced-before关系，即同一线程中的操作按照他们在源码中的出现顺序执行。</li>
