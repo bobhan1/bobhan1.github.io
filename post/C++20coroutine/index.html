@@ -49,7 +49,7 @@
 <meta itemprop="name" content="C&#43;&#43;20协程">
 <meta itemprop="description" content="本文小结了C&#43;&#43; coroutine TS中的关键概念，并结合几个具体的例子说明了它们的用法"><meta itemprop="datePublished" content="2021-10-11T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2021-10-11T00:00:00+00:00" />
-<meta itemprop="wordCount" content="8941">
+<meta itemprop="wordCount" content="9294">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="C&#43;&#43;20协程"/>
 <meta name="twitter:description" content="本文小结了C&#43;&#43; coroutine TS中的关键概念，并结合几个具体的例子说明了它们的用法"/>
@@ -678,7 +678,7 @@
 <p>我们可以通过重载<code>promise_type</code>中的<code>operator new</code>来定制协程帧分配的行为。同时，如果协程状态的生存期严格内嵌于调用方的生存期且协程帧的大小在调用点已知，那么编译器可以优化掉对<code>operator new</code>的调用而将协程状态嵌入调用方栈帧中。</p>
 <p>如果协程帧堆分配失败，那么协程抛出 <code>std::bad_alloc</code>，如果<code>promise</code>类型定义了成员函数<code>get_return_object_on_allocation_failure()</code>，那么使用 <code>operator new(size_t ,nothow_t )</code>的重载进行分配，而在分配失败时(返回<code>nullptr</code>)，协程会将 <code>promise::get_return_object_on_allocation_failure()</code> 获得的对象返回给调用方并且不抛出异常。</p>
 <p>我们需要在启动协程函数体之前构造<code>return-object</code>对象，是因为在调用<code>coroutine_handle::resume()</code>返回之前，协程帧（以及<code>promise</code>对象）可能在这个线程上或另一个线程上被破坏，因此，在开始执行协程函数体之后调用<code>get_return_object()</code>是不安全的。</p>
-<p>当协程函数到达它的第一个<code>&lt;return-to-caller-or-resumer&gt;</code>点（或者没有到达这个点，协程已经执行完成），那么通过<code>get_return_object()</code>构造的<code>return-object</code>对象将返回给协程的主调函数。</p>
+<p><strong>当协程函数到达它的第一个<code>&lt;return-to-caller-or-resumer&gt;</code>点（或者没有到达这个点，协程已经执行完成），那么通过<code>get_return_object()</code>构造的<code>return-object</code>对象将返回给协程的主调函数</strong>。</p>
 <p>当协程抵达<code>co_return</code>语句时，它进行下列操作：</p>
 <ul>
 <li>对下列情形调用 <code>promise.return_void()</code>
@@ -1029,7 +1029,7 @@
 <li>利用<code>coroutine_handle&lt;proimse_type&gt;::from(*promise)</code>从<code>promise</code>对象重新构造</li>
 </ul>
 <p>需要注意的是，<code>coroutine_handle</code>不是RAII对象。我们必须手动调用<code>destroy()</code>来销毁协程帧并释放其资源。<strong>可以把它看作是用于管理内存的<code>void*</code>的等价物</strong>。这样设计是因为性能的原因：使它成为一个RAII对象会给coroutine增加额外的开销，例如需要引用计数。</p>
-<p>例如，在下面的例子中，在<code>main2</code>函数的第一行，<code>counter2()</code>返回一个<code>ReturnObject2</code>的临时对象，我们通过定制<code>operator std::coroutine_handle&lt;&gt;()</code>来保存其中的<code>coroutine_handle</code>至<code>main2</code>中的<code>h</code>里，在第二行开始之前，该临时对象销毁(但不会销毁其中<code>h_</code>所指向的协程帧)，由于我们已经在外部保存了协程帧指针，之后我们通过该协程帧指针来恢复协程，最后我们调用<code>h.destroy()</code>来销毁协程帧。如果我们在调用<code>counter()</code>的时候忽略它的返回值，或是在最后没有调用<code>h.destroy()</code>，那么就会发生内存泄漏。</p>
+<p>例如，在下面的例子中，在<code>main2</code>函数的第一行，<code>counter2()</code>返回一个<code>ReturnObject2</code>的临时对象，我们通过定制<code>operator std::coroutine_handle&lt;&gt;()</code>来保存其中的<code>coroutine_handle</code>至<code>main2</code>中的<code>h</code>里，在第二行开始之前，该临时对象销毁(但不会销毁其中<code>h_</code>所&quot;指向&quot;的协程帧)，由于我们已经在外部保存了协程帧指针，之后我们通过该&quot;协程帧指针&quot;(coroutine_handler&lt;&gt;)来恢复协程，最后我们调用<code>h.destroy()</code>来销毁协程帧。如果我们在调用<code>counter()</code>的时候忽略它的返回值，或是在最后没有调用<code>h.destroy()</code>，那么就会发生内存泄漏(分配在堆上的协程帧无法被销毁)。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -1135,6 +1135,16 @@
 </span><span class="lnt">30
 </span><span class="lnt">31
 </span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">ReturnObject3</span> <span class="p">{</span>
@@ -1152,6 +1162,16 @@
 </span></span><span class="line"><span class="cl">
 </span></span><span class="line"><span class="cl">  <span class="n">std</span><span class="o">::</span><span class="n">coroutine_handle</span><span class="o">&lt;</span><span class="n">promise_type</span><span class="o">&gt;</span> <span class="n">h_</span><span class="p">;</span>
 </span></span><span class="line"><span class="cl">  <span class="k">operator</span> <span class="n">std</span><span class="o">::</span><span class="n">coroutine_handle</span><span class="o">&lt;</span><span class="n">promise_type</span><span class="o">&gt;</span><span class="p">()</span> <span class="k">const</span> <span class="p">{</span> <span class="k">return</span> <span class="n">h_</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">PromiseType</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">  <span class="k">struct</span> <span class="nc">GetPromise</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="n">PromiseType</span> <span class="o">*</span><span class="n">p_</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">  <span class="kt">bool</span> <span class="nf">await_ready</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="nb">false</span><span class="p">;</span> <span class="p">}</span> <span class="c1">// says yes call await_suspend
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kt">bool</span> <span class="nf">await_suspend</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">coroutine_handle</span><span class="o">&lt;</span><span class="n">PromiseType</span><span class="o">&gt;</span> <span class="n">h</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p_</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">h</span><span class="p">.</span><span class="n">promise</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nb">false</span><span class="p">;</span> <span class="c1">// says no don&#39;t suspend coroutine after all
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="p">}</span>
+</span></span><span class="line"><span class="cl">  <span class="n">PromiseType</span> <span class="o">*</span><span class="nf">await_resume</span><span class="p">()</span> <span class="p">{</span> <span class="k">return</span> <span class="n">p_</span><span class="p">;</span> <span class="p">}</span>
 </span></span><span class="line"><span class="cl"><span class="p">};</span>
 </span></span><span class="line"><span class="cl"><span class="n">ReturnObject3</span> <span class="nf">counter3</span><span class="p">(){</span>
 </span></span><span class="line"><span class="cl">  <span class="k">auto</span> <span class="n">pp</span> <span class="o">=</span> <span class="k">co_await</span> <span class="n">GetPromise</span><span class="o">&lt;</span><span class="n">ReturnObject3</span><span class="o">::</span><span class="n">promise_type</span><span class="o">&gt;</span><span class="p">{};</span>
@@ -1171,7 +1191,8 @@
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><p>在这个例子中，<code>couter3()</code>的<code>for</code>循环中的<code>i</code>是该协程生命周期跨过挂起点的临时变量，在每次协程挂起前我们指向它的指针放入<code>promise_type</code>中，之后再在主函数中访问它。正如前面所说，生命周期跨过挂起点的临时变量会放在堆上，所以知道我们调用<code>h.destroy()</code>之前他们都是可以访问的。</p>
+</div><p>在这个例子中，<code>couter3()</code>的<code>for</code>循环中的<code>i</code>是该协程生命周期跨过挂起点的临时变量，在每次协程挂起前我们指向它的指针放入<code>promise_type</code>中，之后再在主函数中访问它。正如前面所说，生命周期跨过挂起点的临时变量会放在堆上，所以知道我们调用<code>h.destroy()</code>之前他们都是可以访问的。
+其中，我们利用<code>GetPromise</code>对象获得了<code>counter3()</code>这个协程自身的<code>promise</code>对象。之前我们说过，有两种方法可以获得到一个协程的协程帧。这里，<code>GetPromise</code>临时对象调用<code>await_suspend(coroutine_handle&lt;&gt;)</code>时，调用者协程(即<code>counter3()</code>这个协程)的协程帧被作为实参传递给<code>h</code>，接着我们通过该协程帧拿到其对应的<code>promnise</code>对象，再通过<code>await_resume()</code>将其返回给调用者协程。</p>
 <h2 id="协程在线程间切换时的数据安全问题"><strong>协程在线程间切换时的数据安全问题</strong></h2>
 <p>我们知道，<code>co_await</code>运算符让我们能够在协程挂起和执行权返回主调函数/resumer之前执行额外代码。这允许一个awaiter对象在协程挂起后初始化一个异步操作，将挂起的协程的<code>coroutine_handle</code>传递给后续能安全恢复(挂起的协程)的操作，该操作完成时就可以恢复协程(可能是在另一个线程中)，并且这当中不需要额外的同步语句。同时由于 <code>await_suspend()</code> 在当前线程上持续执行， <code>await_suspend()</code> 应该把<code>*this</code>当作已被销毁并且在柄被发布到其他线程后不再访问它。这是因为一旦我们将协程句柄发布给其它线程，那么其它线程可能会在<code>await_suspend()</code>方法返回之前恢复协程，这可能会导致(其它线程中的)协程与(当前线程中的协程的)<code>await_suspend()</code>方法的剩余部分并发地执行。</p>
 <p>而协程恢复时第一件要做的事就是调用<code>await_resume()</code>方法来获取结果，之后，它大概率会立即销毁<code>awaiter</code>对象(也就是调用<code>await_suspend()</code>的<code>this</code>指针)。（在另一个线程上恢复的）协程接下来可能会在当前线程中的<code>await_suspend()</code>返回之前会执行到结束，销毁协程和<code>promise</code>对象。</p>
@@ -1265,6 +1286,7 @@
 </span></span></code></pre></td></tr></table>
 </div>
 </div><p>在这个例子中，协程开始时在一个线程上开始执行，然后通过在<code>await_suspend()</code>中将<code>coroutine_handle</code>传递给新线程从而使协程在另一个线程上恢复。正如前面所说的，在这种情况下，<code>await_suspend()</code>执行过程中能安全访问的内容应当是<code>await_suspend()</code>内的局部变量。由于协程在第二个线程恢复后与第一个线程中<code>await_suspend()</code>的剩余部分并发执行，其可能在第一个线程的<code>await_suspend()</code>执行过程中就已经完成了协程帧的销毁，而<code>awaiter</code>对象是在协程帧中的(其生命周期跨过了挂起点)，也就是说<code>awaiter</code>对象(连同其持有的<code>jthread</code>指针)可能在第一个线程执行<code>await_suspend()</code>的过程中随时被销毁，所以我们要在将当前协程的<code>coroutine_handle</code>传递给第二个线程之前先用<code>std::jthread&amp; out = *p_out;</code>将其保留在第一个线程函数的栈帧上才能保证没有错误。</p>
+<p><a href="https://www.scs.stanford.edu/~dm/blog/c++-coroutines.html">My tutorial and take on C++20 coroutines</a></p>
 <!--coroutine_handle是指向协程帧的指针。对于一般的函数，其存储器相关信息的栈帧的生命周期和，当函数返回时，局部变量被销毁，控制权被返回给调用者。但协程的状态是持续存在的，其生命周期是独立的的，所以需要coroutine_handle指向它用于管理生命周期，使其生命周期和执行过程解绑。同时，由于编译器一般不知道协程帧的大小，所以协程帧在堆上动态分配，coroutine_handle就是指向这个堆上对象的类型擦除指针。包装类对象拥有promise_type和coroutine_handle对象，它被分配在栈上，借助coroutine_handle管理堆上协程帧的生命周期。	-->
 <!--编译器会进行优化使得重入的效率更高，如果编译器能看到协程帧的生命周期，它可以将协程放在栈上-->
 
