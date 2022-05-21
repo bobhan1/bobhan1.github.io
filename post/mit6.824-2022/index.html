@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>MIT6.824 Spring-2022 完成小结 - bobh&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="bobh" /><meta name="description" content="先这么放着，之后再来补 Lab 4: Sharded Key/Value Service lab4a: 要求我们基于raft写一个管理raft集群的shardctrler,它能够接收来自客户端的配置更新，支持集" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.96.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/mit6.824-2022/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2a71e62d7ea35a3a3f92c3c16c456852aaec63713de5cd5dbadb28e7480fd599.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="MIT6.824 Spring-2022 完成小结" />
+<meta property="og:description" content="先这么放着，之后再来补 Lab 4: Sharded Key/Value Service lab4a: 要求我们基于raft写一个管理raft集群的shardctrler,它能够接收来自客户端的配置更新，支持集" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/mit6.824-2022/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2022-05-01T00:00:00+00:00" />
+<meta property="article:modified_time" content="2022-05-01T00:00:00+00:00" />
+
+<meta itemprop="name" content="MIT6.824 Spring-2022 完成小结">
+<meta itemprop="description" content="先这么放着，之后再来补 Lab 4: Sharded Key/Value Service lab4a: 要求我们基于raft写一个管理raft集群的shardctrler,它能够接收来自客户端的配置更新，支持集"><meta itemprop="datePublished" content="2022-05-01T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2022-05-01T00:00:00+00:00" />
+<meta itemprop="wordCount" content="1615">
+<meta itemprop="keywords" content="分布式系统,go," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="MIT6.824 Spring-2022 完成小结"/>
+<meta name="twitter:description" content="先这么放着，之后再来补 Lab 4: Sharded Key/Value Service lab4a: 要求我们基于raft写一个管理raft集群的shardctrler,它能够接收来自客户端的配置更新，支持集"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">bobh&#39;s blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">首页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">bobh&#39;s blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">首页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">MIT6.824 Spring-2022 完成小结</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2022-05-01 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#lab-4-sharded-keyvalue-servicehttpspdoscsailmitedu6824labslab-shardhtml"><strong><a href="https://pdos.csail.mit.edu/6.824/labs/lab-shard.html">Lab 4: Sharded Key/Value Service</a></strong></a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>先这么放着，之后再来补</p>
+<h2 id="lab-4-sharded-keyvalue-servicehttpspdoscsailmitedu6824labslab-shardhtml"><strong><a href="https://pdos.csail.mit.edu/6.824/labs/lab-shard.html">Lab 4: Sharded Key/Value Service</a></strong></h2>
+<p>lab4a:
+要求我们基于raft写一个管理raft集群的shardctrler,它能够接收来自客户端的配置更新，支持集群的动态加入和退出，同时还要实时计算各个raft集群应该负责的shards. 当然这里并不负责真正shard的迁移，真正shard的迁移在4b部分，这里只是计算出相应的数据以供4b部分使用。</p>
+<p>基本框架和lab3类似，用一个前置分派器来处理来自客户端的请求并根据请求类型来将其分派到对应的handler去处理请求。
+每次有raft集群加入或退出时都尝试重新平衡数据分片在各个集群之间的分配情况.重新分配的方法如下:不断尝试将拥有最多分片集群的一个分片移动至拥有最少分片的集群，直到集群中拥有最多分片的分片数比拥有最少分片集群的分片数多1,此时一定处于分片平衡状态(既符合要求的状态)</p>
+<p>其余部分和lab3一致。</p>
+<p>lab4b:
+要求我们在写一个K/V集群, 支持动态扩缩容, 集群内部的负载均衡, 线性一致性以及宕机后可恢复。
+总体架构和lab3基本上一样，需要考虑的部分主要是分片在不同raft集群之间的转移</p>
+<p>首先要明确，所以对状态机修改的操作必须要集群的leader通过下推修改日志到raft层后才能进行
+比如分片的收发应只能由发送方集群的leader发送到接收方集群的leader,然后接后方集群的leader下推一条InsertShard的日志将其传播到自己的集群当中，这样才能满足题目的要求</p>
+<p>challeng2中要求各个shard之间互不干扰，所以要将shard这个数据结构抽象出来。具体来说，一个shard应当包含自己存储的数据、当前状态(用于分片的发送与接收)，同时为了保证客户段操作的幂等性，保存各个客户端最后一次请求Id的map也要放在shard当中存储。一个shard的状态有normal(可以给客户端提供服务),sending(该分片需要发给另一个集群),recieving(正在等待其他集群发送这个分片给自己)</p>
+<p>分片转移的难点主要在于如何做到不漏发shard。由于在更新配置和分片转移的过程中，发送方和接收方都可能随时挂掉，我们需要保证集群在挂掉重新恢复之后还能正确的处理之前没处理完的分片，所以我们必须保存每个分片当前的状态，然后用一个一直运行在后台的协程不停地根据分片状态去收发shard</p>
+<p>每个节点要注册一个shardctrler的client并开启一个go协程去不断尝试拉取最新的config,当拉取到比自己当前config刚好比自己当前的config大一个版本号的时候开始更新分片数据(修改所有shard的状态,然后由分片拉取协程去处理)。注意config的更新需要一个一个顺序处理，在一个节点更新config的过程中，即只要有一个分片还处于待更新状态(recieving状态)，就要禁止拉取更新的config防止覆盖当前状态造成错误，只有在当前config的更新完成后才能去拉取下一个config</p>
+<p>由于我们阻塞了config的更新过程，所以每个节点只用保存当前config和上一次config.上一次config用于和最新config比较得出需要进行收发的shard.</p>
+<p>分片转移的rpc可以设计成接收方拉取，也可以设计成发送方主动发送。但是如果发送方主动发送的话，由于只能leader接收分片数据，发送方需要向接受方的每个节点尝试发送分片数据，而分片数据较大，这样带来的损耗较大(也可以发送方先询问接受方的leader然后再直接发给leader但这样比较麻烦)。最后我使用的接收方主动去拉取分片的模式，这样，发送方中非leader节点在接收到拉取分片的请求时直接返回Err让接受方尝试另一个节点拉取即可。</p>
+<p>当一个节点接收到来自客户端的get/put/append请求时，只要当前分片属于自己这个集群负责并且其状态不是receiving就可以相应这个请求。即challenge2中的配置更新和相应请求可以并行。</p>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">bobh</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2022-05-01
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F/">分布式系统</a>
+          <a href="/tags/go/">go</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/cmu15445-2021/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">CMU15445-2021 完成小结</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/cpp_memory_order/">
+            <span class="next-text nav-default">C&#43;&#43; execution model and memory order</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:bh2444151092@outlook.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/bobhan1" class="iconfont icon-github" title="github"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
