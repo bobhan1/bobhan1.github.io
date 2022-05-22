@@ -13,7 +13,7 @@
       <pubDate>Fri, 20 May 2022 00:00:00 +0000</pubDate>
       
       <guid>http://localhost:1313/post/cmu15445-2021/</guid>
-      <description>先这么放着，之后再来补</description>
+      <description>先这么放着，之后再来补 PROJECT 1-BUFFER POOL project 1要我们实现一个buffer pool，buffer pool相当于数据库核心引擎和磁盘之间的一个缓存，负责在磁盘</description>
     </item>
     
     <item>

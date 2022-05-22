@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="bobh" /><meta name="description" content="先这么放着，之后再来补" /><meta name="keywords" content="Hugo, theme, even" />
+<meta name="author" content="bobh" /><meta name="description" content="先这么放着，之后再来补 PROJECT 1-BUFFER POOL project 1要我们实现一个buffer pool，buffer pool相当于数据库核心引擎和磁盘之间的一个缓存，负责在磁盘" /><meta name="keywords" content="Hugo, theme, even" />
 
 
 
@@ -40,19 +40,19 @@
 
 
 <meta property="og:title" content="CMU15445-2021 DATABASE SYSTEMS 完成小结" />
-<meta property="og:description" content="先这么放着，之后再来补" />
+<meta property="og:description" content="先这么放着，之后再来补 PROJECT 1-BUFFER POOL project 1要我们实现一个buffer pool，buffer pool相当于数据库核心引擎和磁盘之间的一个缓存，负责在磁盘" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://localhost:1313/post/cmu15445-2021/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2022-05-20T00:00:00+00:00" />
 <meta property="article:modified_time" content="2022-05-20T00:00:00+00:00" />
 
 <meta itemprop="name" content="CMU15445-2021 DATABASE SYSTEMS 完成小结">
-<meta itemprop="description" content="先这么放着，之后再来补"><meta itemprop="datePublished" content="2022-05-20T00:00:00+00:00" />
+<meta itemprop="description" content="先这么放着，之后再来补 PROJECT 1-BUFFER POOL project 1要我们实现一个buffer pool，buffer pool相当于数据库核心引擎和磁盘之间的一个缓存，负责在磁盘"><meta itemprop="datePublished" content="2022-05-20T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2022-05-20T00:00:00+00:00" />
-<meta itemprop="wordCount" content="11">
+<meta itemprop="wordCount" content="1986">
 <meta itemprop="keywords" content="数据库系统,C&#43;&#43;," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="CMU15445-2021 DATABASE SYSTEMS 完成小结"/>
-<meta name="twitter:description" content="先这么放着，之后再来补"/>
+<meta name="twitter:description" content="先这么放着，之后再来补 PROJECT 1-BUFFER POOL project 1要我们实现一个buffer pool，buffer pool相当于数据库核心引擎和磁盘之间的一个缓存，负责在磁盘"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -141,11 +141,45 @@
     <div class="post-toc" id="post-toc">
   <h2 class="post-toc-title">文章目录</h2>
   <div class="post-toc-content always-active">
-    <nav id="TableOfContents"></nav>
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#project-1-buffer-poolhttps15445coursescscmuedufall2021project1"><strong><a href="https://15445.courses.cs.cmu.edu/fall2021/project1/">PROJECT 1-BUFFER POOL</a></strong></a></li>
+        <li><a href="#project-2-extendible-hash-indexhttps15445coursescscmuedufall2021project2"><strong><a href="https://15445.courses.cs.cmu.edu/fall2021/project2/">PROJECT 2-EXTENDIBLE HASH INDEX</a></strong></a>
+          <ul>
+            <li><a href="#extendible-hash-table">extendible hash table</a></li>
+            <li><a href="#实现">实现</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
   </div>
 </div>
     <div class="post-content">
       <p>先这么放着，之后再来补</p>
+<h2 id="project-1-buffer-poolhttps15445coursescscmuedufall2021project1"><strong><a href="https://15445.courses.cs.cmu.edu/fall2021/project1/">PROJECT 1-BUFFER POOL</a></strong></h2>
+<p>project 1要我们实现一个buffer pool，buffer pool相当于数据库核心引擎和磁盘之间的一个缓存，负责在磁盘和内存之间传送page</p>
+<h2 id="project-2-extendible-hash-indexhttps15445coursescscmuedufall2021project2"><strong><a href="https://15445.courses.cs.cmu.edu/fall2021/project2/">PROJECT 2-EXTENDIBLE HASH INDEX</a></strong></h2>
+<p>project2要我们实现一个用于快速检索存储数据的哈希索引，其中哈希表采用Extendible hash的策略来实现。</p>
+<h3 id="extendible-hash-table">extendible hash table</h3>
+<p>首先通过最普通的chained hash来介绍相关概念。在chained hash中，我们维护一个存储数据的bucket的链表，每次要查询或插入一个数据时，首先通过一个hash函数将key映射到一个更小的空间中的一个点，即slot=hash(key)。同时，每个slot都对应一个bucket，这样就可以通过slot找到对应的bucket从而检索或插入数据，</p>
+<p>但是，chained hash中slot的数量的固定的，无法根据需要动态修改，并且可能由于hash函数选取不当而发生hot spot现象从而导致索引的效率降低。</p>
+<p>extendible hash和linear hash都是为了解决chained hash中上述问题的方案，他们的核心思想都是通过适时改变slot和分裂bucket并移动数据来平衡数据的存储，从而减少hot spot的现象。</p>
+<p>linear hash维护一个指向下一个要分裂的bucket的sp指针，每当插入一定数量的tuple(通过某个经验公式算出)或当某个页面overflow时，将sp指针所指向的bucket进行分裂，分裂时采用新的hash函数(通常采用hash后结果的最高k位或最低k位，分裂时增加k)对该页面中的数据重新进行分配，之后移动sp指针。</p>
+<p>extendible hash中slot的个数会动态变化，多个slot可以指向同一个bucket。整张表维护一个gloabl_depth表示需要检查的位数，它决定了slot的大小。同时每个bucket维护一个local_depth，这个信息在后面用于分裂与合并中会用到。当插入一个数据导致发生overflow时，将会分裂bucket并重分配其中的数据，如果bucket的local_depth比global_depth小，那么直接将一个新页面分配到一个(些)已有的slot(之前指向该bucket的一部分slot)上，然后重新分配其中的数据。否则，已有的slot中没有可用的slot可以指向新的page，此时要增加global_depth并slot的数量扩大一倍，<strong>并把之前slot的相关数据完整的复制到新的slot中，</strong>，然后再执行上面分裂的步骤。相关实现细节在后面进行详述。</p>
+<p><img src="/imgs/extendible_hash_table2.png" alt="extendible_hash_table"></p>
+<p><img src="/imgs/extendible_hash_table.png" alt=""></p>
+<h3 id="实现">实现</h3>
+<h4 id="page-layout"><strong>Page layout</strong></h4>
+<p>在extendible_hash_table中有两种类型的page，<code>HashTableDirectoryPage</code>和<code>HashTableBucketPage</code>。其中，<code>HashTableDirectoryPage</code>用于存放有关extendible hash table的元数据，<code>HashTableBucketPage</code>用于存放真实的数据。</p>
+<p>每次extendiable hash table进行操作时，都要先从buffer pool中请求需要的page(申请资源)，读取相应数据并进行修改(使用资源)，使用完成后再用<code>UnpinPage()</code>来指示将某个page归还给buffer pool(释放资源)。需要注意<code>NewPage()/FetchPage()</code>和<code>UnpinPage()</code>一定要配对，否则会出现类似与内存管理中dangling pointer,double free,memory leak等问题。</p>
+<h4 id="splitemerge"><strong><code>Splite/Merge</code></strong></h4>
+<p>bucket的分裂与合并按照其要求实现即可，需要注意的是local_depth这个属性本应该是bucket的属性，但是代码中将元数据都关联到了slot上而不是bucket上(<code>VerifyIntegrity</code>中的代码印证了这一点)。所以<strong>在由于Split/Merge需要更新某个bucket的元数据时，需要更新所有指向这个bucket的slot的元数据(包括<code>local_depths_</code>和<code>bucket_page_ids_</code>)</strong>。具体来说，当执行<code>IncrGlobalDepth()</code>时，需要将就的slot的元数据复制到新的slot中，然后再进行修改。在Splite一个bucket时，需要将指向原bucket的slot中一般的slot重新指向分离后新的bucket。在进行Merge时，需要将所有指向Merge前的slot重新指向Merge后的bucket。</p>
+<h4 id="concurrency-control"><strong>Concurrency control</strong></h4>
+<p>这里的<code>HashTableDirectoryPage</code>和<code>HashTableBucketPage</code>虽然都是存放在buffer pool提供的<code>Page</code>的<code>data</code>字段中的，但由于<code>char data[PAGE_SIZE]</code>是<code>Page</code>的第一个字段，所以我们可以通过<code>reinterprete_cast&lt;Page*&gt;</code>来将一个<code>HashTableDirectoryPage/HashTableBucketPage</code>强转为<code>Page*</code>从而操作<code>Page</code>上的锁。</p>
 
     </div>
 
