@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>数据库 on bobh&#39;s blog</title>
+    <link>http://localhost:1313/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/</link>
+    <description>Recent content in 数据库 on bobh&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Fri, 20 May 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>CMU15445-2021 DATABASE SYSTEMS 完成小结</title>
+      <link>http://localhost:1313/post/cmu15445-2021/</link>
+      <pubDate>Fri, 20 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/cmu15445-2021/</guid>
+      <description>PROJECT 1-BUFFER POOL project 1要我们实现一个buffer pool，buffer pool相当于数据库核心引擎和磁盘之间的一个缓存，负责在磁盘和内存之间传送page</description>
+    </item>
+    
+    <item>
+      <title>MIT6.824 Distributed Systems Spring-2022 完成小结</title>
+      <link>http://localhost:1313/post/mit6.824-2022/</link>
+      <pubDate>Sun, 01 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/mit6.824-2022/</guid>
+      <description>先这么放着，之后再来补 Lab 4: Sharded Key/Value Service lab4a: 要求我们基于raft写一个管理raft集群的shardctrler,它能够接收来自客户端的配置更新，支持集</description>
+    </item>
+    
+  </channel>
+</rss>
