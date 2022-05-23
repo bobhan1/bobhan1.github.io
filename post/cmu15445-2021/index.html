@@ -49,7 +49,7 @@
 <meta itemprop="name" content="CMU15445-2021 DATABASE SYSTEMS 完成小结">
 <meta itemprop="description" content="PROJECT 1-BUFFER POOL project 1要我们实现一个buffer pool，buffer pool相当于数据库核心引擎和磁盘之间的一个缓存，负责在磁盘和内存之间传送page"><meta itemprop="datePublished" content="2022-05-20T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2022-05-20T00:00:00+00:00" />
-<meta itemprop="wordCount" content="2570">
+<meta itemprop="wordCount" content="2578">
 <meta itemprop="keywords" content="数据库系统,C&#43;&#43;," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="CMU15445-2021 DATABASE SYSTEMS 完成小结"/>
 <meta name="twitter:description" content="PROJECT 1-BUFFER POOL project 1要我们实现一个buffer pool，buffer pool相当于数据库核心引擎和磁盘之间的一个缓存，负责在磁盘和内存之间传送page"/>
@@ -198,7 +198,7 @@
 <h1 id="project-3-query-executionhttps15445coursescscmuedufall2021project3"><strong><a href="https://15445.courses.cs.cmu.edu/fall2021/project3/">PROJECT 3-QUERY EXECUTION</a></strong></h1>
 <p>实验三要求我们对每个query plan写对应的executor</p>
 <h2 id="总体架构"><strong>总体架构</strong></h2>
-<p>在这个project中，实现索引的数据结构的value中并不存储真实的数据，而是存储一个和真实数据一一对应并能快速找到真实数据的记录。通过这种方式，我们将索引和数据解耦。于是，我们可以将长度相同的数据存储在同一个数据存储空间，同时，当对数据进行修改时，我们不需要在索引数据结构上大量移动数据，而是只需要修改相应的记录即可。具体来说，我们使用在project 2中实现的exendible hash table来实现数据的索引结构。hash table的key对应一个索引，它是某个关系模式上的一个超码(唯一确定关系表中一个元组的属性集)，hash table的bucket中的value对应一个RID(Record Identifier)，它唯一标识了一个真实数据存储空间的逻辑页号和逻辑序号，通过这个逻辑页号和逻辑序号可以找到一个真实数据(元组)，于是一个RID唯一对应了一个存储的元组。</p>
+<p>在这个project中，实现索引的数据结构的value中并不存储真实的数据，而是存储一个和真实数据一一对应并能快速找到真实数据的<strong>记录(record)</strong>。通过这种方式，我们将索引和数据解耦。于是，我们可以将长度相同的数据存储在同一个数据存储空间，同时，当对数据进行修改时，我们不需要在索引数据结构上大量移动数据，而是只需要修改相应的记录即可。具体来说，我们使用在project 2中实现的exendible hash table来实现数据的索引结构。hash table的key对应一个<strong>索引</strong>，它是某个关系模式上的一个<strong>超码</strong>(唯一确定关系表中一个元组的属性集)，hash table的bucket中的value对应一个<strong>RID(Record Identifier)</strong>，它唯一标识了一个真实数据存储空间的逻辑页号和逻辑序号，通过这个逻辑页号和逻辑序号可以找到一个真实数据(元组)，于是一个RID唯一对应了一个存储的元组。</p>
 <p>DBMS中关系表的元数据(每张表的关系模式，每张表的数据的实际存储位置等)被<code>Catalog</code>所管理，在实现executor的过程中，我们需要通过和<code>Catalog</code>类交互来获取这些元数据。</p>
 
     </div>
