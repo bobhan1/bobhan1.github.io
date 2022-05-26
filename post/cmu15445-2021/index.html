@@ -49,7 +49,7 @@
 <meta itemprop="name" content="CMU15445-2021 DATABASE SYSTEMS 完成小结">
 <meta itemprop="description" content="PROJECT 1-BUFFER POOL project 1要我们实现一个buffer pool，buffer pool相当于数据库核心引擎和磁盘之间的一个缓存，负责在磁盘和内存之间传送page"><meta itemprop="datePublished" content="2022-05-20T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2022-05-20T00:00:00+00:00" />
-<meta itemprop="wordCount" content="2713">
+<meta itemprop="wordCount" content="3036">
 <meta itemprop="keywords" content="数据库,C&#43;&#43;," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="CMU15445-2021 DATABASE SYSTEMS 完成小结"/>
 <meta name="twitter:description" content="PROJECT 1-BUFFER POOL project 1要我们实现一个buffer pool，buffer pool相当于数据库核心引擎和磁盘之间的一个缓存，负责在磁盘和内存之间传送page"/>
@@ -197,7 +197,7 @@
 <h3 id="concurrency-control"><strong>Concurrency control</strong></h3>
 <p>下发的代码使用了page latch实现对整个hash table的并发访问。这里的<code>HashTableDirectoryPage</code>和<code>HashTableBucketPage</code>虽然都是存放在buffer pool提供的<code>Page</code>的<code>data</code>字段中的，但由于<code>char data[PAGE_SIZE]</code>是<code>Page</code>的第一个字段，所以我们可以通过<code>reinterprete_cast&lt;Page*&gt;</code>来将一个<code>HashTableDirectoryPage/HashTableBucketPage</code>强转为<code>Page*</code>从而操作<code>Page</code>上的latch。</p>
 <h1 id="project-3-query-executionhttps15445coursescscmuedufall2021project3"><strong><a href="https://15445.courses.cs.cmu.edu/fall2021/project3/">PROJECT 3-QUERY EXECUTION</a></strong></h1>
-<p>实验三要求我们对每个query plan写对应的executor</p>
+<p>实验三要求我们完成基于火山模型的9个query plan对应的查询执行引擎</p>
 <h2 id="总体架构"><strong>总体架构</strong></h2>
 <h2 id="存储与索引"><strong>存储与索引</strong></h2>
 <p>在这个project中，实现索引的数据结构的value中并不存储真实的数据，而是存储一个和真实数据一一对应并能快速找到真实数据的<strong>记录(record)</strong>。通过这种方式，我们将索引和数据解耦。于是，我们可以将长度相同的数据存储在同一个数据存储空间，同时，当对数据进行修改时，我们不需要在索引数据结构上大量移动数据，而是只需要修改相应的记录即可。具体来说，我们使用在project 2中实现的exendible hash table来实现数据的索引结构。hash table的key对应一个<strong>索引</strong>，它是某个关系模式上的一个<strong>超码</strong>(唯一确定关系表中一个元组的属性集)，hash table的bucket中的value对应一个<strong>RID(Record Identifier)</strong>，它唯一标识了一个真实数据存储空间的逻辑页号和逻辑序号，通过这个逻辑页号和逻辑序号可以找到一个真实数据(元组)，于是一个RID唯一对应了一个存储的元组。</p>
@@ -205,6 +205,7 @@
 <blockquote>
 <p>project 3在GradeScope上提交时可能出现测试中gtest的一些文件过不了clang-tidy的问题，解决方案是提交的时候把<code>src/include/storage/page/tmp_tuple_page.h</code>这个文件也提交上去，详见<a href="https://github.com/cmu-db/bustub/issues/227">issual#227</a></p>
 </blockquote>
+<p>CMU15445这门课的几个project从开始写到写完一共花了5条左右的时间，我感觉这个难度还是比MIT6.824要小很多，它给的代码框架基本上已经完成了90%左右，需要我们写的部分很少，并且每个模块的职责和各个模块之间的关系也都很清晰。不同于MIT6.824 lab 4那样需要我们自行设计分片迁移的方案，这个lab中几乎没有需要我们自己设计的内容，每个需要完成的类和函数都有很明确的说明，只要搞懂了各个模块之间的协作关系，就很容易完成。总的来说，这个数据库玩具项目比较简单，但是很适合初学数据库的人。这几个project基本上把数据库系统里一些重要话题都覆盖了，对我自己而言，这几个lab的实践确实加深了我对数据库系统当中基础概念的理解。</p>
 
     </div>
 
