@@ -49,7 +49,7 @@
 <meta itemprop="name" content="CMU15445-2021 DATABASE SYSTEMS 完成小结">
 <meta itemprop="description" content="PROJECT 1-BUFFER POOL project 1要我们实现一个buffer pool，buffer pool相当于数据库核心引擎和磁盘之间的一个缓存，负责在磁盘和内存之间传送page"><meta itemprop="datePublished" content="2022-05-20T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2022-05-20T00:00:00+00:00" />
-<meta itemprop="wordCount" content="3036">
+<meta itemprop="wordCount" content="3265">
 <meta itemprop="keywords" content="数据库,C&#43;&#43;," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="CMU15445-2021 DATABASE SYSTEMS 完成小结"/>
 <meta name="twitter:description" content="PROJECT 1-BUFFER POOL project 1要我们实现一个buffer pool，buffer pool相当于数据库核心引擎和磁盘之间的一个缓存，负责在磁盘和内存之间传送page"/>
@@ -190,7 +190,7 @@
 <p><img src="/imgs/extendible_hash_table.png" alt=""></p>
 <h2 id="实现"><strong>实现</strong></h2>
 <h3 id="page-layout"><strong>Page layout</strong></h3>
-<p>在extendible_hash_table中有两种类型的page，<code>HashTableDirectoryPage</code>和<code>HashTableBucketPage</code>。其中，<code>HashTableDirectoryPage</code>用于存放有关extendible hash table的元数据，<code>HashTableBucketPage</code>用于存放真实的数据。</p>
+<p>在这个projet中，extendible hash table的元数据和实际存储的key-value pair分别在不同的区域存储，每个存储区域均使用page model来进行管理。所以，有两种类型的page，<code>HashTableDirectoryPage</code>和<code>HashTableBucketPage</code>。其中，<code>HashTableDirectoryPage</code>用于存放有关extendible hash table的元数据，<code>HashTableBucketPage</code>用于存放真实的数据。</p>
 <p>每次extendiable hash table进行操作时，都要先从buffer pool中请求需要的page(申请资源)，读取相应数据并进行修改(使用资源)，使用完成后再用<code>UnpinPage()</code>来指示将某个page归还给buffer pool(释放资源)。需要注意<code>NewPage()/FetchPage()</code>和<code>UnpinPage()</code>一定要配对，否则会出现类似与内存管理中dangling pointer,double free,memory leak等问题。</p>
 <h3 id="splitemerge"><strong>Splite/Merge</strong></h3>
 <p>bucket的分裂与合并按照其要求实现即可，需要注意的是local_depth这个属性本应该是bucket的属性，但是代码中将相关的元数据都关联到了slot上而不是bucket上(<code>VerifyIntegrity</code>中的代码印证了这一点)。所以<strong>在由于Split/Merge需要更新某个bucket的元数据时，需要更新所有指向这个bucket的slot的元数据(包括<code>local_depths_</code>和<code>bucket_page_ids_</code>)</strong>。具体来说，当执行<code>IncrGlobalDepth()</code>时，需要将就的slot的元数据复制到新的slot中，然后再进行修改。在Splite一个bucket时，需要将指向原bucket的slot中一般的slot重新指向分离后新的bucket。在进行Merge时，需要将所有指向Merge前的slot重新指向Merge后的bucket。</p>
@@ -202,6 +202,7 @@
 <h2 id="存储与索引"><strong>存储与索引</strong></h2>
 <p>在这个project中，实现索引的数据结构的value中并不存储真实的数据，而是存储一个和真实数据一一对应并能快速找到真实数据的<strong>记录(record)</strong>。通过这种方式，我们将索引和数据解耦。于是，我们可以将长度相同的数据存储在同一个数据存储空间，同时，当对数据进行修改时，我们不需要在索引数据结构上大量移动数据，而是只需要修改相应的记录即可。具体来说，我们使用在project 2中实现的exendible hash table来实现数据的索引结构。hash table的key对应一个<strong>索引</strong>，它是某个关系模式上的一个<strong>超码</strong>(唯一确定关系表中一个元组的属性集)，hash table的bucket中的value对应一个<strong>RID(Record Identifier)</strong>，它唯一标识了一个真实数据存储空间的逻辑页号和逻辑序号，通过这个逻辑页号和逻辑序号可以找到一个真实数据(元组)，于是一个RID唯一对应了一个存储的元组。</p>
 <p>DBMS中关系表的元数据(每张表的关系模式，数据的实际存储位置，表上的索引信息等)被<code>Catalog</code>类所管理，在实现executor的过程中，我们需要通过和<code>Catalog</code>类交互来获取这些元数据。</p>
+<p>了解了各个模块的职责后剩下的工作就很简单了，偏底层的API已经需要进行范式转换的地方都已经实现好了，在实现算子的执行引擎时，我们基本上只需要关注它的逻辑，调用相关的API即可。需要注意的是执行引擎完成其功能后再通过<code>Next(...)</code>将产生的结果传递给上层之前一定要将元组转换为其执行计划<code>OutputSchema</code>所规定的关系模式。</p>
 <blockquote>
 <p>project 3在GradeScope上提交时可能出现测试中gtest的一些文件过不了clang-tidy的问题，解决方案是提交的时候把<code>src/include/storage/page/tmp_tuple_page.h</code>这个文件也提交上去，详见<a href="https://github.com/cmu-db/bustub/issues/227">issual#227</a></p>
 </blockquote>

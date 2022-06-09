@@ -22,7 +22,7 @@
       <pubDate>Sun, 27 Mar 2022 00:00:00 +0000</pubDate>
       
       <guid>http://localhost:1313/post/cpp_memory_order/</guid>
-      <description>本文介绍了C++抽象机与memory order的相关知识</description>
+      <description>本文介绍了C++抽象机与C++中memory order的相关知识</description>
     </item>
     
     <item>
