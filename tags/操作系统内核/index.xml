@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>操作系统内核 on bobh&#39;s blog</title>
+    <link>http://localhost:1313/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%86%85%E6%A0%B8/</link>
+    <description>Recent content in 操作系统内核 on bobh&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 20 Aug 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%86%85%E6%A0%B8/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>MIT6.828-2018 Lab 4 Preemptive Multitasking</title>
+      <link>http://localhost:1313/post/mit6828-2018-lab4/</link>
+      <pubDate>Sat, 20 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/mit6828-2018-lab4/</guid>
+      <description>Lab 4: Preemptive Multitasking Part A: Multiprocessor Support and Cooperative Multitasking 在这个部分，我们要扩展JOS使得其能够运行在多处理器系统上，同时增加新的系统调用使得用户进程能够创建新的用户进程为pa</description>
+    </item>
+    
+    <item>
+      <title>MIT6.828-2018 Lab 1 Booting a PC</title>
+      <link>http://localhost:1313/post/mit6828-2018-lab1/</link>
+      <pubDate>Wed, 10 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/mit6828-2018-lab1/</guid>
+      <description>MIT6.828-2018 本课程课程主要以xv6为例子进行讲解，会有xv6相关的作业，但lab为实现一个自己的JOS。JOS与xv6类似，但两者在某些方面有不同的设</description>
+    </item>
+    
+  </channel>
+</rss>

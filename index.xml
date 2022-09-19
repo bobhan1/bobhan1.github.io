@@ -6,7 +6,34 @@
     <description>Recent content on bobh&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Fri, 20 May 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 20 Aug 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>MIT6.828-2018 Lab 4 Preemptive Multitasking</title>
+      <link>http://localhost:1313/post/mit6828-2018-lab4/</link>
+      <pubDate>Sat, 20 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/mit6828-2018-lab4/</guid>
+      <description>Lab 4: Preemptive Multitasking Part A: Multiprocessor Support and Cooperative Multitasking 在这个部分，我们要扩展JOS使得其能够运行在多处理器系统上，同时增加新的系统调用使得用户进程能够创建新的用户进程为pa</description>
+    </item>
+    
+    <item>
+      <title>MIT6.828-2018 Lab 1 Booting a PC</title>
+      <link>http://localhost:1313/post/mit6828-2018-lab1/</link>
+      <pubDate>Wed, 10 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/mit6828-2018-lab1/</guid>
+      <description>MIT6.828-2018 本课程课程主要以xv6为例子进行讲解，会有xv6相关的作业，但lab为实现一个自己的JOS。JOS与xv6类似，但两者在某些方面有不同的设</description>
+    </item>
+    
+    <item>
+      <title>C&#43;&#43; concept快速入门</title>
+      <link>http://localhost:1313/post/concept%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/</link>
+      <pubDate>Mon, 20 Jun 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/concept%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/</guid>
+      <description>可以使用concept的位置 下图展示了模板声明中所有可以使用concept的位置 注意，在requires­-clause子句中可以使用typ</description>
+    </item>
+    
     <item>
       <title>CMU15445-2021 DATABASE SYSTEMS 完成小结</title>
       <link>http://localhost:1313/post/cmu15445-2021/</link>
@@ -23,6 +50,15 @@
       
       <guid>http://localhost:1313/post/mit6.824-2022/</guid>
       <description>先这么放着，之后再来补 Lab 4: Sharded Key/Value Service lab4a: 要求我们基于raft写一个管理raft集群的shardctrler,它能够接收来自客户端的配置更新，支持集</description>
+    </item>
+    
+    <item>
+      <title>Modern CMake快速入门——作为构建系统</title>
+      <link>http://localhost:1313/post/modern_cmake_notes/</link>
+      <pubDate>Sun, 01 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/modern_cmake_notes/</guid>
+      <description>本文介绍了一些CMake构建系统的基本知识</description>
     </item>
     
     <item>
@@ -158,6 +194,15 @@
       
       <guid>http://localhost:1313/post/cppthings/</guid>
       <description>一个关于C++20 coroutine的文章和视频的合集。 C++ links: Coroutines C++ links: atomics, lock free, memory model 一个专为教学向游戏引擎的开发作业系统，兼容C++20协程，代码结</description>
+    </item>
+    
+    <item>
+      <title>数据库/分布式系统资源合集</title>
+      <link>http://localhost:1313/post/DB-distributed-system/</link>
+      <pubDate>Tue, 01 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/DB-distributed-system/</guid>
+      <description>虚拟共识，Delos通过对不同的共识协议作进一步抽象，在复制状态机WAL日志和数据库之间增加一层虚拟日志层，使得上层应用不感知具体的共识协议</description>
     </item>
     
     <item>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>操作系统 on bobh&#39;s blog</title>
+    <link>http://localhost:1313/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/</link>
+    <description>Recent content in 操作系统 on bobh&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 20 Aug 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>MIY6.828-2018 Lab 4 Preemptive Multitasking</title>
+      <link>http://localhost:1313/post/mit6828-2018-lab4/</link>
+      <pubDate>Sat, 20 Aug 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/mit6828-2018-lab4/</guid>
+      <description>Lab 4: Preemptive Multitasking Part A: Multiprocessor Support and Cooperative Multitasking 在这个部分，我们要扩展JOS使得其能够运行在多处理器系统上，同时增加新的系统调用使得用户进程能够创建新的用户进程为pa</description>
+    </item>
+    
+  </channel>
+</rss>

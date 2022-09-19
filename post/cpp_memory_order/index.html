@@ -49,7 +49,7 @@
 <meta itemprop="name" content="C&#43;&#43; execution model and memory order">
 <meta itemprop="description" content="本文介绍了C&#43;&#43;抽象机与C&#43;&#43;中memory order的相关知识"><meta itemprop="datePublished" content="2022-03-27T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2022-03-27T00:00:00+00:00" />
-<meta itemprop="wordCount" content="3865">
+<meta itemprop="wordCount" content="3867">
 <meta itemprop="keywords" content="C&#43;&#43;,memory order,多线程," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="C&#43;&#43; execution model and memory order"/>
 <meta name="twitter:description" content="本文介绍了C&#43;&#43;抽象机与C&#43;&#43;中memory order的相关知识"/>
@@ -361,7 +361,7 @@
 <li>Boost blocking ensures your children threads make progress, not your siblings.</li>
 </ul>
 <h1 id="memory-order"><strong>memory order</strong></h1>
-<p>内存一致性模型描述的是程序在执行过程中内存操作正确性的问题。内存操作包括读操作和写操作，每一操作又可以用两个时间点界定：发出和响应。在假定没有流水线的情况下（即单个处理器内指令的执行是按顺序执行的），设系统内共有N个处理器，每个处理器可发出$s_i$个内存操作(读/写)，那么总共有$\frac{(\sum_{i=1}^{n}s_i)!}{\prod_{i=1}^{n}s_i}$中不同执行顺序的指令序列，内存一致性模型给出了这些指令序列中哪些执行顺序是合法的。</p>
+<p>内存一致性模型描述的是程序在执行过程中内存操作正确性的问题。内存操作包括读操作和写操作，每一操作又可以用两个时间点界定：发出和响应。在假定没有流水线的情况下（即单个处理器内指令的执行是按顺序执行的），设系统内共有$N$个处理器，每个处理器可发出$s_i$个内存操作(读/写)，那么总共有$\frac{(\sum_{i=1}^{n}s_i)!}{\prod_{i=1}^{n}s_i}$中不同执行顺序的指令序列，内存一致性模型给出了这些指令序列中哪些执行顺序是合法的。</p>
 <p>这里的memory order，指的是C++语言层面的内存序模型，与exectuion model的作用类似，是为了屏蔽底层微体系结构的不同内存序模型而产生的一层抽象。这篇论文<a href="https://www.cl.cam.ac.uk/~pes20/cpp/popl085ap-sewell.pdf">C++并发模型的数学模型</a>给出了讨论并发模型时的各种名词的确切定义。</p>
 <h2 id="ordering-constraints"><strong>ordering constraints</strong></h2>
 <p>C++中有三种ordering constraint</p>
@@ -563,9 +563,9 @@
           <a href="/tags/%E5%A4%9A%E7%BA%BF%E7%A8%8B/">多线程</a>
           </div>
       <nav class="post-nav">
-        <a class="prev" href="/post/mit6.824-2022/">
+        <a class="prev" href="/post/modern_cmake_notes/">
             <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">MIT6.824 Distributed Systems Spring-2022 完成小结</span>
+            <span class="prev-text nav-default">Modern CMake快速入门——作为构建系统</span>
             <span class="prev-text nav-mobile">上一篇</span>
           </a>
         <a class="next" href="/post/%E5%BC%A0%E9%87%8F%E7%9A%84%E6%9E%84%E9%80%A0/">

@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>MIT6.828-2018 Lab 4 Preemptive Multitasking - bobh&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="bobh" /><meta name="description" content="Lab 4: Preemptive Multitasking Part A: Multiprocessor Support and Cooperative Multitasking 在这个部分，我们要扩展JOS使得其能够运行在多处理器系统上，同时增加新的系统调用使得用户进程能够创建新的用户进程为pa" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.96.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/mit6828-2018-lab4/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2a71e62d7ea35a3a3f92c3c16c456852aaec63713de5cd5dbadb28e7480fd599.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="MIT6.828-2018 Lab 4 Preemptive Multitasking" />
+<meta property="og:description" content="Lab 4: Preemptive Multitasking Part A: Multiprocessor Support and Cooperative Multitasking 在这个部分，我们要扩展JOS使得其能够运行在多处理器系统上，同时增加新的系统调用使得用户进程能够创建新的用户进程为pa" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/mit6828-2018-lab4/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2022-08-20T00:00:00+00:00" />
+<meta property="article:modified_time" content="2022-08-20T00:00:00+00:00" />
+
+<meta itemprop="name" content="MIT6.828-2018 Lab 4 Preemptive Multitasking">
+<meta itemprop="description" content="Lab 4: Preemptive Multitasking Part A: Multiprocessor Support and Cooperative Multitasking 在这个部分，我们要扩展JOS使得其能够运行在多处理器系统上，同时增加新的系统调用使得用户进程能够创建新的用户进程为pa"><meta itemprop="datePublished" content="2022-08-20T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2022-08-20T00:00:00+00:00" />
+<meta itemprop="wordCount" content="7286">
+<meta itemprop="keywords" content="操作系统内核,C," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="MIT6.828-2018 Lab 4 Preemptive Multitasking"/>
+<meta name="twitter:description" content="Lab 4: Preemptive Multitasking Part A: Multiprocessor Support and Cooperative Multitasking 在这个部分，我们要扩展JOS使得其能够运行在多处理器系统上，同时增加新的系统调用使得用户进程能够创建新的用户进程为pa"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">bobh&#39;s blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">首页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">bobh&#39;s blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">首页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">MIT6.828-2018 Lab 4 Preemptive Multitasking</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2022-08-20 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#lab-4-preemptive-multitasking"><strong>Lab 4: Preemptive Multitasking</strong></a>
+      <ul>
+        <li><a href="#part-a-multiprocessor-support-and-cooperative-multitasking"><strong>Part A: Multiprocessor Support and Cooperative Multitasking</strong></a>
+          <ul>
+            <li><a href="#多处理器支持"><strong>多处理器支持</strong></a></li>
+            <li><a href="#应用处理器的启动"><strong>应用处理器的启动</strong></a></li>
+            <li><a href="#per-cpu-state-and-initialization"><strong>Per-CPU State and Initialization</strong></a></li>
+            <li><a href="#创建进程的系统调用"><strong>创建进程的系统调用</strong></a></li>
+          </ul>
+        </li>
+        <li><a href="#part-b-copy-on-write-fork"><strong>Part B: Copy-on-Write Fork</strong></a>
+          <ul>
+            <li><a href="#用户态缺页中断处理函数的设置"><strong>用户态缺页中断处理函数的设置</strong></a></li>
+            <li><a href="#用户态的异常处理栈"><strong>用户态的异常处理栈</strong></a></li>
+            <li><a href="#trap-time状态的恢复"><strong>Trap-time状态的恢复</strong></a></li>
+            <li><a href="#实现copy-on-write-fork"><strong>实现<code>copy-on-write fork()</code></strong></a></li>
+          </ul>
+        </li>
+        <li><a href="#part-c-preemptive-multitasking-and-ipc"><strong>Part C: Preemptive Multitasking and IPC</strong></a>
+          <ul>
+            <li><a href="#时钟中断"><strong>时钟中断</strong></a></li>
+            <li><a href="#ipc"><strong>IPC</strong></a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="lab-4-preemptive-multitasking"><strong>Lab 4: Preemptive Multitasking</strong></h1>
+<h2 id="part-a-multiprocessor-support-and-cooperative-multitasking"><strong>Part A: Multiprocessor Support and Cooperative Multitasking</strong></h2>
+<p>在这个部分，我们要扩展JOS使得其能够运行在多处理器系统上，同时增加新的系统调用使得用户进程能够创建新的用户进程为part <code>copy-on-write fork()</code>做准备。之后我们将实现一个最基本的调度算法: Round-Robin调度算法。</p>
+<h3 id="多处理器支持"><strong>多处理器支持</strong></h3>
+<p>我们将在JOS中实现SMP架构，在这个架构中，每个CPU核都对如内存和I/O总线等系统资源在访问上具有相同的优先级，即每个核的地位是等同的。然而，在启动过程中，他们被分为两类：</p>
+<ul>
+<li><strong>bootstrap processor (BSP)</strong>: 负责系统的初始化并启动系统。</li>
+<li><strong>application processors (APs)</strong>: 除BSP之外的CPU，被BSP唤醒。</li>
+</ul>
+<p>在SMP架构中，每个CPU都有一个对应的local APIC (LAPIC) unit，它负责向CPU传递系统中断。处理器通过MMIO来访问它的LAPIC。在<code>lapic_init()</code>中通过<code>mmio_map_region()</code>在物理地址<code>lapicaddr</code>处创建了MMIO的虚拟内存映射。我们首先需要完成<code>mmio_map_region()</code>这个辅助函数。它使用<code>boot_map_region()</code>来完成相应的地址分配。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="o">*</span> <span class="nf">mmio_map_region</span><span class="p">(</span><span class="n">physaddr_t</span> <span class="n">pa</span><span class="p">,</span> <span class="n">size_t</span> <span class="n">size</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">static</span> <span class="n">uintptr_t</span> <span class="n">base</span> <span class="o">=</span> <span class="n">MMIOBASE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="n">size_t</span> <span class="n">pa_lim</span> <span class="o">=</span> <span class="n">ROUNDUP</span><span class="p">(</span><span class="n">pa</span> <span class="o">+</span> <span class="n">size</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">pa</span> <span class="o">=</span> <span class="n">ROUNDDOWN</span><span class="p">(</span><span class="n">pa</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">size_t</span> <span class="n">sz</span> <span class="o">=</span> <span class="n">pa_lim</span> <span class="o">-</span> <span class="n">pa</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="o">*</span> <span class="n">ret</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">base</span> <span class="o">+</span> <span class="n">sz</span> <span class="o">&gt;=</span> <span class="n">MMIOLIM</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">panic</span><span class="p">(</span><span class="s">&#34;mmio_map_region: overflow MMIOLIM!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="n">boot_map_region</span><span class="p">(</span><span class="n">kern_pgdir</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">sz</span><span class="p">,</span> <span class="n">pa</span><span class="p">,</span> <span class="n">PTE_PCD</span> <span class="o">|</span> <span class="n">PTE_PWT</span> <span class="o">|</span> <span class="n">PTE_W</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">ret</span> <span class="o">=</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">base</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">base</span> <span class="o">+=</span> <span class="n">sz</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="应用处理器的启动"><strong>应用处理器的启动</strong></h3>
+<p>在启动其他AP之前，BSP首先通过<code>kern/mpconfig:mp_init()</code>函数收集CPU总数，其他核的APIC ID，MMIO地址等信息。之后在<code>kern/init.c:boot_aps()</code>中，由于AP将在实模式下启动，BSP将其他AP的entry code (<code>kern/mpentry.S</code>)复制到一个实模式下可寻址的位置<code>MPENTRY_PADDR=0x7000</code>，然后 通过向每个AP的LAPIC发送<code>STARTUP</code> IPIs来一次唤醒这些AP，同时向它们传递启动代码的位置。BSP通过等待<code>CPU_STARTED</code>信号来判断某个CPU是否已经启动成功，从而唤醒下一个CPU。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">void</span> <span class="nf">boot_aps</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">extern</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">mpentry_start</span><span class="p">[],</span> <span class="n">mpentry_end</span><span class="p">[];</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="o">*</span><span class="n">code</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">struct</span> <span class="n">CpuInfo</span> <span class="o">*</span><span class="n">c</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// Write entry code to unused memory at MPENTRY_PADDR
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">code</span> <span class="o">=</span> <span class="n">KADDR</span><span class="p">(</span><span class="n">MPENTRY_PADDR</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">memmove</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">mpentry_start</span><span class="p">,</span> <span class="n">mpentry_end</span> <span class="o">-</span> <span class="n">mpentry_start</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// Boot each AP one at a time
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">for</span> <span class="p">(</span><span class="n">c</span> <span class="o">=</span> <span class="n">cpus</span><span class="p">;</span> <span class="n">c</span> <span class="o">&lt;</span> <span class="n">cpus</span> <span class="o">+</span> <span class="n">ncpu</span><span class="p">;</span> <span class="n">c</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">c</span> <span class="o">==</span> <span class="n">cpus</span> <span class="o">+</span> <span class="n">cpunum</span><span class="p">())</span>  <span class="c1">// We&#39;ve started already.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>			<span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="c1">// Tell mpentry.S what stack to use 
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="n">mpentry_kstack</span> <span class="o">=</span> <span class="n">percpu_kstacks</span><span class="p">[</span><span class="n">c</span> <span class="o">-</span> <span class="n">cpus</span><span class="p">]</span> <span class="o">+</span> <span class="n">KSTKSIZE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="c1">// Start the CPU at mpentry_start
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="n">lapic_startap</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">cpu_id</span><span class="p">,</span> <span class="n">PADDR</span><span class="p">(</span><span class="n">code</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="c1">// Wait for the CPU to finish some basic setup in mp_main()
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="k">while</span><span class="p">(</span><span class="n">c</span><span class="o">-&gt;</span><span class="n">cpu_status</span> <span class="o">!=</span> <span class="n">CPU_STARTED</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">			<span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>AP被唤醒后，将首先执行<code>mpentry.S</code>中的代码（注意每唤醒一个AP，系统就多一个执行流）。它所做的工作和BSP的初始化类似：建立临时段表，进入保护模式，打开分页功能，然后控制流转移到<code>mp_main()</code>。</p>
+<p>这里我们需要修改<code>pmap.c:page_init()</code>使其将<code>MPENTRY_PADDR</code>处的物理页标记为不可用从而保证我们可以安全地将AP的启动代码复制到这个位置</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">page_init</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">size_t</span> <span class="n">mmio_page_num</span> <span class="o">=</span> <span class="n">MPENTRY_PADDR</span> <span class="o">/</span> <span class="n">PGSIZE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">npages_basemem</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="c1">// mark the physical page at MPENTRY_PADDR as in use for booting up APs
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="k">if</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="n">mmio_page_num</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">pages</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">pp_ref</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">			<span class="k">continue</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="n">pages</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">pp_ref</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">pages</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">pp_link</span> <span class="o">=</span> <span class="n">page_free_list</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">page_free_list</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">pages</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="per-cpu-state-and-initialization"><strong>Per-CPU State and Initialization</strong></h3>
+<p>对于一个多处理器系统来说每个CPU有其私有状态，也有共享的全局状态。在本实验中，我们需要关注的CPU私有状态包括：</p>
+<ul>
+<li><strong>Per-CPU kernel stack</strong></li>
+<li><strong>Per-CPU TSS and TSS descriptor</strong></li>
+<li><strong>Per-CPU current environment pointer</strong></li>
+<li><strong>Per-CPU system registers</strong></li>
+</ul>
+<p>JOS通过<code>struct CpuInfo</code>来保存这些变量</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// Per-CPU state
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">struct</span> <span class="n">CpuInfo</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">uint8_t</span> <span class="n">cpu_id</span><span class="p">;</span>                 <span class="c1">// Local APIC ID; index into cpus[] below
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">volatile</span> <span class="kt">unsigned</span> <span class="n">cpu_status</span><span class="p">;</span>   <span class="c1">// The status of the CPU
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">struct</span> <span class="n">Env</span> <span class="o">*</span><span class="n">cpu_env</span><span class="p">;</span>            <span class="c1">// The currently-running environment.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">struct</span> <span class="n">Taskstate</span> <span class="n">cpu_ts</span><span class="p">;</span>        <span class="c1">// Used by x86 to find stack for interrupt
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们需要修改<code>mem_init_mp()</code>是BSP在启动其他AP之前，为每个CPU分配栈空间。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">void</span> <span class="nf">mem_init_mp</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">uintptr_t</span> <span class="n">stop</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="p">(;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">NCPU</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">stop</span> <span class="o">=</span> <span class="n">KSTACKTOP</span> <span class="o">-</span> <span class="n">i</span> <span class="o">*</span> <span class="p">(</span><span class="n">KSTKSIZE</span> <span class="o">+</span> <span class="n">KSTKGAP</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">boot_map_region</span><span class="p">(</span><span class="n">kern_pgdir</span><span class="p">,</span> <span class="n">stop</span> <span class="o">-</span> <span class="n">KSTKSIZE</span><span class="p">,</span> <span class="n">KSTKSIZE</span><span class="p">,</span> <span class="n">PADDR</span><span class="p">(</span><span class="n">percpu_kstacks</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">PTE_P</span> <span class="o">|</span> <span class="n">PTE_W</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>同时还要修改<code>kern/trap.c:trap_init_percpu()</code>使得其能为每个CPU初始化自己的TSS和TSS descriptor。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">trap_init_percpu</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">size_t</span> <span class="n">id</span> <span class="o">=</span> <span class="n">thiscpu</span><span class="o">-&gt;</span><span class="n">cpu_id</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    
+</span></span><span class="line"><span class="cl">	<span class="c1">// Setup a TSS so that we get the right stack
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// when we trap to the kernel.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">thiscpu</span><span class="o">-&gt;</span><span class="n">cpu_ts</span><span class="p">.</span><span class="n">ts_esp0</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="n">percpu_kstacks</span><span class="p">[</span><span class="n">id</span><span class="p">]</span> <span class="o">+</span> <span class="n">KSTKSIZE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">thiscpu</span><span class="o">-&gt;</span><span class="n">cpu_ts</span><span class="p">.</span><span class="n">ts_ss0</span> <span class="o">=</span> <span class="n">GD_KD</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">thiscpu</span><span class="o">-&gt;</span><span class="n">cpu_ts</span><span class="p">.</span><span class="n">ts_iomb</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">Taskstate</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// Initialize the TSS slot of the gdt.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">gdt</span><span class="p">[(</span><span class="n">GD_TSS0</span> <span class="o">&gt;&gt;</span> <span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">SEG16</span><span class="p">(</span><span class="n">STS_T32A</span><span class="p">,</span> <span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">thiscpu</span><span class="o">-&gt;</span><span class="n">cpu_ts</span><span class="p">),</span>
+</span></span><span class="line"><span class="cl">					<span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">Taskstate</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">gdt</span><span class="p">[(</span><span class="n">GD_TSS0</span> <span class="o">&gt;&gt;</span> <span class="mi">3</span><span class="p">)</span> <span class="o">+</span> <span class="n">id</span><span class="p">].</span><span class="n">sd_s</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// Load the TSS selector (like other segment selectors, the
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// bottom three bits are special; we leave them 0)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">ltr</span><span class="p">(</span><span class="n">GD_TSS0</span> <span class="o">+</span> <span class="p">(</span><span class="n">id</span> <span class="o">&lt;&lt;</span> <span class="mi">3</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// Load the IDT
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">lidt</span><span class="p">(</span><span class="o">&amp;</span><span class="n">idt_pd</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>注意通过<code>ltr</code>保存TSS selector时低三位为0，第<code>i</code>个CPU的TSS selector索引为<code>(GD_TSS0 &gt;&gt; 3) + id</code>，故叮当加载的值为<code>GD_TSS0 + (id &lt;&lt; 3)</code>。</p>
+<h3 id="创建进程的系统调用"><strong>创建进程的系统调用</strong></h3>
+<p>接下来我们需要完成创建进程所需要的系统调用，这也是在用户进程完成copy-on-write <code>fork()</code>所需要的元操作。</p>
+<p><code>kern/syscall.c:sys_exofork()</code>: 分配一个新的<code>struct env</code>(PCB)，设置其状态为<code>ENV_NOT_RUNNABLE</code>，复制父进程的trap frame到新创建的子进程，同时将其trap frame中的<code>%eax</code>寄存器，即系统调用的返回值置为0，使得该创建出的子进程被唤醒后的返回值为0。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="n">envid_t</span> <span class="nf">sys_exofork</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">struct</span> <span class="n">Env</span> <span class="o">*</span><span class="n">env</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">env_alloc</span><span class="p">(</span><span class="o">&amp;</span><span class="n">env</span><span class="p">,</span> <span class="n">curenv</span><span class="o">-&gt;</span><span class="n">env_id</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="p">(</span><span class="n">envid_t</span><span class="p">)</span><span class="n">ret</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="n">env</span><span class="o">-&gt;</span><span class="n">env_status</span> <span class="o">=</span> <span class="n">ENV_NOT_RUNNABLE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// memcpy(&amp;env-&gt;env_tf, &amp;curenv-&gt;env_tf, sizeof(struct Trapframe));
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">env</span><span class="o">-&gt;</span><span class="n">env_tf</span> <span class="o">=</span> <span class="n">curenv</span><span class="o">-&gt;</span><span class="n">env_tf</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">env</span><span class="o">-&gt;</span><span class="n">env_tf</span><span class="p">.</span><span class="n">tf_regs</span><span class="p">.</span><span class="n">reg_eax</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">env</span><span class="o">-&gt;</span><span class="n">env_id</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>还要注意将系统调用<code>sys_exofork()</code>封装为供用户进程的库函数时必须inline为一条汇编指令，否则子进程无法正确返回。</p>
+<p><code>inc/lib.h:sys_exofork()</code>:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="kr">inline</span> <span class="n">envid_t</span> <span class="nf">__attribute__</span><span class="p">((</span><span class="n">always_inline</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="n">sys_exofork</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="n">envid_t</span> <span class="n">ret</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">asm</span> <span class="k">volatile</span><span class="p">(</span><span class="s">&#34;int %2&#34;</span>
+</span></span><span class="line"><span class="cl">		     <span class="o">:</span> <span class="s">&#34;=a&#34;</span> <span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">		     <span class="o">:</span> <span class="s">&#34;a&#34;</span> <span class="p">(</span><span class="n">SYS_exofork</span><span class="p">),</span> <span class="s">&#34;i&#34;</span> <span class="p">(</span><span class="n">T_SYSCALL</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>kern/syscall.c:sys_env_set_status</code>: 用于改变进程状态</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">int</span> <span class="nf">sys_env_set_status</span><span class="p">(</span><span class="n">envid_t</span> <span class="n">envid</span><span class="p">,</span> <span class="kt">int</span> <span class="n">status</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">struct</span> <span class="n">Env</span> <span class="o">*</span><span class="n">env</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">status</span> <span class="o">!=</span> <span class="n">ENV_RUNNABLE</span> <span class="o">&amp;&amp;</span> <span class="n">status</span> <span class="o">!=</span> <span class="n">ENV_NOT_RUNNABLE</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="o">-</span><span class="n">E_BAD_ENV</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">envid2env</span><span class="p">(</span><span class="n">envid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">env</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="n">env</span><span class="o">-&gt;</span><span class="n">env_status</span> <span class="o">=</span> <span class="n">status</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>	
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>sys_page_alloc/sys_page_map/sys_page_unmap</code>: 用于分配页，更改页映射关系。这里需要注意做相关的检查。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">int</span> <span class="nf">sys_page_alloc</span><span class="p">(</span><span class="n">envid_t</span> <span class="n">envid</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">va</span><span class="p">,</span> <span class="kt">int</span> <span class="n">perm</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">struct</span> <span class="n">Env</span> <span class="o">*</span><span class="n">env</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">struct</span> <span class="n">PageInfo</span><span class="o">*</span> <span class="n">pp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">ret</span> <span class="o">=</span> <span class="n">envid2env</span><span class="p">(</span><span class="n">envid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">env</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">ret</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">((</span><span class="n">uintptr_t</span><span class="p">)</span><span class="n">va</span> <span class="o">&gt;=</span> <span class="n">UTOP</span> <span class="o">||</span> <span class="p">(</span><span class="n">uintptr_t</span><span class="p">)</span><span class="n">va</span> <span class="o">%</span> <span class="n">PGSIZE</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="o">-</span><span class="n">E_INVAL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">((</span><span class="n">perm</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">PTE_U</span> <span class="o">|</span> <span class="n">PTE_P</span><span class="p">))</span> <span class="o">!=</span> <span class="p">(</span><span class="n">PTE_U</span> <span class="o">|</span> <span class="n">PTE_P</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">perm</span> <span class="o">&amp;</span> <span class="o">~</span><span class="p">(</span><span class="n">PTE_SYSCALL</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="o">-</span><span class="n">E_INVAL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">pp</span> <span class="o">=</span> <span class="n">page_alloc</span><span class="p">(</span><span class="mi">0</span><span class="p">)))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="o">-</span><span class="n">E_NO_MEM</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">((</span><span class="n">ret</span> <span class="o">=</span> <span class="n">page_insert</span><span class="p">(</span><span class="n">env</span><span class="o">-&gt;</span><span class="n">env_pgdir</span><span class="p">,</span> <span class="n">pp</span><span class="p">,</span> <span class="n">va</span><span class="p">,</span> <span class="n">perm</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">int</span> <span class="nf">sys_page_map</span><span class="p">(</span><span class="n">envid_t</span> <span class="n">srcenvid</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">srcva</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">	     <span class="n">envid_t</span> <span class="n">dstenvid</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">dstva</span><span class="p">,</span> <span class="kt">int</span> <span class="n">perm</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">struct</span> <span class="n">Env</span> <span class="o">*</span><span class="n">srcenv</span><span class="p">,</span> <span class="o">*</span><span class="n">dstenv</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">struct</span> <span class="n">PageInfo</span> <span class="o">*</span><span class="n">pp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">pte_t</span> <span class="o">*</span><span class="n">pte</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">ret</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">((</span><span class="n">ret</span> <span class="o">=</span> <span class="n">envid2env</span><span class="p">(</span><span class="n">srcenvid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">srcenv</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">((</span><span class="n">ret</span> <span class="o">=</span> <span class="n">envid2env</span><span class="p">(</span><span class="n">dstenvid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">dstenv</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">((</span><span class="n">uintptr_t</span><span class="p">)</span><span class="n">srcva</span> <span class="o">&gt;=</span> <span class="n">UTOP</span> <span class="o">||</span> <span class="p">(</span><span class="n">uintptr_t</span><span class="p">)</span><span class="n">srcva</span> <span class="o">%</span> <span class="n">PGSIZE</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="p">(</span><span class="n">uintptr_t</span><span class="p">)</span><span class="n">dstva</span> <span class="o">&gt;=</span> <span class="n">UTOP</span> <span class="o">||</span> <span class="p">(</span><span class="n">uintptr_t</span><span class="p">)</span><span class="n">dstva</span> <span class="o">%</span> <span class="n">PGSIZE</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="o">-</span><span class="n">E_INVAL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">((</span><span class="n">perm</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">PTE_U</span> <span class="o">|</span> <span class="n">PTE_P</span><span class="p">))</span> <span class="o">!=</span> <span class="p">(</span><span class="n">PTE_U</span> <span class="o">|</span> <span class="n">PTE_P</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">perm</span> <span class="o">&amp;</span> <span class="o">~</span><span class="p">(</span><span class="n">PTE_SYSCALL</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="o">-</span><span class="n">E_INVAL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">pp</span> <span class="o">=</span> <span class="n">page_lookup</span><span class="p">(</span><span class="n">srcenv</span><span class="o">-&gt;</span><span class="n">env_pgdir</span><span class="p">,</span> <span class="n">srcva</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pte</span><span class="p">)))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="o">-</span><span class="n">E_INVAL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">((</span><span class="n">perm</span> <span class="o">&amp;</span> <span class="n">PTE_W</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="p">(</span><span class="o">*</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_W</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="o">-</span><span class="n">E_INVAL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">((</span><span class="n">ret</span> <span class="o">=</span> <span class="n">page_insert</span><span class="p">(</span><span class="n">dstenv</span><span class="o">-&gt;</span><span class="n">env_pgdir</span><span class="p">,</span> <span class="n">pp</span><span class="p">,</span> <span class="n">dstva</span><span class="p">,</span> <span class="n">perm</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">int</span> <span class="nf">sys_page_unmap</span><span class="p">(</span><span class="n">envid_t</span> <span class="n">envid</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">va</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">struct</span> <span class="n">Env</span> <span class="o">*</span><span class="n">env</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">struct</span> <span class="n">PageInfo</span><span class="o">*</span> <span class="n">pp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">ret</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">((</span><span class="n">ret</span> <span class="o">=</span> <span class="n">envid2env</span><span class="p">(</span><span class="n">envid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">env</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">((</span><span class="n">uintptr_t</span><span class="p">)</span><span class="n">va</span> <span class="o">&gt;=</span> <span class="n">UTOP</span> <span class="o">||</span> <span class="p">(</span><span class="n">uintptr_t</span><span class="p">)</span><span class="n">va</span> <span class="o">%</span> <span class="n">PGSIZE</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="o">-</span><span class="n">E_INVAL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="n">page_remove</span><span class="p">(</span><span class="n">env</span><span class="o">-&gt;</span><span class="n">env_pgdir</span><span class="p">,</span> <span class="n">va</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="part-b-copy-on-write-fork"><strong>Part B: Copy-on-Write Fork</strong></h2>
+<p>part A中的<code>dumpfork()</code>给出了一个可能的<code>fork()</code>实现，然而它在创建子进程时就将父进程中的页面全部复制到子进程中分配的新页面中。在本节中我们要实现一个更高效的copy-on-write<code>fork()</code>，即在<code>fork()</code>调用时并不复制全部的页面数据到子进程中，而只是将页表项复制到子进程的页目录中。即父子进程将各自的虚拟页面映射到相同的物理页面上，只有当其中一方需要写某个页面时才真正为其分配新的物理页并复制数据。显然，我们需要在缺页中断函数中处理这部分逻辑。这也使得用户可以通过更改自己的缺页中断处理函数来定制相应的<code>fork()</code>逻辑。</p>
+<h3 id="用户态缺页中断处理函数的设置"><strong>用户态缺页中断处理函数的设置</strong></h3>
+<p>我们首先增加一个设置用户态缺页异常处理函数的系统调用。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">int</span> <span class="nf">sys_env_set_pgfault_upcall</span><span class="p">(</span><span class="n">envid_t</span> <span class="n">envid</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">func</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">ret</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">struct</span> <span class="n">Env</span> <span class="o">*</span><span class="n">env</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">((</span><span class="n">ret</span> <span class="o">=</span> <span class="n">envid2env</span><span class="p">(</span><span class="n">envid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">env</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">ret</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="n">env</span><span class="o">-&gt;</span><span class="n">env_pgfault_upcall</span> <span class="o">=</span> <span class="n">func</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="用户态的异常处理栈"><strong>用户态的异常处理栈</strong></h3>
+<p>通常，用户态所使用的栈是栈顶位于<code>USTACKTOP</code>的栈空间，我们称之为normal stack。在发生缺页异常时，内核会在切换到另一个栈空间上(需要用户进程通过系统调用分配)运行相应的缺页中断处理函数，这个栈空间被称为exception stack。JOS中用户态的异常处理栈的栈顶位于<code>UXSTAKTOP</code>，大小为一页。在完成缺页异常的处理后，将通过<code>pfentry.S:_pgfault_upcall</code>恢复到发生缺页中断前的状态。</p>
+<p>当进程没有注册缺页处理函数时，内核将销毁该进程。否则，内核会在异常处理栈上建立起如下所示的栈帧并调用缺页异常处理函数</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">                    &lt;-- UXSTACKTOP
+</span></span><span class="line"><span class="cl">trap-time esp
+</span></span><span class="line"><span class="cl">trap-time eflags
+</span></span><span class="line"><span class="cl">trap-time eip
+</span></span><span class="line"><span class="cl">trap-time eax       start of struct PushRegs
+</span></span><span class="line"><span class="cl">trap-time ecx
+</span></span><span class="line"><span class="cl">trap-time edx
+</span></span><span class="line"><span class="cl">trap-time ebx
+</span></span><span class="line"><span class="cl">trap-time esp
+</span></span><span class="line"><span class="cl">trap-time ebp
+</span></span><span class="line"><span class="cl">trap-time esi
+</span></span><span class="line"><span class="cl">trap-time edi       end of struct PushRegs
+</span></span><span class="line"><span class="cl">tf_err (error code)
+</span></span><span class="line"><span class="cl">fault_va            &lt;-- %esp when handler is run
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>kern/trap.c:</code> 这里我们通过将<code>struct UTrapframe *utf</code>的地址改为相应的地址然后直接进行赋值来得到所需的栈帧布局。需要 注意的是，如果在执行<code>page_fault_handler</code>的过程中发生了缺页异常，我们需要首先保留一个4个字节的空白区域然后再将栈帧构造为如上布局（我们可以通过<code>%esp</code>相对<code>UXSTACKTOP</code>的位置来判断是否是在执行<code>page_fault_handler</code>的过程中发生了缺页异常）。这个留出的4字节位置的作用将在后一部分解释。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">page_fault_handler</span><span class="p">(</span><span class="k">struct</span> <span class="n">Trapframe</span> <span class="o">*</span><span class="n">tf</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">uint32_t</span> <span class="n">fault_va</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">fault_va</span> <span class="o">=</span> <span class="n">rcr2</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">((</span><span class="n">tf</span><span class="o">-&gt;</span><span class="n">tf_cs</span> <span class="o">&amp;</span> <span class="mh">0x3</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">panic</span><span class="p">(</span><span class="s">&#34;page_fault_handler: receive page fault in kernel mode!&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">struct</span> <span class="n">UTrapframe</span> <span class="o">*</span><span class="n">utf</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">curenv</span><span class="o">-&gt;</span><span class="n">env_pgfault_upcall</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">curenv</span><span class="o">-&gt;</span><span class="n">env_tf</span><span class="p">.</span><span class="n">tf_esp</span> <span class="o">&gt;=</span> <span class="n">UXSTACKTOP</span> <span class="o">-</span> <span class="n">PGSIZE</span> <span class="o">&amp;&amp;</span> <span class="n">curenv</span><span class="o">-&gt;</span><span class="n">env_tf</span><span class="p">.</span><span class="n">tf_esp</span> <span class="o">&lt;</span> <span class="n">UXSTACKTOP</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">utf</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">UTrapframe</span> <span class="o">*</span><span class="p">)((</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="n">curenv</span><span class="o">-&gt;</span><span class="n">env_tf</span><span class="p">.</span><span class="n">tf_esp</span> <span class="o">-</span> <span class="mi">32</span> <span class="o">-</span> <span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">UTrapframe</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">utf</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">UTrapframe</span> <span class="o">*</span><span class="p">)((</span><span class="kt">char</span> <span class="o">*</span><span class="p">)</span><span class="n">UXSTACKTOP</span> <span class="o">-</span> <span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">UTrapframe</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="n">user_mem_assert</span><span class="p">(</span><span class="n">curenv</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="n">utf</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">UTrapframe</span><span class="p">),</span> <span class="n">PTE_U</span> <span class="o">|</span> <span class="n">PTE_W</span> <span class="o">|</span> <span class="n">PTE_P</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		
+</span></span><span class="line"><span class="cl">		<span class="n">utf</span><span class="o">-&gt;</span><span class="n">utf_fault_va</span> <span class="o">=</span> <span class="n">fault_va</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">utf</span><span class="o">-&gt;</span><span class="n">utf_err</span> <span class="o">=</span> <span class="n">tf</span><span class="o">-&gt;</span><span class="n">tf_err</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">utf</span><span class="o">-&gt;</span><span class="n">utf_regs</span> <span class="o">=</span> <span class="n">tf</span><span class="o">-&gt;</span><span class="n">tf_regs</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">utf</span><span class="o">-&gt;</span><span class="n">utf_eip</span> <span class="o">=</span> <span class="n">tf</span><span class="o">-&gt;</span><span class="n">tf_eip</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">utf</span><span class="o">-&gt;</span><span class="n">utf_eflags</span> <span class="o">=</span> <span class="n">tf</span><span class="o">-&gt;</span><span class="n">tf_eflags</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">utf</span><span class="o">-&gt;</span><span class="n">utf_esp</span> <span class="o">=</span> <span class="n">tf</span><span class="o">-&gt;</span><span class="n">tf_esp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="n">tf</span><span class="o">-&gt;</span><span class="n">tf_esp</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="n">utf</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">tf</span><span class="o">-&gt;</span><span class="n">tf_eip</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="n">curenv</span><span class="o">-&gt;</span><span class="n">env_pgfault_upcall</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="n">env_run</span><span class="p">(</span><span class="n">curenv</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="n">cprintf</span><span class="p">(</span><span class="s">&#34;[%08x] user fault va %08x ip %08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="n">curenv</span><span class="o">-&gt;</span><span class="n">env_id</span><span class="p">,</span> <span class="n">fault_va</span><span class="p">,</span> <span class="n">tf</span><span class="o">-&gt;</span><span class="n">tf_eip</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">print_trapframe</span><span class="p">(</span><span class="n">tf</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="n">env_destroy</span><span class="p">(</span><span class="n">curenv</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="trap-time状态的恢复"><strong>Trap-time状态的恢复</strong></h3>
+<p>接下来我们要在<code>pfentry.S:_pgfalut_up_call</code>中实现<code>paeg_handler()</code>处理完之后恢复到发生缺页中断之前状态的逻辑。这里的难点在于我们需要让<strong>所有状态</strong>都恢复到发生缺页中断之前，使得缺页中断的过程仿佛没有发生一样。如果我们简单地直接使用<code>jmp</code>指令，这需要我们首先将返回地址复制到一个寄存器中，这显然会破坏保存的寄存器状态。如果我们直接使用<code>call</code>指令，那么<code>%esp</code>寄存器将依然指向异常处理栈的栈顶。还要注意的是，当我们恢复了保存的状态寄存器后，我们就不能进行任何运行。当恢复通用寄存器后，也无法再使用这些通用寄存器。</p>
+<p>为了在这些约束条件下条件下实现要求，我们需要一些特殊的技巧，具体而言，我们将修改生缺页中断时的<code>trap-time %eip</code>复制到当前normal stack栈帧的底部(即<code>trap-time %esp</code>下方的4字节)，这也是为什么在第一次缺页中断后需要在构造新的异常处理栈帧之前留出4字节的空白，其作用是为了存放<code>%eip</code>从而能够正确返回到调用之前的状态。下面是具体过程分析。</p>
+<p><code>_pgfault_handler</code>返回后栈帧布局如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">============== Normal Stack ===================
+</span></span><span class="line"><span class="cl">(instruction that cause page falut)    &lt;- trap-time %esp 
+</span></span><span class="line"><span class="cl">============ Current Exception Stack ============
+</span></span><span class="line"><span class="cl">trap-time %esp  
+</span></span><span class="line"><span class="cl">trap-time eflags
+</span></span><span class="line"><span class="cl">trap-time eip		
+</span></span><span class="line"><span class="cl">trap-time eax		start of struct PushRegs
+</span></span><span class="line"><span class="cl">trap-time ecx
+</span></span><span class="line"><span class="cl">trap-time edx
+</span></span><span class="line"><span class="cl">trap-time ebx
+</span></span><span class="line"><span class="cl">trap-time esp
+</span></span><span class="line"><span class="cl">trap-time ebp
+</span></span><span class="line"><span class="cl">trap-time esi
+</span></span><span class="line"><span class="cl">trap-time edi       end of struct PushRegs
+</span></span><span class="line"><span class="cl">tf_err (error code)
+</span></span><span class="line"><span class="cl">fault_va            &lt;-- %esp
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>我们首先修改栈帧上保存的<code>trap-time %esp</code>从而将normal stack的栈空间扩大了4个字节，然后将<code>trap-time %eip</code>放入复制到这四个字节中（相当与向normal stack中压入了<code>trap-time %eip</code>）。（<code>sizeof(struct UTrapframe)==52B</code>，<code>%esp</code>此时指向栈顶的<code>fault_va</code>，<code>0x30(%esp)</code>即为<code>trap-time %esp</code>的地址，<code>0x28(%esp)</code>即为<code>trap-time %eip</code>的地址）。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">	movl 0x30(%esp), %eax
+</span></span><span class="line"><span class="cl">	subl $0x4, %eax       // extend the trap-time stack to store the trap-time&#39;s %eip
+</span></span><span class="line"><span class="cl">	movl %eax, 0x30(%esp) // update the trap-time&#39;s %esp
+</span></span><span class="line"><span class="cl">	movl 0x28(%esp), %ebx // load trap-time&#39;s eip
+</span></span><span class="line"><span class="cl">	movl %ebx, (%eax) 	  // save the trap-time&#39;s %eip to the &#39;extended&#39; trap-time stack
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>此时栈帧布局如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">============== Normal Stack ===================
+</span></span><span class="line"><span class="cl">(instruction that cause page falut)    &lt;- trap-time %esp 
+</span></span><span class="line"><span class="cl">trap-time %eip     &lt;- (trap-time %esp) - 4
+</span></span><span class="line"><span class="cl">============ Current Exception Stack ============
+</span></span><span class="line"><span class="cl">(trap-time %esp) - 4  
+</span></span><span class="line"><span class="cl">trap-time eflags
+</span></span><span class="line"><span class="cl">trap-time eip		
+</span></span><span class="line"><span class="cl">trap-time eax		start of struct PushRegs
+</span></span><span class="line"><span class="cl">trap-time ecx
+</span></span><span class="line"><span class="cl">trap-time edx
+</span></span><span class="line"><span class="cl">trap-time ebx
+</span></span><span class="line"><span class="cl">trap-time esp
+</span></span><span class="line"><span class="cl">trap-time ebp
+</span></span><span class="line"><span class="cl">trap-time esi
+</span></span><span class="line"><span class="cl">trap-time edi       end of struct PushRegs
+</span></span><span class="line"><span class="cl">tf_err (error code)
+</span></span><span class="line"><span class="cl">fault_va            &lt;-- %esp
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>之后跳过<code>fault_va</code>和错误码，然后恢复通用寄存器。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">	// Restore the trap-time registers.  After you do this, you
+</span></span><span class="line"><span class="cl">	// can no longer modify any general-purpose registers.
+</span></span><span class="line"><span class="cl">	addl $8, %esp // skip fault_va and tf_err
+</span></span><span class="line"><span class="cl">	popal // restore the trap-time registers
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>此时栈帧布局如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">============== Normal Stack ===================
+</span></span><span class="line"><span class="cl">(instruction that cause page falut)   &lt;- trap-time %esp 
+</span></span><span class="line"><span class="cl">trap-time %eip     &lt;- (trap-time %esp) - 4
+</span></span><span class="line"><span class="cl">============ Current Exception Stack ============
+</span></span><span class="line"><span class="cl">(trap-time %esp) - 4  
+</span></span><span class="line"><span class="cl">trap-time eflags
+</span></span><span class="line"><span class="cl">trap-time eip		&lt;-- %esp
+</span></span><span class="line"><span class="cl">trap-time eax		start of struct PushRegs
+</span></span><span class="line"><span class="cl">trap-time ecx
+</span></span><span class="line"><span class="cl">trap-time edx
+</span></span><span class="line"><span class="cl">trap-time ebx
+</span></span><span class="line"><span class="cl">trap-time esp
+</span></span><span class="line"><span class="cl">trap-time ebp
+</span></span><span class="line"><span class="cl">trap-time esi
+</span></span><span class="line"><span class="cl">trap-time edi       end of struct PushRegs
+</span></span><span class="line"><span class="cl">tf_err (error code)
+</span></span><span class="line"><span class="cl">fault_va     
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后跳过<code>trap-time %eip</code>并恢复状态寄存器。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">	// Restore eflags from the stack.  After you do this, you can
+</span></span><span class="line"><span class="cl">	// no longer use arithmetic operations or anything else that
+</span></span><span class="line"><span class="cl">	// modifies eflags.
+</span></span><span class="line"><span class="cl">	addl $4, %esp // skip the trap-time&#39;s %eip
+</span></span><span class="line"><span class="cl">	popfl // restore the trap-time eflags
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>此时栈帧布局如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">============== Normal Stack ===================
+</span></span><span class="line"><span class="cl">(instruction that cause page falut)    &lt;- trap-time %esp 
+</span></span><span class="line"><span class="cl">trap-time %eip     &lt;- (trap-time %esp) - 4
+</span></span><span class="line"><span class="cl">============ Current Exception Stack ============
+</span></span><span class="line"><span class="cl">(trap-time %esp) - 4   &lt;-- %esp
+</span></span><span class="line"><span class="cl">trap-time eflags
+</span></span><span class="line"><span class="cl">trap-time eip		
+</span></span><span class="line"><span class="cl">trap-time eax		start of struct PushRegs
+</span></span><span class="line"><span class="cl">trap-time ecx
+</span></span><span class="line"><span class="cl">trap-time edx
+</span></span><span class="line"><span class="cl">trap-time ebx
+</span></span><span class="line"><span class="cl">trap-time esp
+</span></span><span class="line"><span class="cl">trap-time ebp
+</span></span><span class="line"><span class="cl">trap-time esi
+</span></span><span class="line"><span class="cl">trap-time edi       end of struct PushRegs
+</span></span><span class="line"><span class="cl">tf_err (error code)
+</span></span><span class="line"><span class="cl">fault_va            
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>切回缺页中断前的栈空间</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">	// Switch back to the adjusted trap-time stack.
+</span></span><span class="line"><span class="cl">	pop %esp
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>此时栈帧布局如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">============== Normal Stack ===================
+</span></span><span class="line"><span class="cl">(instruction that cause page falut)    &lt;- trap-time %esp 
+</span></span><span class="line"><span class="cl">trap-time %eip     &lt;- %esp
+</span></span><span class="line"><span class="cl">============ Current Exception Stack ============
+</span></span><span class="line"><span class="cl">(trap-time %esp) - 4
+</span></span><span class="line"><span class="cl">trap-time eflags
+</span></span><span class="line"><span class="cl">trap-time eip		
+</span></span><span class="line"><span class="cl">trap-time eax		start of struct PushRegs
+</span></span><span class="line"><span class="cl">trap-time ecx
+</span></span><span class="line"><span class="cl">trap-time edx
+</span></span><span class="line"><span class="cl">trap-time ebx
+</span></span><span class="line"><span class="cl">trap-time esp
+</span></span><span class="line"><span class="cl">trap-time ebp
+</span></span><span class="line"><span class="cl">trap-time esi
+</span></span><span class="line"><span class="cl">trap-time edi       end of struct PushRegs
+</span></span><span class="line"><span class="cl">tf_err (error code)
+</span></span><span class="line"><span class="cl">fault_va            
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>最后用<code>ret</code>指令返回</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">	// Return to re-execute the instruction that faulted.
+</span></span><span class="line"><span class="cl">	ret 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>此时栈帧布局如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">============== &#34;Caller&#34; Stack ===================
+</span></span><span class="line"><span class="cl">(instruction that cause page falut)    &lt;- trap-time %esp | current %esp
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>于是我们恢复了所以寄存器的值，成功还原到了发生缺页中断之前的状态。</p>
+<p>之后，我们在<code>lib/pg_fault.c:set_pgfault_handler()</code>中注册缺页中断函数同时在第一次调用时分配异常栈空间。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">set_pgfault_handler</span><span class="p">(</span><span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="n">handler</span><span class="p">)(</span><span class="k">struct</span> <span class="n">UTrapframe</span> <span class="o">*</span><span class="n">utf</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">envid_t</span> <span class="n">envid</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">_pgfault_handler</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">((</span><span class="n">r</span> <span class="o">=</span> <span class="n">sys_getenvid</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">panic</span><span class="p">(</span><span class="s">&#34;set_pgfault_handler: %e!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">r</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>	
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">((</span><span class="n">r</span> <span class="o">=</span> <span class="n">sys_page_alloc</span><span class="p">(</span><span class="n">envid</span><span class="p">,</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)(</span><span class="n">UXSTACKTOP</span> <span class="o">-</span> <span class="n">PGSIZE</span><span class="p">),</span> <span class="n">PTE_U</span> <span class="o">|</span> <span class="n">PTE_P</span> <span class="o">|</span> <span class="n">PTE_W</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">panic</span><span class="p">(</span><span class="s">&#34;set_pgfault_handler: %e!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">r</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="n">sys_env_set_pgfault_upcall</span><span class="p">(</span><span class="n">envid</span><span class="p">,</span> <span class="n">_pgfault_upcall</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="n">_pgfault_handler</span> <span class="o">=</span> <span class="n">handler</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="实现copy-on-write-fork"><strong>实现<code>copy-on-write fork()</code></strong></h3>
+<p>完成前述工作后，我们终于可以来实现一个<code>copy-on-write fork()</code>。在此之前，我们还需要知道如何在用户进程中访问页表。这里JOS使用了一个<a href="https://pdos.csail.mit.edu/6.828/2018/labs/lab4/uvpt.html">trick</a>来实现这一点。</p>
+<p><code>fork()</code>的控制流如下：</p>
+<p>首先，父进程通过<code>set_pgfault_handler()</code>函数为自己注册缺页中断处理函数<code>pgfault()</code>。</p>
+<p><code>pgfault()</code>：通过由处理器返回的<code>err</code>和页表项判断是否符合复制的条件（写操作引发的缺页中断，对应的页表项被标记为<code>PTE_COW</code>），对于符合条件的页对其进行复制。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">void</span> <span class="nf">pgfault</span><span class="p">(</span><span class="k">struct</span> <span class="n">UTrapframe</span> <span class="o">*</span><span class="n">utf</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="o">*</span><span class="n">addr</span> <span class="o">=</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span> <span class="n">utf</span><span class="o">-&gt;</span><span class="n">utf_fault_va</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">uint32_t</span> <span class="n">err</span> <span class="o">=</span> <span class="n">utf</span><span class="o">-&gt;</span><span class="n">utf_err</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">((</span><span class="n">err</span> <span class="o">&amp;</span> <span class="n">FEC_WR</span><span class="p">)</span> <span class="o">==</span> <span class="n">FEC_WR</span><span class="p">)</span> <span class="o">||</span> <span class="o">!</span><span class="p">((</span><span class="n">uvpt</span><span class="p">[</span><span class="n">PGNUM</span><span class="p">(</span><span class="n">addr</span><span class="p">)]</span> <span class="o">&amp;</span> <span class="n">PTE_COW</span><span class="p">)</span> <span class="o">==</span> <span class="n">PTE_COW</span><span class="p">))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">panic</span><span class="p">(</span><span class="s">&#34;pgfault: the faulting access was not a write or not to a COW page! err: %u, addr:%p&#34;</span><span class="p">,</span> <span class="n">err</span><span class="p">,</span> <span class="n">addr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">((</span><span class="n">r</span> <span class="o">=</span> <span class="n">sys_page_alloc</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">PFTEMP</span><span class="p">,</span> <span class="n">PTE_P</span> <span class="o">|</span> <span class="n">PTE_U</span> <span class="o">|</span> <span class="n">PTE_W</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">panic</span><span class="p">(</span><span class="s">&#34;sys_page_alloc: %e&#34;</span><span class="p">,</span> <span class="n">r</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="n">memcpy</span><span class="p">(</span><span class="n">PFTEMP</span><span class="p">,</span> <span class="n">ROUNDDOWN</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">),</span> <span class="n">PGSIZE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">((</span><span class="n">r</span> <span class="o">=</span> <span class="n">sys_page_map</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">PFTEMP</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">ROUNDDOWN</span><span class="p">(</span><span class="n">addr</span><span class="p">,</span> <span class="n">PGSIZE</span><span class="p">),</span> <span class="n">PTE_P</span> <span class="o">|</span> <span class="n">PTE_U</span> <span class="o">|</span> <span class="n">PTE_W</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">panic</span><span class="p">(</span><span class="s">&#34;sys_page_map: %e&#34;</span><span class="p">,</span> <span class="n">r</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">((</span><span class="n">r</span> <span class="o">=</span> <span class="n">sys_page_unmap</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">PFTEMP</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">panic</span><span class="p">(</span><span class="s">&#34;sys_page_unmap: %e&#34;</span><span class="p">,</span> <span class="n">r</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>之后，通过系统调用<code>sys_exofork()</code>创建一个新进程，由于子进程的状态为<code>ENV_RUNNBALE</code>，故此时不会被CPU调度。父进程修改子进程的页表，将<code>UTOP</code>以下的所有可写和COW页面在子进程中标记为COW，然后将其在父进程中的页表项也改为COW。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl">	<span class="k">for</span> <span class="p">(</span><span class="n">addr</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">addr</span> <span class="o">&lt;</span> <span class="n">USTACKTOP</span><span class="p">;</span> <span class="n">addr</span> <span class="o">+=</span> <span class="n">PGSIZE</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">((</span><span class="n">uvpd</span><span class="p">[</span><span class="n">PDX</span><span class="p">(</span><span class="n">addr</span><span class="p">)]</span> <span class="o">&amp;</span> <span class="n">PTE_P</span><span class="p">)</span> <span class="o">==</span> <span class="n">PTE_P</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">uvpt</span><span class="p">[</span><span class="n">PGNUM</span><span class="p">(</span><span class="n">addr</span><span class="p">)]</span> <span class="o">&amp;</span> <span class="n">PTE_P</span><span class="p">)</span> <span class="o">==</span> <span class="n">PTE_P</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">duppage</span><span class="p">(</span><span class="n">envid</span><span class="p">,</span> <span class="n">PGNUM</span><span class="p">(</span><span class="n">addr</span><span class="p">));</span>	
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">int</span> <span class="nf">duppage</span><span class="p">(</span><span class="n">envid_t</span> <span class="n">envid</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="n">pn</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="o">*</span><span class="n">addr</span> <span class="o">=</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)(</span><span class="n">pn</span> <span class="o">*</span> <span class="n">PGSIZE</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">((</span><span class="n">uvpt</span><span class="p">[</span><span class="n">pn</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">PTE_W</span><span class="p">)</span> <span class="o">==</span> <span class="n">PTE_W</span> <span class="o">||</span> <span class="p">(</span><span class="n">uvpt</span><span class="p">[</span><span class="n">pn</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">PTE_COW</span><span class="p">)</span> <span class="o">==</span> <span class="n">PTE_COW</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">((</span><span class="n">r</span> <span class="o">=</span> <span class="n">sys_page_map</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">envid</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">PTE_COW</span> <span class="o">|</span> <span class="n">PTE_P</span> <span class="o">|</span> <span class="n">PTE_U</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">panic</span><span class="p">(</span><span class="s">&#34;duppage panic: sys_page_map: %e!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">r</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">((</span><span class="n">r</span> <span class="o">=</span> <span class="n">sys_page_map</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">PTE_COW</span> <span class="o">|</span> <span class="n">PTE_P</span> <span class="o">|</span> <span class="n">PTE_U</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">panic</span><span class="p">(</span><span class="s">&#34;duppage panic: sys_page_map: %e!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">r</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">((</span><span class="n">r</span> <span class="o">=</span> <span class="n">sys_page_map</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">envid</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">PTE_U</span> <span class="o">|</span> <span class="n">PTE_P</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">panic</span><span class="p">(</span><span class="s">&#34;duppage panic: sys_page_map: %e!</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">r</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>之后父进程为子进程的异常栈分配空间，同时为子进程注册缺页异常处理函数<code>pgfault()</code>。最后修改子进程状态使其可以被调度。子进程恢复后将从<code>fork()</code>函数的返回处开始执行并得到返回值0，父进程得到子进程的envid作为<code>fork()</code>的返回值。</p>
+<p>我们再来梳理一遍一次<code>fork()</code>调用的执行流程：</p>
+<ul>
+<li>
+<p>对于父进程而言：</p>
+<ul>
+<li>注册缺页处理函数<code>pgfault()</code> 。</li>
+<li>“调用”<code>sys_exofork()</code>（已确保被内联为<code>fork()</code>中的一条汇编指令），在该系统调用中创建子进程 ，且将此时的<code>strcut Trapframe</code>复制给子进程(其中<code>%eip</code>指向<code>sys_exofork()</code>对应的那条汇编指令)，并修改该<code>struct Trapframe</code>中的<code>%eax</code>(系统调用的返回值寄存器)的值为0。</li>
+<li>根据自己的页表项初始化子进程的页表项。</li>
+<li>为子进程分配异常处理栈并注册缺页处理函数<code>pgfault()</code>。</li>
+<li>修改子进程的状态为<code>ENV_RUNNABLE</code>。</li>
+<li>返回子进程的envid。</li>
+</ul>
+</li>
+<li>
+<p>对于子进程而言：</p>
+<ul>
+<li>当其第一次被某个CPU调度时，<code>env_run()</code>函数首先安装切换到子进程的内存空间，然后通过<code>env_pop_tf()</code>根据其<code>struct Trapframe</code>初始化各个寄存器状态。此时<code>%eip</code>指向<code>sys_exofork()</code>对应的那条汇编指令，于是子进程发现自己在这个系统调用的返回处“醒来”。</li>
+<li>由于父进程将其系统调用返回寄存器<code>%eax</code>置为0，故其得到<code>sys_exofork()</code>的返回值为0。</li>
+<li>将<code>thisenv</code>设置为当前进程所对应的<code>struct Env</code>。</li>
+</ul>
+</li>
+</ul>
+<p>这里我们清楚地看到了用户进程的<code>fork()</code>如何实现“调用一次， 返回两次”的效果。</p>
+<h2 id="part-c-preemptive-multitasking-and-ipc"><strong>Part C: Preemptive Multitasking and IPC</strong></h2>
+<p>在这个部分我们将实现抢占式调度与进程间通信。</p>
+<h3 id="时钟中断"><strong>时钟中断</strong></h3>
+<p>为了防止某个无限循环无限占用CPU资源，CPU需要能够相应外部的时钟中断，在运行超过一定时间收到时钟中断时主动调用<code>sched_yield()</code>从而让出CPU。和处理其他中断一样，我们首先需要在<code>kern/trapentry.S</code>和<code>kern/trap.c</code>中初始化相关信息。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="n">TRAPHANDLER_NOEC</span><span class="p">(</span><span class="n">handler32</span><span class="p">,</span> <span class="n">IRQ_OFFSET</span> <span class="o">+</span> <span class="n">IRQ_TIMER</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">TRAPHANDLER_NOEC</span><span class="p">(</span><span class="n">handler33</span><span class="p">,</span> <span class="n">IRQ_OFFSET</span> <span class="o">+</span> <span class="n">IRQ_KBD</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">TRAPHANDLER_NOEC</span><span class="p">(</span><span class="n">handler36</span><span class="p">,</span> <span class="n">IRQ_OFFSET</span> <span class="o">+</span> <span class="n">IRQ_SERIAL</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">TRAPHANDLER_NOEC</span><span class="p">(</span><span class="n">handler39</span><span class="p">,</span> <span class="n">IRQ_OFFSET</span> <span class="o">+</span> <span class="n">IRQ_SPURIOUS</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">TRAPHANDLER_NOEC</span><span class="p">(</span><span class="n">handler46</span><span class="p">,</span> <span class="n">IRQ_OFFSET</span> <span class="o">+</span> <span class="n">IRQ_IDE</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="n">TRAPHANDLER_NOEC</span><span class="p">(</span><span class="n">handler51</span><span class="p">,</span> <span class="n">IRQ_OFFSET</span> <span class="o">+</span> <span class="n">IRQ_ERROR</span><span class="p">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">	SETGATE(idt[32], 0, GD_KT, handler32, 0);
+</span></span><span class="line"><span class="cl">	SETGATE(idt[33], 0, GD_KT, handler33, 0);
+</span></span><span class="line"><span class="cl">	SETGATE(idt[36], 0, GD_KT, handler36, 0);
+</span></span><span class="line"><span class="cl">	SETGATE(idt[39], 0, GD_KT, handler39, 0);
+</span></span><span class="line"><span class="cl">	SETGATE(idt[46], 0, GD_KT, handler46, 0);
+</span></span><span class="line"><span class="cl">	SETGATE(idt[51], 0, GD_KT, handler51, 0);
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>之后在<code>trap.c:trap_dispatch()</code>中处理时钟中断</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl">		<span class="k">case</span> <span class="n">IRQ_OFFSET</span> <span class="o">+</span> <span class="nl">IRQ_TIMER</span><span class="p">:</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">lapic_eoi</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">			<span class="n">sched_yield</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">			<span class="k">return</span> <span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="ipc"><strong>IPC</strong></h3>
+<p>JOS中用户进程可以通过IPC传递的信息包括一个32位的值和一个可选的页映射。用户进程通过<code>ipc_send()</code>发送数据，通过<code>ipc_recv()</code>接收数据。发送方可以向任意进程发送数据，发送数据时会阻塞直到接收方接收。接收数据时也将阻塞直到有其他进程发送数据。</p>
+<p>首先实现内核中的函数</p>
+<p><code>kern/syscall.c:sys_ipc_try_send()</code>: 我们只需要简单地进行相关的检查，然后将数据传递到接收方的<code>struct Env</code>当中。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">int</span> <span class="nf">sys_ipc_try_send</span><span class="p">(</span><span class="n">envid_t</span> <span class="n">envid</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">value</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">srcva</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="n">perm</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">struct</span> <span class="n">Env</span> <span class="o">*</span><span class="n">env</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">pte_t</span> <span class="o">*</span><span class="n">pte</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">struct</span> <span class="n">PageInfo</span> <span class="o">*</span><span class="n">pp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">((</span><span class="n">r</span> <span class="o">=</span> <span class="n">envid2env</span><span class="p">(</span><span class="n">envid</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">env</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">cprintf</span><span class="p">(</span><span class="s">&#34;envid: %u</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="p">(</span><span class="kt">uint32_t</span><span class="p">)</span><span class="n">envid</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="o">-</span><span class="n">E_BAD_ENV</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">env</span><span class="o">-&gt;</span><span class="n">env_ipc_recving</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="o">-</span><span class="n">E_IPC_NOT_RECV</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">((</span><span class="n">uintptr_t</span><span class="p">)</span><span class="n">srcva</span> <span class="o">&lt;</span> <span class="n">UTOP</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">PGOFF</span><span class="p">(</span><span class="n">srcva</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">return</span> <span class="o">-</span><span class="n">E_INVAL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">((</span><span class="n">perm</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">PTE_U</span> <span class="o">|</span> <span class="n">PTE_P</span><span class="p">))</span> <span class="o">!=</span> <span class="p">(</span><span class="n">PTE_U</span> <span class="o">|</span> <span class="n">PTE_P</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">perm</span> <span class="o">&amp;</span> <span class="o">~</span><span class="p">(</span><span class="n">PTE_SYSCALL</span><span class="p">))</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">return</span> <span class="o">-</span><span class="n">E_INVAL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">(</span><span class="n">pp</span> <span class="o">=</span> <span class="n">page_lookup</span><span class="p">(</span><span class="n">curenv</span><span class="o">-&gt;</span><span class="n">env_pgdir</span><span class="p">,</span> <span class="n">srcva</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">pte</span><span class="p">)))</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">return</span> <span class="o">-</span><span class="n">E_INVAL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">((</span><span class="n">perm</span> <span class="o">&amp;</span> <span class="n">PTE_W</span><span class="p">)</span> <span class="o">==</span> <span class="n">PTE_W</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="o">*</span><span class="n">pte</span> <span class="o">&amp;</span> <span class="n">PTE_W</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">return</span> <span class="o">-</span><span class="n">E_INVAL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">((</span><span class="n">r</span> <span class="o">=</span> <span class="n">page_insert</span><span class="p">(</span><span class="n">env</span><span class="o">-&gt;</span><span class="n">env_pgdir</span><span class="p">,</span> <span class="n">pp</span><span class="p">,</span> <span class="n">env</span><span class="o">-&gt;</span><span class="n">env_ipc_dstva</span><span class="p">,</span> <span class="n">perm</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">return</span> <span class="o">-</span><span class="n">E_NO_MEM</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="n">env</span><span class="o">-&gt;</span><span class="n">env_ipc_perm</span> <span class="o">=</span> <span class="n">perm</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">env</span><span class="o">-&gt;</span><span class="n">env_ipc_perm</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="n">env</span><span class="o">-&gt;</span><span class="n">env_ipc_recving</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">env</span><span class="o">-&gt;</span><span class="n">env_ipc_from</span> <span class="o">=</span> <span class="n">curenv</span><span class="o">-&gt;</span><span class="n">env_id</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">env</span><span class="o">-&gt;</span><span class="n">env_ipc_value</span> <span class="o">=</span> <span class="n">value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="n">env</span><span class="o">-&gt;</span><span class="n">env_status</span> <span class="o">=</span> <span class="n">ENV_RUNNABLE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>kern/syscall.c:sys_ipc_recv()</code> : 接收方的操作同样很简单，只需要改变状态然后将自身挂起即可。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">static</span> <span class="kt">int</span> <span class="nf">sys_ipc_recv</span><span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="n">dstva</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">((</span><span class="kt">uint32_t</span><span class="p">)</span><span class="n">dstva</span> <span class="o">&lt;</span> <span class="n">UTOP</span> <span class="o">&amp;&amp;</span> <span class="n">PGOFF</span><span class="p">(</span><span class="n">dstva</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="o">-</span><span class="n">E_INVAL</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">curenv</span><span class="o">-&gt;</span><span class="n">env_ipc_recving</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">curenv</span><span class="o">-&gt;</span><span class="n">env_ipc_dstva</span> <span class="o">=</span> <span class="n">dstva</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">curenv</span><span class="o">-&gt;</span><span class="n">env_status</span> <span class="o">=</span> <span class="n">ENV_NOT_RUNNABLE</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后是两他们包装为供用户进程调用的库函数。<code>lib/ipc.c:ipc_recv/ipc_send</code> :</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">int32_t</span> <span class="nf">ipc_recv</span><span class="p">(</span><span class="n">envid_t</span> <span class="o">*</span><span class="n">from_env_store</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">pg</span><span class="p">,</span> <span class="kt">int</span> <span class="o">*</span><span class="n">perm_store</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="o">*</span><span class="n">dstva</span> <span class="o">=</span> <span class="n">pg</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="o">?</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="nl">UTOP</span> <span class="p">:</span> <span class="n">pg</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span><span class="p">((</span><span class="n">r</span> <span class="o">=</span> <span class="n">sys_ipc_recv</span><span class="p">(</span><span class="n">dstva</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">from_env_store</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="o">*</span><span class="n">from_env_store</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">perm_store</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="o">*</span><span class="n">perm_store</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">from_env_store</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="o">*</span><span class="n">from_env_store</span> <span class="o">=</span> <span class="n">thisenv</span><span class="o">-&gt;</span><span class="n">env_ipc_from</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="p">(</span><span class="n">perm_store</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="o">*</span><span class="n">perm_store</span> <span class="o">=</span> <span class="n">thisenv</span><span class="o">-&gt;</span><span class="n">env_ipc_perm</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="n">thisenv</span><span class="o">-&gt;</span><span class="n">env_ipc_value</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="kt">void</span> <span class="nf">ipc_send</span><span class="p">(</span><span class="n">envid_t</span> <span class="n">to_env</span><span class="p">,</span> <span class="kt">uint32_t</span> <span class="n">val</span><span class="p">,</span> <span class="kt">void</span> <span class="o">*</span><span class="n">pg</span><span class="p">,</span> <span class="kt">int</span> <span class="n">perm</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">int</span> <span class="n">r</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">void</span> <span class="o">*</span><span class="n">srcva</span> <span class="o">=</span> <span class="n">pg</span> <span class="o">==</span> <span class="nb">NULL</span> <span class="o">?</span> <span class="p">(</span><span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="nl">UTOP</span> <span class="p">:</span> <span class="n">pg</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">	<span class="k">while</span> <span class="p">((</span><span class="n">r</span> <span class="o">=</span> <span class="n">sys_ipc_try_send</span><span class="p">(</span><span class="n">to_env</span><span class="p">,</span> <span class="n">val</span><span class="p">,</span> <span class="n">srcva</span><span class="p">,</span> <span class="n">perm</span><span class="p">))</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">!=</span> <span class="o">-</span><span class="n">E_IPC_NOT_RECV</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="n">panic</span><span class="p">(</span><span class="s">&#34;ipc_send panic: %e!&#34;</span><span class="p">,</span> <span class="n">r</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="n">sys_yield</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">bobh</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2022-08-20
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%86%85%E6%A0%B8/">操作系统内核</a>
+          <a href="/tags/C/">C</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/mit6828-2018-lab1/">
+            <span class="next-text nav-default">MIT6.828-2018 Lab 1 Booting a PC</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:bh2444151092@outlook.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/bobhan1" class="iconfont icon-github" title="github"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

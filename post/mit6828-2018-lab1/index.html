@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>MIT6.828-2018 Lab 1 Booting a PC - bobh&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="bobh" /><meta name="description" content="MIT6.828-2018 本课程课程主要以xv6为例子进行讲解，会有xv6相关的作业，但lab为实现一个自己的JOS。JOS与xv6类似，但两者在某些方面有不同的设" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.96.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/mit6828-2018-lab1/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2a71e62d7ea35a3a3f92c3c16c456852aaec63713de5cd5dbadb28e7480fd599.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="MIT6.828-2018 Lab 1 Booting a PC" />
+<meta property="og:description" content="MIT6.828-2018 本课程课程主要以xv6为例子进行讲解，会有xv6相关的作业，但lab为实现一个自己的JOS。JOS与xv6类似，但两者在某些方面有不同的设" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/mit6828-2018-lab1/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2022-08-10T00:00:00+00:00" />
+<meta property="article:modified_time" content="2022-08-10T00:00:00+00:00" />
+
+<meta itemprop="name" content="MIT6.828-2018 Lab 1 Booting a PC">
+<meta itemprop="description" content="MIT6.828-2018 本课程课程主要以xv6为例子进行讲解，会有xv6相关的作业，但lab为实现一个自己的JOS。JOS与xv6类似，但两者在某些方面有不同的设"><meta itemprop="datePublished" content="2022-08-10T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2022-08-10T00:00:00+00:00" />
+<meta itemprop="wordCount" content="4429">
+<meta itemprop="keywords" content="操作系统内核,C," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="MIT6.828-2018 Lab 1 Booting a PC"/>
+<meta name="twitter:description" content="MIT6.828-2018 本课程课程主要以xv6为例子进行讲解，会有xv6相关的作业，但lab为实现一个自己的JOS。JOS与xv6类似，但两者在某些方面有不同的设"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">bobh&#39;s blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">首页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">bobh&#39;s blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">首页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">MIT6.828-2018 Lab 1 Booting a PC</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2022-08-10 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#mit6828-2018"><strong>MIT6.828-2018</strong></a></li>
+    <li><a href="#环境配置"><strong>环境配置</strong></a>
+      <ul>
+        <li><a href="#安装qemu"><strong>安装<code>qemu</code></strong></a></li>
+        <li><a href="#编译并启动jos"><strong>编译并启动<code>JOS</code></strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#lab-1-booting-a-pc"><strong>Lab 1: Booting a PC</strong></a>
+      <ul>
+        <li><a href="#part-1-pc-bootstrap"><strong>Part 1: PC Bootstrap</strong></a>
+          <ul>
+            <li><a href="#物理内存空间"><strong>物理内存空间</strong></a></li>
+          </ul>
+        </li>
+        <li><a href="#part-2-the-boot-loader"><strong>Part 2: The Boot Loader</strong></a>
+          <ul>
+            <li><a href="#x86下的寻址模式"><strong>x86下的寻址模式</strong></a></li>
+            <li><a href="#全局段描述表gdt的建立"><strong>全局段描述表(GDT)的建立</strong></a></li>
+            <li><a href="#从实模式到保护模式"><strong>从实模式到保护模式</strong></a></li>
+            <li><a href="#内核代码的加载"><strong>内核代码的加载</strong></a></li>
+          </ul>
+        </li>
+        <li><a href="#part-3-the-kernel"><strong>Part 3: The Kernel</strong></a>
+          <ul>
+            <li><a href="#分页机制的开启与临时页表的建立"><strong>分页机制的开启与临时页表的建立</strong></a></li>
+            <li><a href="#内核栈区的建立"><strong>内核栈区的建立</strong></a></li>
+            <li><a href="#calling-convention与函数调用栈"><strong>Calling convention与函数调用栈</strong></a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="mit6828-2018"><strong>MIT6.828-2018</strong></h1>
+<p>本课程课程主要以xv6为例子进行讲解，会有xv6相关的作业，但lab为实现一个自己的JOS。JOS与xv6类似，但两者在某些方面有不同的设计思路。</p>
+<h1 id="环境配置"><strong>环境配置</strong></h1>
+<p>下载课程所需的源码：</p>
+<ul>
+<li><code>qemu</code>(根据课程需要修改过): <a href="https://github.com/mit-pdos/6.828-qemu.git">https://github.com/mit-pdos/6.828-qemu.git</a></li>
+<li><code>JOS</code>(本课程lab要完成的操作系统): <a href="https://pdos.csail.mit.edu/6.828/2018/jos.git">https://pdos.csail.mit.edu/6.828/2018/jos.git</a></li>
+<li><code>xv6</code>(本课程讲课所参考的操作系统): <a href="https://github.com/mit-pdos/xv6-public">https://github.com/mit-pdos/xv6-public</a></li>
+</ul>
+<p>安装依赖</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt-get install build-essential gdb gcc-multilib
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="安装qemu"><strong>安装<code>qemu</code></strong></h2>
+<p>首先进行配置，配置需要<code>python2.X</code>环境，需指定<code>python2.X</code>可执行文件的位置，如</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">./configure --disable-kvm --target-list<span class="o">=</span><span class="s2">&#34;i386-softmmu x86_64-softmmu&#34;</span> --python<span class="o">=</span>python2.7
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>之后编译安装</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">make
+</span></span><span class="line"><span class="cl">sudo make install
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>编译过程中可能出现一些问题， 如需要在 <code>qga/commands-posix.c</code> 的 <code>&lt;sys/types.h&gt; </code>头文件后面加 <code>&lt;sys/sysmacros.h&gt;</code>。</p>
+<p>编译过程中出现的<code>-Werror=XXX</code>的错误可通过在<code>config-host.mak</code>中的<code>QEMU_CFLAGS</code>后添加对应的<code>Wno-XXX</code>解决。注意<code>config-host.mak</code>是由<code>./configure</code>生成的文件，修改<code>QEMU_CFLAGS</code>后不要重新<code>./configure</code>。</p>
+<h2 id="编译并启动jos"><strong>编译并启动<code>JOS</code></strong></h2>
+<p>在<code>JOS</code>源码目录下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">make
+</span></span><span class="line"><span class="cl">make qemu
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>即可在命令行和新窗口中同时启动<code>JOS</code>操作系统。<code>GNUMakefile</code>中还定义了许多方便我们调试的phony targets，详细信息以及gdb, qemu调试技巧参考<a href="https://pdos.csail.mit.edu/6.828/2018/labguide.html#make-qemu-gdb">6.828 lab tools guide</a>。</p>
+<p>编译运行xv6的过程类似。</p>
+<h1 id="lab-1-booting-a-pc"><strong>Lab 1: Booting a PC</strong></h1>
+<h2 id="part-1-pc-bootstrap"><strong>Part 1: PC Bootstrap</strong></h2>
+<h3 id="物理内存空间"><strong>物理内存空间</strong></h3>
+<p>32位机的物理内存空间通常有如下布局：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">+------------------+  &lt;- 0xFFFFFFFF (4GB)
+</span></span><span class="line"><span class="cl">|      32-bit      |
+</span></span><span class="line"><span class="cl">|  memory mapped   |
+</span></span><span class="line"><span class="cl">|     devices      |
+</span></span><span class="line"><span class="cl">|                  |
+</span></span><span class="line"><span class="cl">/\/\/\/\/\/\/\/\/\/\
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">/\/\/\/\/\/\/\/\/\/\
+</span></span><span class="line"><span class="cl">|                  |
+</span></span><span class="line"><span class="cl">|      Unused      |
+</span></span><span class="line"><span class="cl">|                  |
+</span></span><span class="line"><span class="cl">+------------------+  &lt;- depends on amount of RAM
+</span></span><span class="line"><span class="cl">|                  |
+</span></span><span class="line"><span class="cl">|                  |
+</span></span><span class="line"><span class="cl">| Extended Memory  |
+</span></span><span class="line"><span class="cl">|                  |
+</span></span><span class="line"><span class="cl">|                  |
+</span></span><span class="line"><span class="cl">+------------------+  &lt;- 0x00100000 (1MB)
+</span></span><span class="line"><span class="cl">|     BIOS ROM     |
+</span></span><span class="line"><span class="cl">+------------------+  &lt;- 0x000F0000 (960KB)
+</span></span><span class="line"><span class="cl">|  16-bit devices, |
+</span></span><span class="line"><span class="cl">|  expansion ROMs  |
+</span></span><span class="line"><span class="cl">+------------------+  &lt;- 0x000C0000 (768KB)
+</span></span><span class="line"><span class="cl">|   VGA Display    |
+</span></span><span class="line"><span class="cl">+------------------+  &lt;- 0x000A0000 (640KB)
+</span></span><span class="line"><span class="cl">|                  |
+</span></span><span class="line"><span class="cl">|    Low Memory    |
+</span></span><span class="line"><span class="cl">|                  |
+</span></span><span class="line"><span class="cl">+------------------+  &lt;- 0x00000000
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="part-2-the-boot-loader"><strong>Part 2: The Boot Loader</strong></h2>
+<p>BIOS运行过程中，首先设定了中断描述符表，对VGA显示器等设备进行了初始化。在初始化完PCI总线和所有BIOS负责的重要设备后，它就开始搜索软盘、硬盘、或是CD-ROM等可启动的设备。最终，当它找到可引导磁盘时，BIOS从磁盘读取引导加载程序并将控制权转移给它。</p>
+<p>JOS使用传统的硬盘启动机制，这意味着boot loader必须满足于512字节。BIOS将boot.S这段代码从硬盘的第一个扇区load到物理地址为0x7c00的位置，同时CPU工作在实模式。</p>
+<h3 id="x86下的寻址模式"><strong>x86下的寻址模式</strong></h3>
+<p>x86下的寻址模式包括实模式和保护模式。在实模式下采用分段的方式，程序中的一个地址通过<code>CS:IP</code>的模式进行解释，<code>CS</code>为段地址，<code>IP</code>为偏移地址。其表示的物理地址通过<code>CS*16+IP</code>计算得出。</p>
+<p>而在保护模式下则采用分段与分页相结合的寻址方式，总体示意图如下图所示：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">           Selector  +--------------+         +-----------+
+</span></span><span class="line"><span class="cl">          ----------&gt;|              |         |           |
+</span></span><span class="line"><span class="cl">                     | Segmentation |         |  Paging   |
+</span></span><span class="line"><span class="cl">Software             |              |--------&gt;|           |----------&gt;  RAM
+</span></span><span class="line"><span class="cl">            Offset   |  Mechanism   |         | Mechanism |
+</span></span><span class="line"><span class="cl">          ----------&gt;|              |         |           |
+</span></span><span class="line"><span class="cl">                     +--------------+         +-----------+
+</span></span><span class="line"><span class="cl">            Logical                   Linear                Physical
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>对于一个logical address，它首先会根据分段机制翻译为linear address，之后再根据分页机制将该linear address翻译为真正的physical address。</p>
+<p>详细的翻译过程与表项结构如下图所示：</p>
+<p><img src="/imgs/80386%E5%AF%BB%E5%9D%80.png" alt=""></p>
+<p>从logical address到linear address的翻译采用分段的方式，它将一个logical address解释为selector+offset，并根据selector找到段描述表中对应的表项，该表项存了放每个分段的相关信息(段起始，段长，标志)，检查权限后根据段基址base和偏移offset得到linear address。从linear address到physical address的翻译采两级页表的分页方式，这个两级页表的维护将由我们在lab2中完成。</p>
+<p>需要注意的是<strong>上述地址翻译的过程都是MMU由硬件完成的</strong>，操作系统通过寄存器向MMU硬件传递信息，例如操作系统可以通过将<code>CR0</code>的<code>CR0_PG</code>位置1来开启分页机制；可以通过汇编指令<code>lgdt gdtdesc</code>将<code>gdtdesc</code>作为段描述表的基址；<code>page directory</code>的基址(物理地址)被存放在<code>%CR3</code>当中，</p>
+<blockquote>
+<p>i386寻址的过程可参考<a href="https://pdos.csail.mit.edu/6.828/2018/readings/i386/c05.htm">Intel 80386 Reference Programmer&rsquo;s Manual  Ch5</a> 和</p>
+<p>Intel® 64 and IA-32 Architectures Software Developer’s Manual <a href="https://pdos.csail.mit.edu/6.828/2018/readings/ia32/IA32-3A.pdf">3A</a> <a href="https://pdos.csail.mit.edu/6.828/2018/readings/ia32/IA32-3B.pdf">3B</a></p>
+</blockquote>
+<h3 id="全局段描述表gdt的建立"><strong>全局段描述表(GDT)的建立</strong></h3>
+<p>为了在进入保护模式后在地址翻译的过程中分段机制对地址不影响，在<code>boot.S</code>中我们硬编码了一个descriptor table，将其中所有selector descriptor的base设为0，limit设为0xffffffff。实施上在JOS建立了虚拟内存机制之后段表中的表项依然被设置为base设为0，limit设为0xffffffff，相当于分段机制对地址翻译不影响。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">#define SEG_NULL						\
+</span></span><span class="line"><span class="cl">	.word 0, 0;						\
+</span></span><span class="line"><span class="cl">	.byte 0, 0, 0, 0
+</span></span><span class="line"><span class="cl">#define SEG(type,base,lim)					\
+</span></span><span class="line"><span class="cl">	.word (((lim) &gt;&gt; 12) &amp; 0xffff), ((base) &amp; 0xffff);	\
+</span></span><span class="line"><span class="cl">	.byte (((base) &gt;&gt; 16) &amp; 0xff), (0x90 | (type)),		\
+</span></span><span class="line"><span class="cl">		(0xC0 | (((lim) &gt;&gt; 28) &amp; 0xf)), (((base) &gt;&gt; 24) &amp; 0xff)
+</span></span><span class="line"><span class="cl">		
+</span></span><span class="line"><span class="cl">		
+</span></span><span class="line"><span class="cl">  #...
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">  lgdt    gdtdesc
+</span></span><span class="line"><span class="cl">  # ...
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl"># Bootstrap GDT
+</span></span><span class="line"><span class="cl">.p2align 2                                # force 4 byte alignment
+</span></span><span class="line"><span class="cl">gdt:
+</span></span><span class="line"><span class="cl">  SEG_NULL				# null seg
+</span></span><span class="line"><span class="cl">  SEG(STA_X|STA_R, 0x0, 0xffffffff)	# code seg
+</span></span><span class="line"><span class="cl">  SEG(STA_W, 0x0, 0xffffffff)	        # data seg	
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">gdtdesc:
+</span></span><span class="line"><span class="cl">  .word   0x17                            # sizeof(gdt) - 1
+</span></span><span class="line"><span class="cl">  .long   gdt                             # address gdt
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="从实模式到保护模式"><strong>从实模式到保护模式</strong></h3>
+<p>GDT建立完成后，我们通过将控制寄存器<code>CR0</code>的保护模式使能位<code>CR0_PE_ON</code>置1从而从实模式转换为32位保护模式。进入保护模式即开启了上述寻址机制，当然由于页表还没有建立，此时分页机制还没有打开。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">.set PROT_MODE_CSEG, 0x8         # kernel code segment selector
+</span></span><span class="line"><span class="cl">.set PROT_MODE_DSEG, 0x10        # kernel data segment selector
+</span></span><span class="line"><span class="cl">.set CR0_PE_ON,      0x1         # protected mode enable flag
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  # Switch from real to protected mode, using a bootstrap GDT
+</span></span><span class="line"><span class="cl">  # and segment translation that makes virtual addresses 
+</span></span><span class="line"><span class="cl">  # identical to their physical addresses, so that the 
+</span></span><span class="line"><span class="cl">  # effective memory map does not change during the switch.
+</span></span><span class="line"><span class="cl">  lgdt    gdtdesc
+</span></span><span class="line"><span class="cl">  movl    %cr0, %eax
+</span></span><span class="line"><span class="cl">  orl     $CR0_PE_ON, %eax
+</span></span><span class="line"><span class="cl">  movl    %eax, %cr0
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">  # Jump to next instruction, but in 32-bit code segment.
+</span></span><span class="line"><span class="cl">  # Switches processor into 32-bit mode.
+</span></span><span class="line"><span class="cl">  ljmp    $PROT_MODE_CSEG, $protcseg
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  .code32                     # Assemble for 32-bit mode
+</span></span><span class="line"><span class="cl">protcseg:
+</span></span><span class="line"><span class="cl">  # Set up the protected-mode data segment registers
+</span></span><span class="line"><span class="cl">  movw    $PROT_MODE_DSEG, %ax    # Our data segment selector
+</span></span><span class="line"><span class="cl">  
+</span></span><span class="line"><span class="cl">  # ...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="内核代码的加载"><strong>内核代码的加载</strong></h3>
+<p>之后，继续设置相应的寄存器的值后，<code>boot/mian.c</code>中的<code>bootmain()</code>函数将存放在磁盘上的内核映像文件加载到内存中，由于内核映像文件<code>kernel.img</code>遵循ELF格式，我们可以根据ELF格式规范获得其大小等元数据进行操作。这里<code>bootmain()</code>依次从磁盘上读取内核映像的每一段并将其复制到内存中规定的加载地址处。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// load each program segment (ignores ph flags)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="n">ph</span> <span class="o">=</span> <span class="p">(</span><span class="k">struct</span> <span class="n">Proghdr</span> <span class="o">*</span><span class="p">)</span> <span class="p">((</span><span class="kt">uint8_t</span> <span class="o">*</span><span class="p">)</span> <span class="n">ELFHDR</span> <span class="o">+</span> <span class="n">ELFHDR</span><span class="o">-&gt;</span><span class="n">e_phoff</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="n">eph</span> <span class="o">=</span> <span class="n">ph</span> <span class="o">+</span> <span class="n">ELFHDR</span><span class="o">-&gt;</span><span class="n">e_phnum</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="k">for</span> <span class="p">(;</span> <span class="n">ph</span> <span class="o">&lt;</span> <span class="n">eph</span><span class="p">;</span> <span class="n">ph</span><span class="o">++</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// p_pa is the load address of this segment (as well
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="c1">// as the physical address)
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="n">readseg</span><span class="p">(</span><span class="n">ph</span><span class="o">-&gt;</span><span class="n">p_pa</span><span class="p">,</span> <span class="n">ph</span><span class="o">-&gt;</span><span class="n">p_memsz</span><span class="p">,</span> <span class="n">ph</span><span class="o">-&gt;</span><span class="n">p_offset</span><span class="p">);</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后运行其入口函数从而将控制流转移给内核。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="c1">// call the entry point from the ELF header
+</span></span></span><span class="line"><span class="cl"><span class="c1">// note: does not return!
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">((</span><span class="kt">void</span> <span class="p">(</span><span class="o">*</span><span class="p">)(</span><span class="kt">void</span><span class="p">))</span> <span class="p">(</span><span class="n">ELFHDR</span><span class="o">-&gt;</span><span class="n">e_entry</span><span class="p">))();</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="part-3-the-kernel"><strong>Part 3: The Kernel</strong></h2>
+<h3 id="分页机制的开启与临时页表的建立"><strong>分页机制的开启与临时页表的建立</strong></h3>
+<p>在part 2中我们通过objdump可以看到boot loader程序的LMA(加载到内存中的位置)和VMA(执行地址)相同而kernel的LMA和VMA不同。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">objdump -h obj/boot/boot.out                                                                               
+</span></span><span class="line"><span class="cl">obj/boot/boot.out:     file format elf32-i386
+</span></span><span class="line"><span class="cl">Sections:
+</span></span><span class="line"><span class="cl">Idx Name          Size      VMA       LMA       File off  Algn
+</span></span><span class="line"><span class="cl">  <span class="m">0</span> .text         0000019c  00007c00  00007c00  <span class="m">00000074</span>  2**2
+</span></span><span class="line"><span class="cl">                  CONTENTS, ALLOC, LOAD, CODE
+</span></span><span class="line"><span class="cl">  <span class="m">1</span> .eh_frame     0000009c  00007d9c  00007d9c  <span class="m">00000210</span>  2**2
+</span></span><span class="line"><span class="cl">                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+</span></span><span class="line"><span class="cl">  <span class="m">2</span> .stab         <span class="m">00000870</span>  <span class="m">00000000</span>  <span class="m">00000000</span>  000002ac  2**2
+</span></span><span class="line"><span class="cl">                  CONTENTS, READONLY, DEBUGGING
+</span></span><span class="line"><span class="cl">  <span class="m">3</span> .stabstr      <span class="m">00000940</span>  <span class="m">00000000</span>  <span class="m">00000000</span>  00000b1c  2**0
+</span></span><span class="line"><span class="cl">                  CONTENTS, READONLY, DEBUGGING
+</span></span><span class="line"><span class="cl">  <span class="m">4</span> .comment      0000002b  <span class="m">00000000</span>  <span class="m">00000000</span>  0000145c  2**0
+</span></span><span class="line"><span class="cl">                  CONTENTS, READONLY
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">objdump -h obj/kern/kernel                                                                               
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">obj/kern/kernel:     file format elf32-i386
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Sections:
+</span></span><span class="line"><span class="cl">Idx Name          Size      VMA       LMA       File off  Algn
+</span></span><span class="line"><span class="cl">  <span class="m">0</span> .text         00001acd  f0100000  <span class="m">00100000</span>  <span class="m">00001000</span>  2**4
+</span></span><span class="line"><span class="cl">                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+</span></span><span class="line"><span class="cl">  <span class="m">1</span> .rodata       000006bc  f0101ae0  00101ae0  00002ae0  2**5
+</span></span><span class="line"><span class="cl">                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+</span></span><span class="line"><span class="cl">  <span class="m">2</span> .stab         <span class="m">00004291</span>  f010219c  0010219c  0000319c  2**2
+</span></span><span class="line"><span class="cl">                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+</span></span><span class="line"><span class="cl">  <span class="m">3</span> .stabstr      0000197f  f010642d  0010642d  0000742d  2**0
+</span></span><span class="line"><span class="cl">                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+</span></span><span class="line"><span class="cl">  <span class="m">4</span> .data         <span class="m">00009300</span>  f0108000  <span class="m">00108000</span>  <span class="m">00009000</span>  2**12
+</span></span><span class="line"><span class="cl">                  CONTENTS, ALLOC, LOAD, DATA
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>操作系统内核通常被链接到非常高的虚拟地址下运行，以便留下处理器虚拟地址空间的低地址部分供用户程序使用。在之后的lab中，我们会通过维护虚拟内存所需的二级页表将全部的4G虚拟地址空间映射到全部的256M物理地址空间上。现在，我们需要只映射物理地址空间的起始4M， 这个大小对于JOS的初始化和运行足够了。</p>
+<p>为此，我们将在<code>kern/entrypgdir.c</code>手动编写静态的二级页表，这个页表中将线性地址<code>0xf0000000-0xf0400000</code>映射到物理<code>0x00000000-0x00400000</code>。然后在<code>entry.S</code>中将页目录<code>entry_pgdir</code>的物理地址传递给<code>%CR3</code>(页目录基址寄存器)，并设置<code>CR0</code>的<code>CR0_PG</code>标志位通知MMU打开paging功能使得之后对虚拟地址的访问要先被翻译成物理地址，从而将地址<code>0xf0000000-0xf0400000</code>映射到<code>0x00000000-0x00400000</code>（<code>0x00000000-0x00400000</code>也映射到<code>0x00000000-0x00400000</code>）。对这两个范围之外的地址访问会触发硬件错误，由于没有设置对应的handler，这会使得qemu退出。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">#define	RELOC(x) ((x) - KERNBASE)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># Load the physical address of entry_pgdir into cr3.  entry_pgdir
+</span></span><span class="line"><span class="cl"># is defined in entrypgdir.c.
+</span></span><span class="line"><span class="cl">movl	$(RELOC(entry_pgdir)), %eax
+</span></span><span class="line"><span class="cl">movl	%eax, %cr3
+</span></span><span class="line"><span class="cl"># Turn on paging.
+</span></span><span class="line"><span class="cl">movl	%cr0, %eax
+</span></span><span class="line"><span class="cl">orl	$(CR0_PE|CR0_PG|CR0_WP), %eax
+</span></span><span class="line"><span class="cl">movl	%eax, %cr0
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>为了详细地看到它的效果，我们首先运行内核代码。通过查看<code>obj/boot/boot.asm</code>我们发现boot loader执行的最后一条指令在0x7d81处，我们在此处打断点，再执行一条指令便进入了内核入口<code>entry.S</code>。继续执行指令直到<code>movl </code>处</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">=&gt; 0x100025:	mov    %eax,%cr0
+</span></span><span class="line"><span class="cl">0x00100025 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) x/8x 0x100000
+</span></span><span class="line"><span class="cl">0x100000:	0x1badb002	0x00000000	0xe4524ffe	0x7205c766
+</span></span><span class="line"><span class="cl">0x100010:	0x34000004	0x2000b812	0x220f0011	0xc0200fd8
+</span></span><span class="line"><span class="cl">(gdb) x/8x 0xf0100000
+</span></span><span class="line"><span class="cl">0xf0100000 &lt;_start-268435468&gt;:	0x00000000	0x00000000	0x00000000	0x00000000
+</span></span><span class="line"><span class="cl">0xf0100010 &lt;entry+4&gt;:	0x00000000	0x00000000	0x00000000	0x00000000
+</span></span><span class="line"><span class="cl">(gdb) si
+</span></span><span class="line"><span class="cl">=&gt; 0x100028:	mov    $0xf010002f,%eax
+</span></span><span class="line"><span class="cl">0x00100028 in ?? ()
+</span></span><span class="line"><span class="cl">(gdb) x/8x 0x100000
+</span></span><span class="line"><span class="cl">0x100000:	0x1badb002	0x00000000	0xe4524ffe	0x7205c766
+</span></span><span class="line"><span class="cl">0x100010:	0x34000004	0x2000b812	0x220f0011	0xc0200fd8
+</span></span><span class="line"><span class="cl">(gdb) x/8x 0xf0100000
+</span></span><span class="line"><span class="cl">0xf0100000 &lt;_start-268435468&gt;:	0x1badb002	0x00000000	0xe4524ffe	0x7205c766
+</span></span><span class="line"><span class="cl">0xf0100010 &lt;entry+4&gt;:	0x34000004	0x2000b812	0x220f0011	0xc0200fd8
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>可以看到，在执行了<code>mov %eax,%cr0</code>后，地址<code>0xf0000000-0xf0400000</code>被映射到了<code>0x00000000-0x00400000</code>。</p>
+<h3 id="内核栈区的建立"><strong>内核栈区的建立</strong></h3>
+<p>内核在<code>.data</code>段区域预留一片空间作为内核栈区（大小为<code>8*PGSIZE=8*4KiB=32KiB</code>），并在进行操作系统初始化之前将<code>%esp</code>寄存器指向栈顶（栈从高地址向低地址方向增长）</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">#define PGSIZE		4096
+</span></span><span class="line"><span class="cl">#define KSTKSIZE	(8*PGSIZE)
+</span></span><span class="line"><span class="cl">movl	$(bootstacktop),%esp
+</span></span><span class="line"><span class="cl">call	i386_init
+</span></span><span class="line"><span class="cl"># ...
+</span></span><span class="line"><span class="cl">.data
+</span></span><span class="line"><span class="cl">	.p2align	PGSHIFT		# force page alignment
+</span></span><span class="line"><span class="cl">	.globl		bootstack
+</span></span><span class="line"><span class="cl">bootstack:
+</span></span><span class="line"><span class="cl">	.space		KSTKSIZE
+</span></span><span class="line"><span class="cl">	.globl		bootstacktop   
+</span></span><span class="line"><span class="cl">bootstacktop:
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="calling-convention与函数调用栈"><strong>Calling convention与函数调用栈</strong></h3>
+<p><img src="/imgs/calling-conventions.png" alt=""></p>
+<p>为了实现函数的递归调用调用方与被调方需要就参数如何传递，寄存器如何保存，返回地址如何存放等问题做出一致的约定，即我们需要一个一致的、稳定的栈帧布局。这种约定(保存寄存器，局部变量，返回地址的位置和顺序等)即为<a href="https://wiki.osdev.org/Calling_Conventions">Calling convetion</a>。上图即为一些常见架构的Calling convention这里我们通过汇编来观察x86下的C Calling convention。每次函数执行前都会有一段<em>prologue</em> code，即每当执行<code>call</code>指令调将<code>eip</code>即下一条要执行的指令的地址压栈并跳转至函数内后。首先会将<code>ebp</code>压栈，然后将当前<code>esp</code>复制到<code>ebp</code>，作为当前函数栈帧的起始位置，保存某些寄存器的值然后下移<code>esp</code>来获得新的栈空间。相关汇编代码如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">void
+</span></span><span class="line"><span class="cl">test_backtrace(int x)
+</span></span><span class="line"><span class="cl">{
+</span></span><span class="line"><span class="cl">f0100040:	f3 0f 1e fb          	endbr32 
+</span></span><span class="line"><span class="cl">f0100044:	55                   	push   %ebp
+</span></span><span class="line"><span class="cl">f0100045:	89 e5                	mov    %esp,%ebp
+</span></span><span class="line"><span class="cl">f0100047:	56                   	push   %esi
+</span></span><span class="line"><span class="cl">f0100048:	53                   	push   %ebx
+</span></span><span class="line"><span class="cl">f0100049:	e8 7e 01 00 00       	call   f01001cc &lt;__x86.get_pc_thunk.bx&gt;
+</span></span><span class="line"><span class="cl">f010004e:	81 c3 ba 22 01 00    	add    $0x122ba,%ebx
+</span></span><span class="line"><span class="cl">f0100054:	8b 75 08             	mov    0x8(%ebp),%esi
+</span></span><span class="line"><span class="cl">	cprintf(&#34;entering test_backtrace %d\n&#34;, x);
+</span></span><span class="line"><span class="cl">f0100057:	83 ec 08             	sub    $0x8,%esp
+</span></span><span class="line"><span class="cl">f010005a:	56                   	push   %esi
+</span></span><span class="line"><span class="cl">f010005b:	8d 83 b8 f8 fe ff    	lea    -0x10748(%ebx),%eax
+</span></span><span class="line"><span class="cl">f0100061:	50                   	push   %eax
+</span></span><span class="line"><span class="cl">f0100062:	e8 e3 0a 00 00       	call   f0100b4a &lt;cprintf&gt;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>于是，我们得到了如下图所示的一致且稳定的栈帧内存布局，从而可以进行递归的回溯。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">		       +------------+   |
+</span></span><span class="line"><span class="cl">		       | arg 2      |   \
+</span></span><span class="line"><span class="cl">		       +------------+    &gt;- previous function&#39;s stack frame
+</span></span><span class="line"><span class="cl">		       | arg 1      |   /
+</span></span><span class="line"><span class="cl">		       +------------+   |
+</span></span><span class="line"><span class="cl">		       | ret %eip   |   /
+</span></span><span class="line"><span class="cl">		       +============+   
+</span></span><span class="line"><span class="cl">		       | saved %ebp |   \
+</span></span><span class="line"><span class="cl">		%ebp-&gt; +------------+   |
+</span></span><span class="line"><span class="cl">		       |            |   |
+</span></span><span class="line"><span class="cl">		       |   local    |   \
+</span></span><span class="line"><span class="cl">		       | variables, |    &gt;- current function&#39;s stack frame
+</span></span><span class="line"><span class="cl">		       |    etc.    |   /
+</span></span><span class="line"><span class="cl">		       |            |   |
+</span></span><span class="line"><span class="cl">		       |            |   |
+</span></span><span class="line"><span class="cl">		%esp-&gt; +------------+   /
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>Exercise 11要求我们打印调用占相关的信息，根据上图很容易写出<code>kern/monitor.c</code>中<code>mon_backtrace</code>函数代码如下:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">int</span> <span class="nf">mon_backtrace</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">,</span> <span class="k">struct</span> <span class="nc">Trapframe</span> <span class="o">*</span><span class="n">tf</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// Your code here.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="kt">uint32_t</span> <span class="n">ebp</span> <span class="o">=</span> <span class="n">read_ebp</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">	<span class="kt">uint32_t</span> <span class="o">*</span><span class="n">p</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl">	<span class="n">cprintf</span><span class="p">(</span><span class="s">&#34;Stack backtrace:</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">	<span class="k">while</span><span class="p">(</span><span class="n">ebp</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="n">p</span> <span class="o">=</span> <span class="p">(</span><span class="kt">uint32_t</span> <span class="o">*</span><span class="p">)</span><span class="n">ebp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">		<span class="n">cprintf</span><span class="p">(</span><span class="s">&#34;ebp %08x  &#34;</span><span class="p">,</span> <span class="n">ebp</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">cprintf</span><span class="p">(</span><span class="s">&#34;eip %08x  &#34;</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">cprintf</span><span class="p">(</span><span class="s">&#34;args %08x &#34;</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>	
+</span></span><span class="line"><span class="cl">		<span class="n">cprintf</span><span class="p">(</span><span class="s">&#34;%08x &#34;</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">3</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">cprintf</span><span class="p">(</span><span class="s">&#34;%08x &#34;</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">4</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">cprintf</span><span class="p">(</span><span class="s">&#34;%08x &#34;</span><span class="p">,</span> <span class="n">p</span><span class="p">[</span><span class="mi">5</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">		<span class="n">cprintf</span><span class="p">(</span><span class="s">&#34;%08x</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span><span class="n">p</span><span class="p">[</span><span class="mi">6</span><span class="p">]);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">debuginfo_eip</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">info</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="kt">int</span> <span class="n">fn_offset</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">info</span><span class="p">.</span><span class="n">eip_fn_addr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">            <span class="n">cprintf</span><span class="p">(</span><span class="s">&#34;%s:%d: %.*s+%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">info</span><span class="p">.</span><span class="n">eip_file</span><span class="p">,</span> <span class="n">info</span><span class="p">.</span><span class="n">eip_line</span><span class="p">,</span> <span class="n">info</span><span class="p">.</span><span class="n">eip_fn_namelen</span><span class="p">,</span> <span class="n">info</span><span class="p">.</span><span class="n">eip_fn_name</span><span class="p">,</span> <span class="n">fn_offset</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="n">ebp</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">		<span class="n">ebp</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">bobh</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2022-08-10
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%86%85%E6%A0%B8/">操作系统内核</a>
+          <a href="/tags/C/">C</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/mit6828-2018-lab4/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">MIT6.828-2018 Lab 4 Preemptive Multitasking</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/concept%E5%BF%AB%E9%80%9F%E5%85%A5%E9%97%A8/">
+            <span class="next-text nav-default">C&#43;&#43; concept快速入门</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:bh2444151092@outlook.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/bobhan1" class="iconfont icon-github" title="github"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -25,5 +25,14 @@
       <description>先这么放着，之后再来补 Lab 4: Sharded Key/Value Service lab4a: 要求我们基于raft写一个管理raft集群的shardctrler,它能够接收来自客户端的配置更新，支持集</description>
     </item>
     
+    <item>
+      <title>数据库/分布式系统资源合集</title>
+      <link>http://localhost:1313/post/DB-distributed-system/</link>
+      <pubDate>Tue, 01 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/DB-distributed-system/</guid>
+      <description>虚拟共识，Delos通过对不同的共识协议作进一步抽象，在复制状态机WAL日志和数据库之间增加一层虚拟日志层，使得上层应用不感知具体的共识协议</description>
+    </item>
+    
   </channel>
 </rss>

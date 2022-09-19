@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Modern CMake快速入门——作为构建系统 - bobh&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="bobh" /><meta name="description" content="本文介绍了一些CMake构建系统的基本知识" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.96.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/modern_cmake_notes/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2a71e62d7ea35a3a3f92c3c16c456852aaec63713de5cd5dbadb28e7480fd599.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="Modern CMake快速入门——作为构建系统" />
+<meta property="og:description" content="本文介绍了一些CMake构建系统的基本知识" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/modern_cmake_notes/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2022-05-01T00:00:00+00:00" />
+<meta property="article:modified_time" content="2022-05-01T00:00:00+00:00" />
+
+<meta itemprop="name" content="Modern CMake快速入门——作为构建系统">
+<meta itemprop="description" content="本文介绍了一些CMake构建系统的基本知识"><meta itemprop="datePublished" content="2022-05-01T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2022-05-01T00:00:00+00:00" />
+<meta itemprop="wordCount" content="3548">
+<meta itemprop="keywords" content="CMake," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Modern CMake快速入门——作为构建系统"/>
+<meta name="twitter:description" content="本文介绍了一些CMake构建系统的基本知识"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">bobh&#39;s blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">首页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">bobh&#39;s blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">首页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Modern CMake快速入门——作为构建系统</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2022-05-01 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#basics"><strong>Basics</strong></a>
+      <ul>
+        <li><a href="#配置工具链"><strong>配置工具链</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#targets"><strong>Targets</strong></a>
+      <ul>
+        <li><a href="#properties"><strong>Properties</strong></a></li>
+        <li><a href="#dependency-graph"><strong>Dependency graph</strong></a>
+          <ul>
+            <li><a href="#可视化"><strong>可视化</strong></a></li>
+          </ul>
+        </li>
+        <li><a href="#targets-properties"><strong>Targets properties</strong></a></li>
+        <li><a href="#transitive-usage-requirements"><strong>Transitive usage requirements</strong></a></li>
+        <li><a href="#解决传播属性的冲突"><strong>解决传播属性的冲突</strong></a></li>
+        <li><a href="#pseudo-targets"><strong>Pseudo targets</strong></a>
+          <ul>
+            <li><a href="#imported-targets"><strong>Imported targets</strong></a></li>
+            <li><a href="#alias-targets"><strong>Alias targets</strong></a></li>
+            <li><a href="#interface-libraries"><strong>Interface libraries</strong></a></li>
+          </ul>
+        </li>
+        <li><a href="#add_custom_command"><strong><code>add_custom_command()</code></strong></a>
+          <ul>
+            <li><a href="#as-a-generator"><strong>as a generator</strong></a></li>
+            <li><a href="#as-a-target-hook"><strong>as a target hook</strong></a></li>
+          </ul>
+        </li>
+        <li><a href="#generator-expressions"><strong>Generator expressions</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#编译配置"><strong>编译配置</strong></a>
+      <ul>
+        <li><a href="#预处理配置"><strong>预处理配置</strong></a>
+          <ul>
+            <li><a href="#添加头文件的搜索路径"><strong>添加头文件的搜索路径</strong></a></li>
+            <li><a href="#添加宏定义"><strong>添加宏定义</strong></a></li>
+          </ul>
+        </li>
+        <li><a href="#configuring-the-headers"><strong>Configuring the headers</strong></a></li>
+        <li><a href="#configuring-the-optimizer"><strong>Configuring the optimizer</strong></a></li>
+        <li><a href="#reducing-compilation-time"><strong>Reducing compilation time</strong></a>
+          <ul>
+            <li><a href="#precompilation-of-headers"><strong>Precompilation of headers</strong></a></li>
+            <li><a href="#unity-builds"><strong>Unity builds</strong></a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#linking"><strong>Linking</strong></a>
+      <ul>
+        <li><a href="#type-of-libraries"><strong>Type of libraries</strong></a></li>
+        <li><a href="#pic"><strong>PIC</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#管理依赖"><strong>管理依赖</strong></a>
+      <ul>
+        <li><a href="#find_package"><strong>find_package()</strong></a></li>
+        <li><a href="#externalproject"><strong>ExternalProject</strong></a></li>
+        <li><a href="#fetchcontent"><strong>FetchContent</strong></a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="basics"><strong>Basics</strong></h1>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span> <span class="s">3.20</span><span class="p">)</span> <span class="c"># 声明最低版本
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nb">project</span><span class="p">(</span><span class="s">project1</span> <span class="s">CXX</span><span class="p">)</span> <span class="c"># 配置项目元数据
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nb">add_subdirectory</span><span class="p">(</span><span class="s">source_dir</span> <span class="s">[binary_dir]</span> <span class="s">[EXCLUDE_FROM_ALL]</span><span class="p">)</span> <span class="c"># 子文件夹
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>EXCLUDE_FROM_ALL</code>关键字用于禁用子文件夹中targets的默认构建</p>
+<p>和系统环境有关的变量	: <code>CMAKE_SYSTEM_NAME</code>系统名称, <code>CMAKE_HOST_*</code>, <code>CMAKE_SIZEOF_VOID_P</code>查询32-bit or 64-bit, <code>CMAKE_CXX_BYTE_ORDER</code>系统字节序。<a href="https://cmake.org/cmake/help/latest/manual/cmake-toolchains.7.html">[关于交叉编译的官方文档]</a></p>
+<p>查询host系统的特性</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">cmake_host_system_information</span><span class="p">(</span><span class="s">RESULT</span> <span class="s">&lt;VARIABLE&gt;</span> <span class="s">QUERY</span> <span class="s">&lt;KEY&gt;…</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="配置工具链"><strong>配置工具链</strong></h2>
+<p>设置C++版本。设置某个target的版本<code>set_property(TARGET &lt;target&gt; PROPERTY CXX_STANDARD &lt;standard&gt;)</code></p>
+<p>修改全局变量设置整个project的版本<code>CMAKE_CXX_STANDARD</code>，该命令不强制使用该版本，需要</p>
+<p><code>set(CMAKE_CXX_STANDARD_REQUIRED ON)</code>来强制规定版本</p>
+<p><code>set(CMAKE_CXX_EXTENSIONS OFF)</code></p>
+<p>编译器支持的特性会在configuration stage存放在<code>CMAKE_CXX_ COMPILE_FEATURES </code>变量中，可用于查看某些特性是否支持</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">list</span><span class="p">(</span><span class="s">FIND</span> <span class="s">CMAKE_CXX_COMPILE_FEATURES</span> <span class="s">cxx_variable_templates</span> <span class="s">result</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">if</span><span class="p">(</span><span class="s">result</span> <span class="s">EQUAL</span> <span class="s">-1</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span> <span class="nb">message</span><span class="p">(</span><span class="s">FATAL_ERROR</span> <span class="s2">&#34;I really need variable templates.&#34;</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">endif</span><span class="p">()</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>对版本的支持特性<code>cxx_std_98, cxx_std_11, cxx_std_14, cxx_std_17, cxx_std_20,  and cxx_std_23</code></p>
+<p>运行测试</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">try_run</span><span class="p">(</span><span class="s">run_result</span> <span class="s">compile_result</span>
+</span></span><span class="line"><span class="cl"> <span class="o">${</span><span class="nv">CMAKE_BINARY_DIR</span><span class="o">}</span><span class="s">/test_output</span> 
+</span></span><span class="line"><span class="cl"> <span class="o">${</span><span class="nv">CMAKE_SOURCE_DIR</span><span class="o">}</span><span class="s">/main.cpp</span>
+</span></span><span class="line"><span class="cl"> <span class="s">RUN_OUTPUT_VARIABLE</span> <span class="s">output</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="targets"><strong>Targets</strong></h1>
+<p>target: 一个逻辑对象，包含属性，描述依赖关系</p>
+<p>构建一个target会生成一个artifact(可执行文件或库文件)喂给其他target或作为最终构建结果的一部分</p>
+<p>定义target的命令</p>
+<ul>
+<li><code>add_executable()</code>: 定义一二进制target</li>
+<li><code>add_library()</code>: 定义库target</li>
+<li><code>add_custom_target()</code>: 定义由某个命令的结构为target。用于计算checksum，收集静态分析报告等</li>
+</ul>
+<p>如</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">add_custom_target</span><span class="p">(</span><span class="s">clean_stale_coverage_files</span> 
+</span></span><span class="line"><span class="cl"> <span class="s">COMMAND</span> <span class="s">find</span> <span class="s">.</span> <span class="s">-name</span> <span class="s2">&#34;*.gcda&#34;</span> <span class="s">-type</span> <span class="s">f</span> <span class="s">-delete</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="properties"><strong>Properties</strong></h2>
+<p>cmake可以在各个层级控制target(或非target)具有的properties。如<code>set_property()</code>, <code>set_directory_properties()</code>, <code>set_target_properties()</code>, <code>set_source_files_properties()</code>等。</p>
+<h2 id="dependency-graph"><strong>Dependency graph</strong></h2>
+<p>描述targets之间依赖关系命令</p>
+<ul>
+<li><code>taerget_link_libraries()</code>: 可以控制属性的传播，常用于定义实际的库和可执行文件</li>
+<li><code>add_dependencies()</code>: 常用于定于用户自己的顶级target来设置构建顺序</li>
+</ul>
+<p>构建系统会从我们定义的顶层targets递归向下构建子target</p>
+<p>例如对于以下应用：</p>
+<div style="text-align:center;">
+    <img src="/imgs/cmake-dependency-gragh.png" width="300"/>
+</div>
+<p>描述如下</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span> <span class="s">3.20.0</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">project</span><span class="p">(</span><span class="s">BankApp</span> <span class="s">CXX</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">add_executable</span><span class="p">(</span><span class="s">terminal_app</span> <span class="s">terminal_app.cpp</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">add_executable</span><span class="p">(</span><span class="s">gui_app</span> <span class="s">gui_app.cpp</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">terminal_app</span> <span class="s">calculations</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">gui_app</span> <span class="s">calculations</span> <span class="s">drawing</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">add_library</span><span class="p">(</span><span class="s">calculations</span> <span class="s">calculations.cpp</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">add_library</span><span class="p">(</span><span class="s">drawing</span> <span class="s">drawing.cpp</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">add_custom_target</span><span class="p">(</span><span class="s">checksum</span> <span class="s">ALL</span>
+</span></span><span class="line"><span class="cl">                  <span class="s">COMMAND</span> <span class="s">sh</span> <span class="s">-c</span> <span class="s2">&#34;cksum terminal_app&gt;terminal.ck&#34;</span>
+</span></span><span class="line"><span class="cl">                  <span class="s">COMMAND</span> <span class="s">sh</span> <span class="s">-c</span> <span class="s2">&#34;cksum gui_app&gt;gui.ck&#34;</span>
+</span></span><span class="line"><span class="cl">                  <span class="s">BYPRODUCTS</span> <span class="s">terminal.ck</span> <span class="s">gui.ck</span> 
+</span></span><span class="line"><span class="cl">                  <span class="s">COMMENT</span> <span class="s2">&#34;Checking the sums...&#34;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">add_dependencies</span><span class="p">(</span><span class="s">checksum</span> <span class="s">terminal_app</span> <span class="s">gui_app</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="可视化"><strong>可视化</strong></h3>
+<p>命令<code>cmake --graphviz=test.dot .</code>生成可视化描述文件，然后用(在线)工具生成图像，如</p>
+<p><a href="https://dreampuf.github.io/GraphvizOnline/">Graphviz Online (dreampuf.github.io)</a>。</p>
+<h2 id="targets-properties"><strong>Targets properties</strong></h2>
+<p>target的一部分属性可以修改，一部分是只读的。读写某个target的属性的命令</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">get_target_property</span><span class="p">(</span><span class="s">&lt;var&gt;</span> <span class="s">&lt;target&gt;</span> <span class="s">&lt;property-name&gt;</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">set_target_properties</span><span class="p">(</span><span class="s">&lt;target1&gt;</span> <span class="s">&lt;target2&gt;</span> <span class="s">...</span>
+</span></span><span class="line"><span class="cl"> <span class="s">PROPERTIES</span> <span class="s">&lt;prop1-name&gt;</span> <span class="s">&lt;value1&gt;</span>
+</span></span><span class="line"><span class="cl"> <span class="s">&lt;prop2-name&gt;</span> <span class="s">&lt;value2&gt;</span> <span class="s">...</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">set_property</span><span class="p">(</span><span class="s">TARGET</span> <span class="s">&lt;target&gt;</span> <span class="s">PROPERTY</span> <span class="s">&lt;name&gt;</span> <span class="s">&lt;value&gt;</span><span class="p">)</span> <span class="c"># 等效命令，还可以设置其他作用域的变量属性，如 GLOBAL, DIRECTORY, SOURCE, INSTALL, TEST, and CACHE
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="transitive-usage-requirements"><strong>Transitive usage requirements</strong></h2>
+<p>transitive usage requirements即描述有依赖关系的targets，source target(被使用的target)的属性如何传递给</p>
+<p>destination target(使用其他target)。</p>
+<p><code>set_target_properties()</code>, <code>target_compile_definitions()</code>, <code>target_link_options()</code>等命令中的可见性关键字用于<strong>设置属性存储在target中的位置，这决定了source target中的属性是否会传递给destination target</strong>，其含义如下：</p>
+<ul>
+<li><code>PRIVATE</code> sets the property of the source target.</li>
+<li><code>INTERFACE</code> sets the property of the destination targets.</li>
+<li><code>PUBLIC</code> sets the property of the source and destination targets.</li>
+</ul>
+<p>cmake通过特定前缀来区分私有属性(private property)和公有属性(interface property)，对于<code>PUBLIC/INTERFACE</code>的属性，其属性名将会有<code>INTERFACE_</code>前缀。在configuration stage中，cmake会将source target中的带有<code>INTERFACE_</code>前缀的属性复制到destination target中。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">&lt;target&gt;</span>
+</span></span><span class="line"><span class="cl"> <span class="s">&lt;PRIVATE|PUBLIC|INTERFACE&gt;</span> <span class="s">&lt;item&gt;...</span>
+</span></span><span class="line"><span class="cl"> <span class="s">[&lt;PRIVATE|PUBLIC|INTERFACE&gt;</span> <span class="s">&lt;item&gt;...]...</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>而<code>target_link_libraries()</code>命令中的可见性关键字用于<strong>设置source target的属性将会被保存到destination target中的什么位置，这决定了属性能传递多远</strong>（默认为<code>PUBLIC</code>），其含义如下：</p>
+<ul>
+<li><code>PRIVATE</code> appends the source value to the private property of the destination.</li>
+<li><code>INTERFACE</code> appends the source value to the interface property of the destination.</li>
+<li><code>PUBLIC</code> appends to both properties of the destination.</li>
+</ul>
+<p>属性的可见性总结如下图:</p>
+<div style="text-align:center;">
+    <img src="/imgs/properties-propogation.png" width="500"/>
+</div>
+<h2 id="解决传播属性的冲突"><strong>解决传播属性的冲突</strong></h2>
+<p>多个source target可能传递同名属性到一个destination target上，为了解决冲突，我们需要在source target中定义<code>INTERFACE_LIB_VErSION</code>，然后在destination target中选择如下策略处理冲突</p>
+<ul>
+<li><code>COMPATIBLE_INTERFACE_BOOL</code>: 检查传播到target中的属性是否可以求值为同一个<code>bool</code>值</li>
+<li><code>COMPATIBLE_INTERFACE_STRING</code>: 检查传播到target中的属性是否可以求值为同一个<code>string</code>值</li>
+<li><code>COMPATIBLE_INTERFACE_NUMBER_MAX</code>: 选择传播到target中的最大的属性</li>
+<li><code>COMPATIBLE_INTERFACE_NUMBER_MIN</code>: 选择传播到target中的最小的属性</li>
+</ul>
+<p>例子</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span> <span class="s">3.20.0</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">project</span><span class="p">(</span><span class="s">PropagatedProperties</span> <span class="s">CXX</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">add_library</span><span class="p">(</span><span class="s">source1</span> <span class="s">empty.cpp</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">set_property</span><span class="p">(</span><span class="s">TARGET</span> <span class="s">source1</span> <span class="s">PROPERTY</span> <span class="s">INTERFACE_LIB_VERSION</span> <span class="s">4</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">set_property</span><span class="p">(</span><span class="s">TARGET</span> <span class="s">source1</span> <span class="s">APPEND</span> <span class="s">PROPERTY</span>
+</span></span><span class="line"><span class="cl"> <span class="s">COMPATIBLE_INTERFACE_STRING</span> <span class="s">LIB_VERSION</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">add_library</span><span class="p">(</span><span class="s">source2</span> <span class="s">empty.cpp</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">set_property</span><span class="p">(</span><span class="s">TARGET</span> <span class="s">source2</span> <span class="s">PROPERTY</span> <span class="s">INTERFACE_LIB_VERSION</span> <span class="s">4</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">add_library</span><span class="p">(</span><span class="s">destination</span> <span class="s">empty.cpp</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">destination</span> <span class="s">source1</span> <span class="s">source2</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="pseudo-targets"><strong>Pseudo targets</strong></h2>
+<h3 id="imported-targets"><strong>Imported targets</strong></h3>
+<p>从外部导入的项目中的target的某些属性和传递性也可以被设置</p>
+<h3 id="alias-targets"><strong>Alias targets</strong></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">add_executable</span><span class="p">(</span><span class="s">&lt;name&gt;</span> <span class="s">ALIAS</span> <span class="s">&lt;target&gt;</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">add_library</span><span class="p">(</span><span class="s">&lt;name&gt;</span> <span class="s">ALIAS</span> <span class="s">&lt;target&gt;</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>alias targets的属性是只读的，且无法导出</p>
+<h3 id="interface-libraries"><strong>Interface libraries</strong></h3>
+<ul>
+<li>用于表示header-only库</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">add_library</span><span class="p">(</span><span class="s">Eigen</span> <span class="s">INTERFACE</span>
+</span></span><span class="line"><span class="cl"> <span class="s">src/eigen.h</span> <span class="s">src/vector.h</span> <span class="s">src/matrix.h</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">target_include_directories</span><span class="p">(</span><span class="s">Eigen</span> <span class="s">INTERFACE</span>
+</span></span><span class="line"><span class="cl"> <span class="o">$&lt;</span><span class="nv">BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"> <span class="o">$&lt;</span><span class="nv">INSTALL_INTERFACE:include/Eigen</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">executable</span> <span class="s">Eigen</span><span class="p">)</span> <span class="c"># 使用Eigen库
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>用于设置属性</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">add_library</span><span class="p">(</span><span class="s">warning_props</span> <span class="s">INTERFACE</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">target_compile_options</span><span class="p">(</span><span class="s">warning_props</span> <span class="s">INTERFACE</span> 
+</span></span><span class="line"><span class="cl"> <span class="s">-Wall</span> <span class="s">-Wextra</span> <span class="s">-Wpedantic</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span> <span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">executable</span> <span class="s">warning_props</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="add_custom_command"><strong><code>add_custom_command()</code></strong></h2>
+<h3 id="as-a-generator"><strong>as a generator</strong></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">add_custom_command</span><span class="p">(</span><span class="s">OUTPUT</span> <span class="s">person.pb.h</span> <span class="s">person.pb.cc</span>
+</span></span><span class="line"><span class="cl"> <span class="s">COMMAND</span> <span class="s">protoc</span> <span class="s">ARGS</span> <span class="s">person.proto</span>
+</span></span><span class="line"><span class="cl"> <span class="s">DEPENDS</span> <span class="s">person.proto</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">add_executable</span><span class="p">(</span><span class="s">main</span> <span class="s">main.cpp</span> <span class="s">constants.h</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">target_include_directories</span><span class="p">(</span><span class="s">main</span> <span class="s">PRIVATE</span>
+</span></span><span class="line"><span class="cl"> <span class="o">${</span><span class="nv">CMAKE_BINARY_DIR</span><span class="o">}</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">add_custom_command</span><span class="p">(</span><span class="s">OUTPUT</span> <span class="s">constants.h</span> 
+</span></span><span class="line"><span class="cl"><span class="s">COMMAND</span> <span class="s">cp</span> 
+</span></span><span class="line"><span class="cl"><span class="s">ARGS</span> <span class="s2">&#34;${CMAKE_SOURCE_DIR}/template.xyz&#34;</span> <span class="s">constants.h</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="as-a-target-hook"><strong>as a target hook</strong></h3>
+<p>hook点包括:</p>
+<ul>
+<li><code>PRE_BUILD</code> will run before any other rules for this target (Visual Studio generators 
+only; for others, it behaves like PRE_LINK).</li>
+<li><code>PRE_LINK</code> binds the command to be run just after all sources have been compiled 
+but before the linking (or archiving) the target. It doesn&rsquo;t work for custom targets.</li>
+<li><code>POST_BUILD</code> will run after all other rules have been executed for this target.</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">add_executable</span><span class="p">(</span><span class="s">main</span> <span class="s">main.cpp</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">add_custom_command</span><span class="p">(</span><span class="s">TARGET</span> <span class="s">main</span> <span class="s">POST_BUILD</span>
+</span></span><span class="line"><span class="cl"> <span class="s">COMMAND</span> <span class="s">cksum</span> 
+</span></span><span class="line"><span class="cl"> <span class="s">ARGS</span> <span class="s2">&#34;$&lt;TARGET_FILE:main&gt;&#34;</span> <span class="s">&gt;</span> <span class="s2">&#34;main.ck&#34;</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="generator-expressions"><strong>Generator expressions</strong></h2>
+<p>generator expressions用于在configuration/generation stage动态求值，格式:</p>
+<div style="text-align:center;">
+    <img src="/imgs/generation-expr.png" width="350"/>
+</div>
+<p>可以嵌套generator expressions或变量，如<code>$&lt;UPPER_CASE:$&lt;PLATFORM_ID&gt;&gt;,$&lt;UPPER_CASE:${my_variable}&gt;</code> 。各种不同作用的generator expression参考<a href="https://cmake.org/cmake/help/latest/manual/cmake-generator-expressions.7.html">[官方文档]</a>。一些例子:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">target_compile_options</span><span class="p">(</span><span class="s">tgt</span> <span class="o">$&lt;</span><span class="nv">$&lt;CONFIG:DEBUG</span><span class="o">&gt;</span><span class="s">:-ginline-points&gt;</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">target_compile_definitions</span><span class="p">(</span><span class="s">myProject</span> <span class="s">PRIVATE</span> <span class="o">$&lt;</span><span class="nv">$&lt;CMAKE_SYSTEM_NAME:LINUX</span><span class="o">&gt;</span><span class="s">:LINUX=1&gt;</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">myApp</span> <span class="s">PRIVATE</span> <span class="o">$&lt;</span><span class="nv">IF:$&lt;CONFIG:Debug</span><span class="o">&gt;</span><span class="s">,checkedAlgo,fastAlgo&gt;</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="编译配置"><strong>编译配置</strong></h1>
+<ul>
+<li><code>target_compile_features()</code>: Require a compiler with specific features to 
+compile this target.</li>
+<li><code>target_sources()</code>: Add sources to an already defined target.</li>
+<li><code>target_include_directories()</code>: Set up the preprocessor include paths.</li>
+<li><code>target_compile_definitions()</code>: Set up preprocessor definitions.</li>
+<li><code>target_compile_options()</code>: Compiler-specific options for the 
+command line.</li>
+<li><code>target_precompile_headers()</code>: Optimize the compilation of 
+external headers.</li>
+</ul>
+<p>通过设置<code>CMAKE_EXPORT_COMPILE_COMMANDS</code>变量可以在<code>build</code>目录下生成包含详细编译命令的文件<code>compile_commands.json</code>。</p>
+<h2 id="预处理配置"><strong>预处理配置</strong></h2>
+<h3 id="添加头文件的搜索路径"><strong>添加头文件的搜索路径</strong></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">target_include_directories</span><span class="p">(</span><span class="s">&lt;target&gt;</span> <span class="s">[SYSTEM]</span> <span class="s">[AFTER|BEFORE]</span>
+</span></span><span class="line"><span class="cl"> <span class="s">&lt;INTERFACE|PUBLIC|PRIVATE&gt;</span> <span class="s">[item1...]</span>
+</span></span><span class="line"><span class="cl"> <span class="s">[&lt;INTERFACE|PUBLIC|PRIVATE&gt;</span> <span class="s">[item2...]</span> <span class="s">...]</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>AFTER|BEFORE</code>用于表示这些路径被添加到<code> INCLUDE_DIRECTORIES</code>这个属性的前还是后。</p>
+<h3 id="添加宏定义"><strong>添加宏定义</strong></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">set</span><span class="p">(</span><span class="s">VAR</span> <span class="s">8</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">add_executable</span><span class="p">(</span><span class="s">defined</span> <span class="s">definitions.cpp</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">target_compile_definitions</span><span class="p">(</span><span class="s">defined</span> <span class="s">PRIVATE</span> <span class="s">ABC</span> <span class="s2">&#34;DEF=${VAR}&#34;</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">target_compile_definitions</span><span class="p">(</span><span class="s">hello</span> <span class="s">PRIVATE</span> <span class="s">-DFOO</span><span class="p">)</span><span class="c"># -D后可以加空格
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="configuring-the-headers"><strong>Configuring the headers</strong></h2>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="c1">// configure.h.in
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#cmakedefine FOO_ENABLE
+</span></span></span><span class="line"><span class="cl"><span class="cp">#cmakedefine FOO_STRING1 &#34;@FOO_STRING@&#34;
+</span></span></span><span class="line"><span class="cl"><span class="cp">#cmakedefine FOO_STRING2 &#34;${FOO_STRING}&#34;
+</span></span></span><span class="line"><span class="cl"><span class="cp">#cmakedefine FOO_UNDEFINED &#34;@FOO_UNDEFINED@&#34;
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">add_executable</span><span class="p">(</span><span class="s">configure</span> <span class="s">configure.cpp</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">set</span><span class="p">(</span><span class="s">FOO_ENABLE</span> <span class="s">ON</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">set</span><span class="p">(</span><span class="s">FOO_STRING1</span> <span class="s2">&#34;abc&#34;</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">set</span><span class="p">(</span><span class="s">FOO_STRING2</span> <span class="s2">&#34;def&#34;</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">configure_file</span><span class="p">(</span><span class="s">configure.h.in</span> <span class="s">configured/configure.h</span><span class="p">)</span> <span class="c"># 根据当前cmake中的变量生成配置文件
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nb">target_include_directories</span><span class="p">(</span><span class="s">configure</span> <span class="s">PRIVATE</span> <span class="o">${</span><span class="nv">CMAKE_CURRENT_BINARY_DIR</span><span class="o">}</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-c++" data-lang="c++"><span class="line"><span class="cl"><span class="c1">// configure.cpp
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="cp">#include</span> <span class="cpf">&#34;configured/configure.h&#34; //使用</span><span class="cp">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="configuring-the-optimizer"><strong>Configuring the optimizer</strong></h2>
+<p>使用<code>target_compile_options()</code>为target独立配置或使用作用于所有targets的全局变量<code>CMAKE_CXX_FLAGS_DEBUG</code>, <code>CMAKE_CXX_FLAGS_RELEASE</code>。</p>
+<h2 id="reducing-compilation-time"><strong>Reducing compilation time</strong></h2>
+<h3 id="precompilation-of-headers"><strong>Precompilation of headers</strong></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">add_executable</span><span class="p">(</span><span class="s">precompiled</span> <span class="s">hello.cpp</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">target_precompile_headers</span><span class="p">(</span><span class="s">precompiled</span> <span class="s">PRIVATE</span> <span class="s">&lt;iostream&gt;</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cxx" data-lang="cxx"><span class="line"><span class="cl"><span class="c1">// hello.cpp
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span> <span class="n">std</span><span class="o">::</span><span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">&#34;hello world&#34;</span> <span class="o">&lt;&lt;</span> <span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;}</span> 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="unity-builds"><strong>Unity builds</strong></h3>
+<p>通过将多个源文件合并作为一个统一的单元编译。注意各个文件之间的名字可能冲突。[官网文档](<a href="https://cmake.org/cmake/help/latest/prop_tgt/UNITY_BUILD.html">UNITY_BUILD — CMake 3.24.1 Documentation</a>)</p>
+<p>方式：通过<code>set(CMAKE_UNITY_BUILD TRUE)</code>全局配置或逐target配置</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">set_target_properties</span><span class="p">(</span><span class="s">&lt;target1&gt;</span> <span class="s">&lt;target2&gt;</span> <span class="s">...</span> 
+</span></span><span class="line"><span class="cl"> <span class="s">PROPERTIES</span> <span class="s">UNITY_BUILD</span> <span class="s">true</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="linking"><strong>Linking</strong></h1>
+<h2 id="type-of-libraries"><strong>Type of libraries</strong></h2>
+<ul>
+<li><code>add_library(&lt;NAME&gt; STATIC [&lt;source&gt;...])</code>: 创建静态库(a collection of raw object files stored in an 
+archive)</li>
+<li><code>add_library(&lt;NAME&gt; SHARED [&lt;source&gt;...])</code>:</li>
+<li><code>add_library(&lt;NAME&gt; MODULE [&lt;source&gt;...])</code>: 用于创建运行时作为插件手动加载的动态库，必须使用<code>LoadLibrary()/dlopen()/dlsym()</code>加载。</li>
+</ul>
+<p><a href="https://cmake.org/cmake/help/latest/command/add_library.html">[add_library()官方文档]</a></p>
+<p>有关object libraries的传递特性 <a href="https://github.com/Bagira80/More-Modern-CMake/raw/master/OhNoMoreModernCMake.pdf">Oh No! More Modern CMake</a></p>
+<div style="text-align:center;">
+    <img src="/imgs/object-libraries.png" width="500"/>
+</div>
+<h2 id="pic"><strong>PIC</strong></h2>
+<p>由target的属性<code>POSITION_INDEPENDENT_CODE</code>决定。Shared libraries和modules默认为<code>ON</code>。</p>
+<h1 id="管理依赖"><strong>管理依赖</strong></h1>
+<h2 id="find_package"><strong>find_package()</strong></h2>
+<p>使用<code>find_package()</code>寻找已安装的包。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">find_package</span><span class="p">(</span><span class="s">&lt;Name&gt;</span> <span class="s">[version]</span> <span class="s">[EXACT]</span> <span class="s">[QUIET]</span> <span class="s">[REQUIRED]</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span> <span class="s">3.20.0</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">project</span><span class="p">(</span><span class="s">FindPackageProtobufTargets</span> <span class="s">CXX</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">find_package</span><span class="p">(</span><span class="s">Protobuf</span> <span class="s">REQUIRED</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">protobuf_generate_cpp</span><span class="p">(</span><span class="s">GENERATED_SRC</span> <span class="s">GENERATED_HEADER</span> <span class="s">message.proto</span><span class="p">)</span> <span class="c"># protobuf包中定义的函数
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nb">add_executable</span><span class="p">(</span><span class="s">main</span> <span class="s">main.cpp</span> <span class="o">${</span><span class="nv">GENERATED_SRC</span><span class="o">}</span> <span class="o">${</span><span class="nv">GENERATED_HEADER</span><span class="o">}</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">main</span> <span class="s">PRIVATE</span> <span class="s">protobuf::libprotobuf</span><span class="p">)</span> <span class="c"># protobuf中定义了imported target
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nb">target_include_directories</span><span class="p">(</span><span class="s">main</span> <span class="s">PRIVATE</span>
+</span></span><span class="line"><span class="cl"> <span class="o">${</span><span class="nv">CMAKE_CURRENT_BINARY_DIR</span><span class="o">}</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>将局部target提升为全局target（提升后无法取消）。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">find_package</span><span class="p">(</span><span class="s">Boost</span> <span class="o">${</span><span class="nv">BOOST_VERSION</span><span class="o">}</span> <span class="s">EXACT</span> <span class="s">REQUIRED</span> 
+</span></span><span class="line"><span class="cl">	<span class="s">COMPNENTS</span> <span class="s">program_optinons</span> <span class="s">graph</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">if</span> <span class="p">(</span><span class="s">Boost_found</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>	<span class="nb">set_target_properties</span><span class="p">(</span><span class="s">Boost::boost</span> <span class="s">Boost::program_options</span> <span class="s">Boost::graph</span>
+</span></span><span class="line"><span class="cl">		<span class="s">PROPERTIES</span> <span class="s">IMPORTED_GLOBAL</span> <span class="s">TRUE</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">endif</span><span class="p">()</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="externalproject"><strong>ExternalProject</strong></h2>
+<p><code>ExternalProject</code>用于配置依赖，对于使用<code>ExternalProject_Add()</code>添加的项目cmake将会执行如下步骤：<code>mkdir</code>-<code>download</code>-<code>update</code>-<code>patch</code>-<code>configure</code>-<code>build</code>-<code>install</code>-<code>test</code></p>
+<p>部分选项如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">DOWNLOAD_COMMAND &lt;cmd&gt;...
+</span></span><span class="line"><span class="cl">URL &lt;url1&gt; [&lt;url2&gt;...]
+</span></span><span class="line"><span class="cl">GIT_REPOSITORY &lt;url&gt;
+</span></span><span class="line"><span class="cl">GIT_TAG &lt;tag&gt;
+</span></span><span class="line"><span class="cl">PATCH_COMMAND &lt;cmd&gt;...
+</span></span><span class="line"><span class="cl">...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>例子：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span> <span class="s">3.20.0</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">project</span><span class="p">(</span><span class="s">ExternalProjectGit</span> <span class="s">CXX</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">add_executable</span><span class="p">(</span><span class="s">welcome</span> <span class="s">main.cpp</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">configure_file</span><span class="p">(</span><span class="s">config.yaml</span> <span class="s">config.yaml</span> <span class="s">COPYONLY</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">include</span><span class="p">(</span><span class="s">ExternalProject</span><span class="p">)</span> <span class="c"># 需要引入该模块
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nb">ExternalProject_Add</span><span class="p">(</span><span class="s">external-yaml-cpp</span>
+</span></span><span class="line"><span class="cl"> <span class="s">GIT_REPOSITORY</span> <span class="s">https://github.com/jbeder/yaml-cpp.git</span>
+</span></span><span class="line"><span class="cl"> <span class="s">GIT_TAG</span> <span class="s">yaml-cpp-0.6.3</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span> <span class="c"># 将会下载，配置，构建，最后安装到机器上
+</span></span></span><span class="line"><span class="cl"><span class="c"></span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">welcome</span> <span class="s">PRIVATE</span> <span class="s">yaml-cpp</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>缺点，整个过程是封闭的，我们的项目在构建时无法使用其中的targets。</p>
+<h2 id="fetchcontent"><strong>FetchContent</strong></h2>
+<p><code>FetchContent</code>将会在configuration stage将外部项目的target引入主项目中</p>
+<p><code>FetchContent_MakeAvailable()</code>的实际执行过程</p>
+<div style="text-align:center;">
+    <img src="/imgs/FetchContent_MakeAvailable.png" width="300"/>
+</div>
+<p>例子:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">cmake_minimum_required</span><span class="p">(</span><span class="s">VERSION</span> <span class="s">3.20.0</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">project</span><span class="p">(</span><span class="s">ExternalProjectGit</span> <span class="s">CXX</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">add_executable</span><span class="p">(</span><span class="s">welcome</span> <span class="s">main.cpp</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">configure_file</span><span class="p">(</span><span class="s">config.yaml</span> <span class="s">config.yaml</span> <span class="s">COPYONLY</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">include</span><span class="p">(</span><span class="s">FetchContent</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">FetchContent_Declare</span><span class="p">(</span><span class="s">external-yaml-cpp</span>
+</span></span><span class="line"><span class="cl"> <span class="s">GIT_REPOSITORY</span> <span class="s">https://github.com/jbeder/yaml-cpp.git</span>
+</span></span><span class="line"><span class="cl"> <span class="s">GIT_TAG</span> <span class="s">yaml-cpp-0.6.3</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">FetchContent_MakeAvailable</span><span class="p">(</span><span class="s">external-yaml-cpp</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">target_link_libraries</span><span class="p">(</span><span class="s">welcome</span> <span class="s">PRIVATE</span> <span class="s">yaml-cpp</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div>
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">bobh</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2022-05-01
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/CMake/">CMake</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/mit6.824-2022/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">MIT6.824 Distributed Systems Spring-2022 完成小结</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/cpp_memory_order/">
+            <span class="next-text nav-default">C&#43;&#43; execution model and memory order</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:bh2444151092@outlook.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/bobhan1" class="iconfont icon-github" title="github"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

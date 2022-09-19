@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>CMake on bobh&#39;s blog</title>
+    <link>http://localhost:1313/tags/CMake/</link>
+    <description>Recent content in CMake on bobh&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Sun, 01 May 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/CMake/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Modern CMake快速入门——作为构建系统</title>
+      <link>http://localhost:1313/post/modern_cmake_notes/</link>
+      <pubDate>Sun, 01 May 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/modern_cmake_notes/</guid>
+      <description>本文介绍了一些CMake构建系统的基本知识</description>
+    </item>
+    
+  </channel>
+</rss>
