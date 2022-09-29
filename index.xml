@@ -6,7 +6,16 @@
     <description>Recent content on bobh&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sat, 20 Aug 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 29 Sep 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Seastar源码阅读 future/promise链式调用的实现</title>
+      <link>http://localhost:1313/post/seastar-future-promise/</link>
+      <pubDate>Thu, 29 Sep 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/seastar-future-promise/</guid>
+      <description>本文介绍了Seastar中future/promise链式调用的实现</description>
+    </item>
+    
     <item>
       <title>MIT6.828-2018 Lab 4 Preemptive Multitasking</title>
       <link>http://localhost:1313/post/mit6828-2018-lab4/</link>

@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Seastar源码阅读 future/promise链式调用的实现 - bobh&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="bobh" /><meta name="description" content="本文介绍了Seastar中future/promise链式调用的实现" /><meta name="keywords" content="Hugo, theme, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.96.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/seastar-future-promise/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2a71e62d7ea35a3a3f92c3c16c456852aaec63713de5cd5dbadb28e7480fd599.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="Seastar源码阅读 future/promise链式调用的实现" />
+<meta property="og:description" content="本文介绍了Seastar中future/promise链式调用的实现" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/seastar-future-promise/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2022-09-29T00:00:00+00:00" />
+<meta property="article:modified_time" content="2022-09-29T00:00:00+00:00" />
+
+<meta itemprop="name" content="Seastar源码阅读 future/promise链式调用的实现">
+<meta itemprop="description" content="本文介绍了Seastar中future/promise链式调用的实现"><meta itemprop="datePublished" content="2022-09-29T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2022-09-29T00:00:00+00:00" />
+<meta itemprop="wordCount" content="2537">
+<meta itemprop="keywords" content="C&#43;&#43;,源码阅读," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Seastar源码阅读 future/promise链式调用的实现"/>
+<meta name="twitter:description" content="本文介绍了Seastar中future/promise链式调用的实现"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">bobh&#39;s blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">首页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">关于</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">bobh&#39;s blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">首页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">关于</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Seastar源码阅读 future/promise链式调用的实现</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2022-09-29 </span>
+        
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li>
+          <ul>
+            <li><a href="#future_state"><strong><code>future_state</code></strong></a></li>
+            <li><a href="#promise"><strong><code>promise</code></strong></a></li>
+            <li><a href="#future"><strong><code>future</code></strong></a></li>
+            <li><a href="#continuation"><strong><code>continuation</code></strong></a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h3 id="future_state"><strong><code>future_state</code></strong></h3>
+<p>一个<code>future/promise pair</code>在逻辑上维护同一个状态，它包括了这个任务的状态(是否完成)，结果值和可能的异常，在seastar中抽象为<code>class future_state</code>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">future_state_base</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">union</span> <span class="nc">any</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">state</span> <span class="n">st</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="n">std</span><span class="o">::</span><span class="n">exception_ptr</span> <span class="n">ex</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="n">_u</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">future_state</span><span class="o">:</span>  <span class="k">public</span> <span class="n">future_state_base</span><span class="p">,</span> <span class="k">private</span> <span class="n">internal</span><span class="o">::</span><span class="n">uninitialized_wrapper</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>internal::uninitialized_wrapper&lt;T&gt;</code>类似<code>std::optional&lt;T&gt;</code>，用于存储结果值。</p>
+<p>对于某个异步任务，有三个地方可能存储这个任务的<code>future_state</code>，但在任意时刻只有一个是有效的:</p>
+<ul>
+<li><code>promise._local_state</code></li>
+<li><code>future._state</code></li>
+<li>在调用了<code>then()</code>之后被存储到下一个任务中</li>
+</ul>
+<h3 id="promise"><strong><code>promise</code></strong></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">promise_base</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">future_base</span><span class="o">*</span> <span class="n">_future</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">future_state_base</span><span class="o">*</span> <span class="n">_state</span><span class="p">;</span> 
+</span></span><span class="line"><span class="cl">    <span class="c1">// points to the future_state that is currently being used
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">task</span><span class="o">*</span> <span class="n">_task</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span> <span class="c1">// 初始化为nullptr，用于存放可能的continuation
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">SEASTAR_ELLIPSIS</span> <span class="n">T</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">promise</span> <span class="o">:</span> <span class="k">private</span> <span class="n">internal</span><span class="o">::</span><span class="n">promise_base_with_type</span><span class="o">&lt;</span><span class="n">T</span> <span class="n">SEASTAR_ELLIPSIS</span><span class="o">&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">future_state</span> <span class="n">_local_state</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">SEASTAR_ELLIPSIS</span> <span class="n">T</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="kr">inline</span> <span class="n">future</span><span class="o">&lt;</span><span class="n">T</span> <span class="n">SEASTAR_ELLIPSIS</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="n">promise</span><span class="o">&lt;</span><span class="n">T</span> <span class="n">SEASTAR_ELLIPSIS</span><span class="o">&gt;::</span><span class="n">get_future</span><span class="p">()</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">assert</span><span class="p">(</span><span class="o">!</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">_future</span> <span class="o">&amp;&amp;</span> <span class="k">this</span><span class="o">-&gt;</span><span class="n">_state</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">_task</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">future</span><span class="o">&lt;</span><span class="n">T</span> <span class="n">SEASTAR_ELLIPSIS</span><span class="o">&gt;</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>当异步任务完成后，通过调用<code>promise</code>的<code>set_value()</code>保存任务的结果值，再通过<code>future_state</code>的<code>set()</code>方法原地构造保存结果值到<code>get_state()</code>返回的<code>promise</code>的<code>_state</code>，同时将其状态设为就绪。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span><span class="p">...</span> <span class="n">A</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">set_value</span><span class="p">(</span><span class="n">A</span><span class="o">&amp;&amp;</span><span class="p">...</span> <span class="n">a</span><span class="p">)</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="k">auto</span> <span class="o">*</span><span class="n">s</span> <span class="o">=</span> <span class="n">get_state</span><span class="p">())</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">s</span><span class="o">-&gt;</span><span class="n">set</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">A</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span><span class="p">)...);</span>
+</span></span><span class="line"><span class="cl">        <span class="n">make_ready</span><span class="o">&lt;</span><span class="n">urgent</span><span class="o">::</span><span class="n">no</span><span class="o">&gt;</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span><span class="p">...</span> <span class="n">A</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">set</span><span class="p">(</span><span class="n">A</span><span class="o">&amp;&amp;</span><span class="p">...</span> <span class="n">a</span><span class="p">)</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">assert</span><span class="p">(</span><span class="n">_u</span><span class="p">.</span><span class="n">st</span> <span class="o">==</span> <span class="n">state</span><span class="o">::</span><span class="n">future</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="k">new</span> <span class="p">(</span><span class="k">this</span><span class="p">)</span> <span class="n">future_state</span><span class="p">(</span><span class="n">ready_future_marker</span><span class="p">(),</span> <span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">A</span><span class="o">&gt;</span><span class="p">(</span><span class="n">a</span><span class="p">)...);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="n">promise_base</span><span class="o">::</span><span class="n">urgent</span> <span class="n">Urgent</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">promise_base</span><span class="o">::</span><span class="n">make_ready</span><span class="p">()</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">_task</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">Urgent</span> <span class="o">==</span> <span class="n">urgent</span><span class="o">::</span><span class="n">yes</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="o">::</span><span class="n">seastar</span><span class="o">::</span><span class="n">schedule_urgent</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">exchange</span><span class="p">(</span><span class="n">_task</span><span class="p">,</span> <span class="k">nullptr</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="o">::</span><span class="n">seastar</span><span class="o">::</span><span class="n">schedule</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">exchange</span><span class="p">(</span><span class="n">_task</span><span class="p">,</span> <span class="k">nullptr</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>如果此时<code>promise</code>对象<code>task_!=nullptr</code>(即存在<code>continuation</code>)，则将其交给<code>seastar</code>的reactor调度器中。</p>
+<h3 id="future"><strong><code>future</code></strong></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">future_base</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">promise_base</span><span class="o">*</span> <span class="n">_promise</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">SEASTAR_NODISCARD</span> <span class="nl">future</span> <span class="p">:</span> <span class="k">private</span> <span class="n">internal</span><span class="o">::</span><span class="n">future_base</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">using</span> <span class="n">future_state</span> <span class="o">=</span> <span class="n">seastar</span><span class="o">::</span><span class="n">future_state</span><span class="o">&lt;</span><span class="n">internal</span><span class="o">::</span><span class="n">future_stored_type_t</span><span class="o">&lt;</span><span class="n">T</span> <span class="n">SEASTAR_ELLIPSIS</span><span class="o">&gt;&gt;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">future_state</span> <span class="n">_state</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>重点看<code>.then()</code>的实现，<code>then()</code>方法的调用链如下:</p>
+<p><code>future::then()</code>-&gt;<code>call_then_impl::run()</code>-&gt;<code>future::then_impl()</code>-&gt;<code>future::then_impl_nrvo()</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">Func</span><span class="p">,</span> <span class="k">typename</span> <span class="n">Result</span> <span class="o">=</span> <span class="n">futurize_t</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">call_then_impl</span><span class="o">::</span><span class="k">template</span> <span class="n">result_type</span><span class="o">&lt;</span><span class="n">Func</span><span class="o">&gt;&gt;&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SEASTAR_CONCEPT</span><span class="p">(</span> <span class="k">requires</span> <span class="n">std</span><span class="o">::</span><span class="n">invocable</span><span class="o">&lt;</span><span class="n">Func</span><span class="p">,</span> <span class="n">T</span> <span class="n">SEASTAR_ELLIPSIS</span><span class="o">&gt;</span> <span class="o">||</span> <span class="n">internal</span><span class="o">::</span><span class="n">CanInvokeWhenAllSucceed</span><span class="o">&lt;</span><span class="n">Func</span><span class="p">,</span> <span class="n">T</span> <span class="n">SEASTAR_ELLIPSIS</span><span class="o">&gt;</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Result</span>
+</span></span><span class="line"><span class="cl">    <span class="n">then</span><span class="p">(</span><span class="n">Func</span><span class="o">&amp;&amp;</span> <span class="n">func</span><span class="p">)</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="k">return</span> <span class="n">call_then_impl</span><span class="o">::</span><span class="n">run</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">func</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span><span class="p">...</span> <span class="n">T</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">call_then_impl</span><span class="o">&lt;</span><span class="n">future</span><span class="o">&lt;</span><span class="n">T</span><span class="p">...</span><span class="o">&gt;&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">static</span> <span class="n">result_type</span><span class="o">&lt;</span><span class="n">Func</span><span class="o">&gt;</span> <span class="n">run</span><span class="p">(</span><span class="n">future</span><span class="o">&lt;</span><span class="n">T</span><span class="p">...</span><span class="o">&gt;&amp;</span> <span class="n">fut</span><span class="p">,</span> <span class="n">Func</span><span class="o">&amp;&amp;</span> <span class="n">func</span><span class="p">)</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">fut</span><span class="p">.</span><span class="n">then_impl</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">Func</span><span class="o">&gt;</span><span class="p">(</span><span class="n">func</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在<code>then_impl()</code>中，如果任务发生异常，则返回异常。如果任务已完成，则直接就地运行<code>then()</code>中的函数而不将其放入调度器。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">bool</span> <span class="nf">available</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span> <span class="p">{</span> <span class="k">return</span> <span class="n">st</span> <span class="o">==</span> <span class="n">state</span><span class="o">::</span><span class="n">result</span> <span class="o">||</span> <span class="n">st</span> <span class="o">&gt;=</span> <span class="n">state</span><span class="o">::</span><span class="n">exception_min</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="kt">bool</span> <span class="nf">failed</span><span class="p">()</span> <span class="k">const</span> <span class="k">noexcept</span> <span class="p">{</span> <span class="k">return</span> <span class="n">__builtin_expect</span><span class="p">(</span><span class="n">st</span> <span class="o">&gt;=</span> <span class="n">state</span><span class="o">::</span><span class="n">exception_min</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">Func</span><span class="p">,</span> <span class="k">typename</span> <span class="n">Result</span> <span class="o">=</span> <span class="n">futurize_t</span><span class="o">&lt;</span><span class="n">internal</span><span class="o">::</span><span class="n">future_result_t</span><span class="o">&lt;</span><span class="n">Func</span><span class="p">,</span> <span class="n">T</span> <span class="n">SEASTAR_ELLIPSIS</span><span class="o">&gt;&gt;&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Result</span>
+</span></span><span class="line"><span class="cl">    <span class="n">then_impl</span><span class="p">(</span><span class="n">Func</span><span class="o">&amp;&amp;</span> <span class="n">func</span><span class="p">)</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#ifndef SEASTAR_DEBUG
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>        <span class="k">using</span> <span class="n">futurator</span> <span class="o">=</span> <span class="n">futurize</span><span class="o">&lt;</span><span class="n">internal</span><span class="o">::</span><span class="n">future_result_t</span><span class="o">&lt;</span><span class="n">Func</span><span class="p">,</span> <span class="n">T</span> <span class="n">SEASTAR_ELLIPSIS</span><span class="o">&gt;&gt;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">if</span> <span class="p">(</span><span class="n">failed</span><span class="p">())</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">return</span> <span class="n">futurator</span><span class="o">::</span><span class="n">make_exception_future</span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">future_state_base</span><span class="o">&amp;&amp;&gt;</span><span class="p">(</span><span class="n">get_available_state_ref</span><span class="p">()));</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="k">else</span> <span class="nf">if</span> <span class="p">(</span><span class="n">available</span><span class="p">())</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#if SEASTAR_API_LEVEL &lt; 5
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>            <span class="k">return</span> <span class="n">futurator</span><span class="o">::</span><span class="n">apply</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">Func</span><span class="o">&gt;</span><span class="p">(</span><span class="n">func</span><span class="p">),</span> <span class="n">get_available_state_ref</span><span class="p">().</span><span class="n">take_value</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#else
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>            <span class="k">return</span> <span class="n">futurator</span><span class="o">::</span><span class="n">invoke</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">Func</span><span class="o">&gt;</span><span class="p">(</span><span class="n">func</span><span class="p">),</span> <span class="n">get_available_state_ref</span><span class="p">().</span><span class="n">take_value</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#endif
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>        <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#endif
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>        <span class="k">return</span> <span class="n">then_impl_nrvo</span><span class="o">&lt;</span><span class="n">Func</span><span class="p">,</span> <span class="n">Result</span><span class="o">&gt;</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">forward</span><span class="o">&lt;</span><span class="n">Func</span><span class="o">&gt;</span><span class="p">(</span><span class="n">func</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>then_impl_nrvo()</code>首先创造一个新的<code>future</code>对象，并通过<code>get_promise()</code>在创建一个新的<code>promise</code>对象绑定到该<code>future</code>对象上，然后将该新创建的<code>promise</code>对象和需要调度的函数<code>func</code>以及一个用于处理前一个任务完成后额外逻辑的(异常处理，将前一个任务的值传入func运行)wrapper函数丢进<code>future::schedule()</code>中，并返回这个<code>future</code>对象。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="n">Func</span><span class="p">,</span> <span class="k">typename</span> <span class="n">Result</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Result</span> <span class="n">then_impl_nrvo</span><span class="p">(</span><span class="n">Func</span><span class="o">&amp;&amp;</span> <span class="n">func</span><span class="p">)</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">using</span> <span class="n">futurator</span> <span class="o">=</span> <span class="n">futurize</span><span class="o">&lt;</span><span class="n">internal</span><span class="o">::</span><span class="n">future_result_t</span><span class="o">&lt;</span><span class="n">Func</span><span class="p">,</span> <span class="n">T</span> <span class="n">SEASTAR_ELLIPSIS</span><span class="o">&gt;&gt;</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">        <span class="k">typename</span> <span class="n">futurator</span><span class="o">::</span><span class="n">type</span> <span class="n">fut</span><span class="p">(</span><span class="n">future_for_get_promise_marker</span><span class="p">{});</span>
+</span></span><span class="line"><span class="cl">        <span class="k">using</span> <span class="n">pr_type</span> <span class="o">=</span> <span class="k">decltype</span><span class="p">(</span><span class="n">fut</span><span class="p">.</span><span class="n">get_promise</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">        <span class="n">schedule</span><span class="p">(</span><span class="n">fut</span><span class="p">.</span><span class="n">get_promise</span><span class="p">(),</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">func</span><span class="p">),</span> <span class="p">[](</span><span class="n">pr_type</span><span class="o">&amp;&amp;</span> <span class="n">pr</span><span class="p">,</span> <span class="n">Func</span><span class="o">&amp;</span> <span class="n">func</span><span class="p">,</span> <span class="n">future_state</span><span class="o">&amp;&amp;</span> <span class="n">state</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">if</span> <span class="p">(</span><span class="n">state</span><span class="p">.</span><span class="n">failed</span><span class="p">())</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">pr</span><span class="p">.</span><span class="n">set_exception</span><span class="p">(</span><span class="k">static_cast</span><span class="o">&lt;</span><span class="n">future_state_base</span><span class="o">&amp;&amp;&gt;</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">state</span><span class="p">)));</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">                <span class="n">futurator</span><span class="o">::</span><span class="n">satisfy_with_result_of</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">pr</span><span class="p">),</span> <span class="p">[</span><span class="o">&amp;</span><span class="n">func</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">state</span><span class="p">]</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#if SEASTAR_API_LEVEL &lt; 5
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>                    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">apply</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">state</span><span class="p">).</span><span class="n">get_value</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#else
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>                    <span class="c1">// clang thinks that &#34;state&#34; is not used, below, for future&lt;&gt;.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                    <span class="c1">// Make it think it is used to avoid an unused-lambda-capture warning.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>                    <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="n">state</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">                    <span class="k">return</span> <span class="n">internal</span><span class="o">::</span><span class="n">future_invoke</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">state</span><span class="p">).</span><span class="n">get_value</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl"><span class="cp">#endif
+</span></span></span><span class="line"><span class="cl"><span class="cp"></span>                <span class="p">});</span>
+</span></span><span class="line"><span class="cl">            <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="p">});</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">fut</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里<code>futurator::satisfy_with_result_of()</code>根据调度任务<code>func</code>返回的类型进行处理当上述新创建的<code>promise</code>对象。当<code>func()</code>返回<code>future</code>对象时，通过<code>future::forward_to()</code>将其绑定的<code>promise</code>对象改为新创建的<code>promise</code>对象；当<code>func()</code>返回值时，将其设置到<code>promise</code>对象中。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">T</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="k">template</span><span class="o">&lt;</span><span class="k">typename</span> <span class="n">Func</span><span class="o">&gt;</span>
+</span></span><span class="line"><span class="cl"><span class="n">SEASTAR_CONCEPT</span><span class="p">(</span> <span class="k">requires</span> <span class="n">std</span><span class="o">::</span><span class="n">invocable</span><span class="o">&lt;</span><span class="n">Func</span><span class="o">&gt;</span> <span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">futurize</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;::</span><span class="n">satisfy_with_result_of</span><span class="p">(</span><span class="n">promise_base_with_type</span><span class="o">&amp;&amp;</span> <span class="n">pr</span><span class="p">,</span> <span class="n">Func</span><span class="o">&amp;&amp;</span> <span class="n">func</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">using</span> <span class="n">ret_t</span> <span class="o">=</span> <span class="k">decltype</span><span class="p">(</span><span class="n">func</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="nf">constexpr</span> <span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">is_void_v</span><span class="o">&lt;</span><span class="n">ret_t</span><span class="o">&gt;</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">func</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pr</span><span class="p">.</span><span class="n">set_value</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="nf">constexpr</span> <span class="p">(</span><span class="n">is_future</span><span class="o">&lt;</span><span class="n">ret_t</span><span class="o">&gt;::</span><span class="n">value</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">func</span><span class="p">().</span><span class="n">forward_to</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">pr</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pr</span><span class="p">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">func</span><span class="p">());</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">future</span><span class="o">::</span><span class="n">forward_to</span><span class="p">(</span><span class="n">internal</span><span class="o">::</span><span class="n">promise_base_with_type</span><span class="o">&lt;</span><span class="n">T</span> <span class="n">SEASTAR_ELLIPSIS</span><span class="o">&gt;&amp;&amp;</span> <span class="n">pr</span><span class="p">)</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="n">_state</span><span class="p">.</span><span class="n">available</span><span class="p">())</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="n">pr</span><span class="p">.</span><span class="n">set_urgent_state</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">_state</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="o">*</span><span class="n">detach_promise</span><span class="p">()</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">pr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>future::schdule()</code>用上述参数构造<code>continuation对象</code>并将<code>future_state</code>设置为<code>invalid</code>状态，然后调用<code>future_base::schedule()</code>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">future</span><span class="o">::</span><span class="n">schedule</span><span class="p">(</span><span class="n">Pr</span><span class="o">&amp;&amp;</span> <span class="n">pr</span><span class="p">,</span> <span class="n">Func</span><span class="o">&amp;&amp;</span> <span class="n">func</span><span class="p">,</span> <span class="n">Wrapper</span><span class="o">&amp;&amp;</span> <span class="n">wrapper</span><span class="p">)</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">auto</span> <span class="n">tws</span> <span class="o">=</span> <span class="k">new</span> <span class="n">continuation</span><span class="o">&lt;</span><span class="n">Pr</span><span class="p">,</span> <span class="n">Func</span><span class="p">,</span> <span class="n">Wrapper</span><span class="p">,</span> <span class="n">T</span> <span class="n">SEASTAR_ELLIPSIS</span><span class="o">&gt;</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">pr</span><span class="p">),</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">func</span><span class="p">),</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">wrapper</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">    <span class="n">schedule</span><span class="p">(</span><span class="n">tws</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_state</span><span class="p">.</span><span class="n">_u</span><span class="p">.</span><span class="n">st</span> <span class="o">=</span> <span class="n">future_state_base</span><span class="o">::</span><span class="n">state</span><span class="o">::</span><span class="n">invalid</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">futuree</span><span class="o">::</span><span class="n">schedule</span><span class="p">(</span><span class="n">continuation_base</span><span class="o">&lt;</span><span class="n">T</span> <span class="n">SEASTAR_ELLIPSIS</span><span class="o">&gt;*</span> <span class="n">tws</span><span class="p">)</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">future_base</span><span class="o">::</span><span class="n">schedule</span><span class="p">(</span><span class="n">tws</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">tws</span><span class="o">-&gt;</span><span class="n">_state</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里解除初始任务的<code>promise</code>对象和其<code>future</code>对象的绑定，并将其<code>task_</code>成员绑定到刚刚创建的<code>continuation</code>对象上。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">future_base</span><span class="o">::</span><span class="n">schedule</span><span class="p">(</span><span class="n">task</span><span class="o">*</span> <span class="n">tws</span><span class="p">,</span> <span class="n">future_state_base</span><span class="o">*</span> <span class="n">state</span><span class="p">)</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">promise_base</span><span class="o">*</span> <span class="n">p</span> <span class="o">=</span> <span class="n">detach_promise</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p</span><span class="o">-&gt;</span><span class="n">_state</span> <span class="o">=</span> <span class="n">state</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">p</span><span class="o">-&gt;</span><span class="n">_task</span> <span class="o">=</span> <span class="n">tws</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="n">promise_base</span><span class="o">*</span> <span class="n">future_base</span><span class="o">::</span><span class="n">detach_promise</span><span class="p">()</span> <span class="k">noexcept</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_promise</span><span class="o">-&gt;</span><span class="n">_state</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="n">_promise</span><span class="o">-&gt;</span><span class="n">_future</span> <span class="o">=</span> <span class="k">nullptr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="n">std</span><span class="o">::</span><span class="n">exchange</span><span class="p">(</span><span class="n">_promise</span><span class="p">,</span> <span class="k">nullptr</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="continuation"><strong><code>continuation</code></strong></h3>
+<p><code>continuation</code>对象只是使用<code>then()</code>所连接的任务的连接点的简单封装。<code>promise</code>对象在被调用<code>set_value()</code>后会将该<code>continuation</code>放入调度器中。前一个任务结束后的逻辑已经被写入了<code>_wrapper</code>函数中</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">continuation_base</span> <span class="o">:</span> <span class="k">public</span> <span class="n">task</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="k">class</span> <span class="nc">continuation_base_with_promise</span> <span class="o">:</span> <span class="k">public</span> <span class="n">continuation_base</span><span class="o">&lt;</span><span class="n">T</span> <span class="n">SEASTAR_ELLIPSIS</span><span class="o">&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="n">Promise</span> <span class="n">_pr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">};</span>
+</span></span><span class="line"><span class="cl"><span class="k">struct</span> <span class="nc">continuation</span> <span class="k">final</span> <span class="o">:</span> <span class="n">continuation_base_with_promise</span><span class="o">&lt;</span><span class="n">Promise</span><span class="p">,</span> <span class="n">T</span> <span class="n">SEASTAR_ELLIPSIS</span><span class="o">&gt;</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">virtual</span> <span class="kt">void</span> <span class="nf">run_and_dispose</span><span class="p">()</span> <span class="k">noexcept</span> <span class="k">override</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">try</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="n">_wrapper</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">_pr</span><span class="p">),</span> <span class="n">_func</span><span class="p">,</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">_state</span><span class="p">));</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span> <span class="k">catch</span> <span class="p">(...)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">            <span class="k">this</span><span class="o">-&gt;</span><span class="n">_pr</span><span class="p">.</span><span class="n">set_to_current_exception</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="p">}</span>
+</span></span><span class="line"><span class="cl">        <span class="k">delete</span> <span class="k">this</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">Func</span> <span class="n">_func</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="na">[[no_unique_address]]</span> <span class="n">Wrapper</span> <span class="n">_wrapper</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>run_and_dispose()</code>则是调度器调度任务的接口。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="kt">void</span> <span class="n">reactor</span><span class="o">::</span><span class="n">run_tasks</span><span class="p">(</span><span class="n">task_queue</span><span class="o">&amp;</span> <span class="n">tq</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">while</span> <span class="p">(</span><span class="o">!</span><span class="n">tasks</span><span class="p">.</span><span class="n">empty</span><span class="p">())</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">        <span class="k">auto</span> <span class="n">tsk</span> <span class="o">=</span> <span class="n">tasks</span><span class="p">.</span><span class="n">front</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="n">tasks</span><span class="p">.</span><span class="n">pop_front</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>        <span class="n">tsk</span><span class="o">-&gt;</span><span class="n">run_and_dispose</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">        <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// ...
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>整个链式调用的实现如下所示：</p>
+<ul>
+<li>某个异步任务创建并返回一个<code>future</code>对象<code>f1</code>。</li>
+<li>在该<code>future</code>对象上调用<code>then(func)</code>。在<code>future::then_imple_nrvo()</code>中临时创建新的<code>future</code>对象<code>f2</code>和与<code>f2</code>关联的<code>promise</code>对象<code>p2</code>。用<code>p2</code>和<code>func</code>构造<code>continuation</code>对象<code>c1</code>。</li>
+<li>将<code>f1</code>所关联的<code>promise</code>对象<code>p1</code>与<code>f1</code>解绑，并将<code>p1._task</code>设为上述<code>c1</code>。</li>
+<li>将<code>f2</code>作为<code>then()</code>的返回值。</li>
+<li>在之后的某个时刻，<code>p1</code>对象上的<code>set_value()</code>方法被调用，在<code>promise_base::make_ready()</code>中<code>p2._task</code>(即<code>c1</code>)被放入全局调度器<code>reactor</code>对象中。</li>
+<li>全局调度器在之后的某个时刻调度到该任务<code>c1</code>，调用<code>c1.run_and_dispose()</code>运行，从而运行<code>c1</code>的<code>_wrapper</code>函数(在<code>future::then_impl_nrvo()</code>中构建，用于处理两个任务交接的逻辑)。</li>
+<li>在<code>_wrapper</code>函数中处理异常或调用<code>futurator::satisfy_with_result_of()</code>。</li>
+<li>在<code>futurator::satisfy_with_result_of()</code>中将前一个任务的结果转发到<code>func()</code>上运行，并根据其返回值设置<code>p2</code>的状态。</li>
+</ul>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">bobh</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2022-09-29
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/C&#43;&#43;/">C&#43;&#43;</a>
+          <a href="/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/">源码阅读</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/mit6828-2018-lab4/">
+            <span class="next-text nav-default">MIT6.828-2018 Lab 4 Preemptive Multitasking</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:bh2444151092@outlook.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/bobhan1" class="iconfont icon-github" title="github"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019 - 
+    2022<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>
