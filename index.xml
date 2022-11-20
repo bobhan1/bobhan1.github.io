@@ -6,7 +6,16 @@
     <description>Recent content on bobh&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Thu, 29 Sep 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 20 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Linux内核网络收包流程</title>
+      <link>http://localhost:1313/post/linux-network-rx/</link>
+      <pubDate>Sun, 20 Nov 2022 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/linux-network-rx/</guid>
+      <description>本文简要概述了Linux内核接收并处理网络数据包的主要流程</description>
+    </item>
+    
     <item>
       <title>Seastar源码阅读 future/promise链式调用的实现</title>
       <link>http://localhost:1313/post/seastar-future-promise/</link>

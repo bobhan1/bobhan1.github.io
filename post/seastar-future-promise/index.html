@@ -49,7 +49,7 @@
 <meta itemprop="name" content="Seastar源码阅读 future/promise链式调用的实现">
 <meta itemprop="description" content="本文介绍了Seastar中future/promise链式调用的实现"><meta itemprop="datePublished" content="2022-09-29T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2022-09-29T00:00:00+00:00" />
-<meta itemprop="wordCount" content="2537">
+<meta itemprop="wordCount" content="2698">
 <meta itemprop="keywords" content="C&#43;&#43;,源码阅读," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Seastar源码阅读 future/promise链式调用的实现"/>
 <meta name="twitter:description" content="本文介绍了Seastar中future/promise链式调用的实现"/>
@@ -145,14 +145,16 @@
   <ul>
     <li>
       <ul>
-        <li>
+        <li><a href="#基本异步框架">基本异步框架</a>
           <ul>
             <li><a href="#future_state"><strong><code>future_state</code></strong></a></li>
             <li><a href="#promise"><strong><code>promise</code></strong></a></li>
             <li><a href="#future"><strong><code>future</code></strong></a></li>
             <li><a href="#continuation"><strong><code>continuation</code></strong></a></li>
+            <li><a href="#链式调用小结">链式调用小结</a></li>
           </ul>
         </li>
+        <li><a href="#对c20协程的适配">对C++20协程的适配</a></li>
       </ul>
     </li>
   </ul>
@@ -160,7 +162,9 @@
   </div>
 </div>
     <div class="post-content">
-      <h3 id="future_state"><strong><code>future_state</code></strong></h3>
+      <h2 id="基本异步框架">基本异步框架</h2>
+<p>seastar采用future/promise/continuation框架作为其基本异步模型。并在此基础上通过适配器整合/接入其他异步框架。</p>
+<h3 id="future_state"><strong><code>future_state</code></strong></h3>
 <p>一个<code>future/promise pair</code>在逻辑上维护同一个状态，它包括了这个任务的状态(是否完成)，结果值和可能的异常，在seastar中抽象为<code>class future_state</code>。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -202,6 +206,7 @@
 <li>在调用了<code>then()</code>之后被存储到下一个任务中</li>
 </ul>
 <h3 id="promise"><strong><code>promise</code></strong></h3>
+<p><code>promise</code>代表一个异步任务</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -305,6 +310,7 @@
 </div>
 </div><p>如果此时<code>promise</code>对象<code>task_!=nullptr</code>(即存在<code>continuation</code>)，则将其交给<code>seastar</code>的reactor调度器中。</p>
 <h3 id="future"><strong><code>future</code></strong></h3>
+<p><code>future</code>代表一个可能未完成的异步任务的计算结果。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
@@ -649,7 +655,8 @@
 </span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><p>整个链式调用的实现如下所示：</p>
+</div><h3 id="链式调用小结">链式调用小结</h3>
+<p>通过上面的分析，我们可以清楚地看到seastar或中一个链式调用的实现如下所示：</p>
 <ul>
 <li>某个异步任务创建并返回一个<code>future</code>对象<code>f1</code>。</li>
 <li>在该<code>future</code>对象上调用<code>then(func)</code>。在<code>future::then_imple_nrvo()</code>中临时创建新的<code>future</code>对象<code>f2</code>和与<code>f2</code>关联的<code>promise</code>对象<code>p2</code>。用<code>p2</code>和<code>func</code>构造<code>continuation</code>对象<code>c1</code>。</li>
@@ -660,6 +667,7 @@
 <li>在<code>_wrapper</code>函数中处理异常或调用<code>futurator::satisfy_with_result_of()</code>。</li>
 <li>在<code>futurator::satisfy_with_result_of()</code>中将前一个任务的结果转发到<code>func()</code>上运行，并根据其返回值设置<code>p2</code>的状态。</li>
 </ul>
+<h2 id="对c20协程的适配">对C++20协程的适配</h2>
 
     </div>
 
@@ -684,7 +692,11 @@
           <a href="/tags/%E6%BA%90%E7%A0%81%E9%98%85%E8%AF%BB/">源码阅读</a>
           </div>
       <nav class="post-nav">
-        
+        <a class="prev" href="/post/linux-network-rx/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Linux内核网络收包流程</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
         <a class="next" href="/post/mit6828-2018-lab4/">
             <span class="next-text nav-default">MIT6.828-2018 Lab 4 Preemptive Multitasking</span>
             <span class="next-text nav-mobile">下一篇</span>

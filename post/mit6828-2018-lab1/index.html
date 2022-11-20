@@ -49,7 +49,7 @@
 <meta itemprop="name" content="MIT6.828-2018 Lab 1 Booting a PC">
 <meta itemprop="description" content="MIT6.828-2018 本课程课程主要以xv6为例子进行讲解，会有xv6相关的作业，但lab为实现一个自己的JOS。JOS与xv6类似，但两者在某些方面有不同的设"><meta itemprop="datePublished" content="2022-08-10T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2022-08-10T00:00:00+00:00" />
-<meta itemprop="wordCount" content="4429">
+<meta itemprop="wordCount" content="4434">
 <meta itemprop="keywords" content="操作系统内核,C," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="MIT6.828-2018 Lab 1 Booting a PC"/>
 <meta name="twitter:description" content="MIT6.828-2018 本课程课程主要以xv6为例子进行讲解，会有xv6相关的作业，但lab为实现一个自己的JOS。JOS与xv6类似，但两者在某些方面有不同的设"/>
@@ -665,7 +665,7 @@
 </div>
 </div><h3 id="calling-convention与函数调用栈"><strong>Calling convention与函数调用栈</strong></h3>
 <p><img src="/imgs/calling-conventions.png" alt=""></p>
-<p>为了实现函数的递归调用调用方与被调方需要就参数如何传递，寄存器如何保存，返回地址如何存放等问题做出一致的约定，即我们需要一个一致的、稳定的栈帧布局。这种约定(保存寄存器，局部变量，返回地址的位置和顺序等)即为<a href="https://wiki.osdev.org/Calling_Conventions">Calling convetion</a>。上图即为一些常见架构的Calling convention这里我们通过汇编来观察x86下的C Calling convention。每次函数执行前都会有一段<em>prologue</em> code，即每当执行<code>call</code>指令调将<code>eip</code>即下一条要执行的指令的地址压栈并跳转至函数内后。首先会将<code>ebp</code>压栈，然后将当前<code>esp</code>复制到<code>ebp</code>，作为当前函数栈帧的起始位置，保存某些寄存器的值然后下移<code>esp</code>来获得新的栈空间。相关汇编代码如下:</p>
+<p>为了实现函数的递归调用调用方与被调方需要就参数如何传递，寄存器如何保存，返回地址如何存放等问题做出一致的约定，即我们需要一个一致的、稳定的栈帧布局。这种约定(保存寄存器，局部变量，返回地址的位置和顺序，对齐要求等)即为<a href="https://wiki.osdev.org/Calling_Conventions">Calling convetion</a>。上图即为一些常见架构的Calling convention这里我们通过汇编来观察x86下的C Calling convention。每次函数执行前都会有一段<em>prologue</em> code，即每当执行<code>call</code>指令调将<code>eip</code>即下一条要执行的指令的地址压栈并跳转至函数内后。首先会将<code>ebp</code>压栈，然后将当前<code>esp</code>复制到<code>ebp</code>，作为当前函数栈帧的起始位置，保存某些寄存器的值然后下移<code>esp</code>来获得新的栈空间。相关汇编代码如下:</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
