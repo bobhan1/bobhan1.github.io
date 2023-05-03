@@ -6,7 +6,7 @@
     <description>Recent content in Posts on bobh&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Sun, 20 Nov 2022 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 03 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>友链</title>
       <link>http://localhost:1313/post/links/</link>
@@ -14,6 +14,15 @@
       
       <guid>http://localhost:1313/post/links/</guid>
       <description>Mobilis In Mobili - 写博客是为了和过去以及未来的自己对话</description>
+    </item>
+    
+    <item>
+      <title>BPF Performance Tools 笔记</title>
+      <link>http://localhost:1313/post/bpf-performance-tools-notes/</link>
+      <pubDate>Wed, 03 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/bpf-performance-tools-notes/</guid>
+      <description>技术背景 动态插桩：kprobes, uprobes 接口可能不稳定 编译器的内联优化可能使得无法使用动态插桩 静态插桩：tracepoint, USDT kprobes: kprobes</description>
     </item>
     
     <item>
@@ -220,7 +229,7 @@
       <pubDate>Tue, 01 Dec 2020 00:00:00 +0000</pubDate>
       
       <guid>http://localhost:1313/post/cppthings/</guid>
-      <description>Blog Barry&amp;rsquo;s C++ blog Arthur O’Dwyer andreasfertig Oleksandr Koval&amp;rsquo;s blog Sutter’s Mill - Herb Sutter on software development Eric Niebler iboB - Homepage of Borislav Stanimirov (aka iboB). Programmer. 文章, PPT, 视频 C++ links: Coroutines: 一个关于C++20 coroutine的</description>
+      <description>Blogs Barry&amp;rsquo;s C++ blog Arthur O’Dwyer andreasfertig Oleksandr Koval&amp;rsquo;s blog Sutter’s Mill - Herb Sutter on software development Eric Niebler iboB - Homepage of Borislav Stanimirov (aka iboB). Programmer. 资源合集 C++中文周刊 C++文章、论文、视频资源分享 C++ Tip</description>
     </item>
     
     <item>

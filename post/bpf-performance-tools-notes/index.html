@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>BPF Performance Tools 笔记 - bobh&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="bobh" /><meta name="description" content="技术背景 动态插桩：kprobes, uprobes 接口可能不稳定 编译器的内联优化可能使得无法使用动态插桩 静态插桩：tracepoint, USDT kprobes: kprobes" /><meta name="keywords" content="Hugo, blog, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.96.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/bpf-performance-tools-notes/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2a71e62d7ea35a3a3f92c3c16c456852aaec63713de5cd5dbadb28e7480fd599.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="BPF Performance Tools 笔记" />
+<meta property="og:description" content="技术背景 动态插桩：kprobes, uprobes 接口可能不稳定 编译器的内联优化可能使得无法使用动态插桩 静态插桩：tracepoint, USDT kprobes: kprobes" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/bpf-performance-tools-notes/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-05-03T00:00:00+00:00" />
+<meta property="article:modified_time" content="2023-05-03T00:00:00+00:00" />
+
+<meta itemprop="name" content="BPF Performance Tools 笔记">
+<meta itemprop="description" content="技术背景 动态插桩：kprobes, uprobes 接口可能不稳定 编译器的内联优化可能使得无法使用动态插桩 静态插桩：tracepoint, USDT kprobes: kprobes"><meta itemprop="datePublished" content="2023-05-03T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2023-05-03T00:00:00+00:00" />
+<meta itemprop="wordCount" content="6123">
+<meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="BPF Performance Tools 笔记"/>
+<meta name="twitter:description" content="技术背景 动态插桩：kprobes, uprobes 接口可能不稳定 编译器的内联优化可能使得无法使用动态插桩 静态插桩：tracepoint, USDT kprobes: kprobes"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">bobh&#39;s blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">首页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/post/links/">
+        <li class="mobile-menu-item">友链</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">bobh&#39;s blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">首页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/links/">友链</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">BPF Performance Tools 笔记</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2023-05-03 </span>
+        
+          <span class="more-meta"> 约 6123 字 </span>
+          <span class="more-meta"> 预计阅读 13 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#技术背景"><strong>技术背景</strong></a></li>
+    <li><a href="#性能分析"><strong>性能分析</strong></a>
+      <ul>
+        <li><a href="#调用栈回溯"><strong>调用栈回溯</strong></a></li>
+        <li><a href="#linux-60s分析"><strong>Linux 60s分析</strong></a></li>
+        <li><a href="#bcc工具"><strong>BCC工具</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#bcc"><strong>BCC</strong></a>
+      <ul>
+        <li><a href="#funccount"><strong><code>funccount</code></strong></a></li>
+        <li><a href="#stackcount"><strong><code>stackcount</code></strong></a></li>
+        <li><a href="#trace"><strong><code>trace</code></strong></a></li>
+        <li><a href="#argdist"><strong><code>argdist</code></strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#bpftrace"><strong>bpftrace</strong></a>
+      <ul>
+        <li><a href="#bpf编程"><strong>bpf编程</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#cpu内核"><strong>CPU/内核</strong></a>
+      <ul>
+        <li><a href="#分析策略"><strong>分析策略</strong></a></li>
+        <li><a href="#传统工具"><strong>传统工具</strong></a></li>
+        <li><a href="#bpf工具"><strong>BPF工具</strong></a>
+          <ul>
+            <li><a href="#profile"><strong><code>profile</code></strong></a></li>
+            <li><a href="#offcputime"><strong><code>offcputime</code></strong></a></li>
+            <li><a href="#mlockmheld"><strong><code>mlock/mheld</code></strong></a></li>
+            <li><a href="#其他工具"><strong>其他工具</strong></a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#内存"><strong>内存</strong></a>
+      <ul>
+        <li><a href="#bpf工具-1"><strong>BPF工具</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#文件系统"><strong>文件系统</strong></a>
+      <ul>
+        <li><a href="#分析策略-1"><strong>分析策略</strong></a></li>
+        <li><a href="#bpf工具-2"><strong>BPF工具</strong></a>
+          <ul>
+            <li><a href="#其他工具-1"><strong>其他工具</strong></a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#网络"><strong>网络</strong></a>
+      <ul>
+        <li><a href="#分析策略-2"><strong>分析策略</strong></a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="技术背景"><strong>技术背景</strong></h1>
+<ul>
+<li>
+<p>动态插桩：kprobes, uprobes</p>
+<ul>
+<li>接口可能不稳定</li>
+<li>编译器的内联优化可能使得无法使用动态插桩</li>
+</ul>
+</li>
+<li>
+<p>静态插桩：tracepoint, USDT</p>
+</li>
+<li>
+<p><strong>kprobes</strong>: kprobes可以对任何内核函数或函数内部的指令进行动态插桩。kprobes插桩原理如下：</p>
+<ul>
+<li>将在要插桩的目标地址的字节内容复制并保存</li>
+<li>以单步中断指令覆盖目标地址(在x86上式int3指令，若开启优化为jmp指令)</li>
+<li>当指令执行到断点时，断点处理函数会检查这个断点是否是由kprobes注册的，若果是，则执行kprobes处理函数</li>
+<li>当不再需要kprobes时，原始的字节内容会被复制回目标地址上，这样这些指令就回到了初始装状态</li>
+</ul>
+<p>有三种接口访问kprobes:</p>
+<ul>
+<li>kprobe API: 写一个内核模块，通过<code>register_kprobe()</code>注册，加载内核模块输出内容，然后取消注册。</li>
+<li>基于Ftrace，通过向<code>/sys/kernel/debug/tracing/kprobes_events</code>写入字符串进行控制</li>
+<li><code>perf_event_open()</code></li>
+</ul>
+</li>
+<li>
+<p><strong>uprobes</strong>: uprobes提供了用户态程序的插桩，原理接口等和kprobes类似</p>
+</li>
+<li>
+<p><strong>跟踪点</strong>: 内核开发者在内核函数中的特定逻辑处防止了一个插桩点，这些跟踪点会被编译到内核二进制文件中。</p>
+</li>
+<li>
+<p><strong>USDT</strong>: 用户定义静态跟踪提供了用户空间的跟踪机制</p>
+</li>
+</ul>
+<h1 id="性能分析"><strong>性能分析</strong></h1>
+<h2 id="调用栈回溯"><strong>调用栈回溯</strong></h2>
+<ul>
+<li>基于帧指针的调用栈回溯：按照惯例，函数调用栈帧链表的头部地址始终保存于某个寄存器中(x86_64中为rbp)，于是可以通过读取rbp后遍遍历调用栈。AMD64 ABI提到，rbp作为帧指针寄存器为惯例而不是轻质要求。为了节省函数prolugue和epilogue指令数量，可以将rbp作为通用寄存器使用。<code>gcc</code>默认不启用函数帧指针，可通过<code>-fno-omit-frame-pointer</code>选项来强制开启。</li>
+<li>调试信息：额外调试信息以debufinfo packages提供，其中包括了DWARF格式的ELF调试信息，相关文件段为<code>.eh_frame</code>和<code>debug_info</code>。</li>
+<li>最后分支记录(LBR)：Intel处理器有意向特性，程序分支包括函数调用分支信息被记录在硬件缓冲区中。该记录没有额外开销但支持的深度有限。</li>
+<li>ORC：一种新的调试格式。</li>
+</ul>
+<h2 id="linux-60s分析"><strong>Linux 60s分析</strong></h2>
+<ul>
+<li><code>uptime</code>: 检查平均负载，确保性能问题仍然存在</li>
+<li><code>dmesg | tail</code>: 通过系统日志查找可能的错误</li>
+<li><code>vmstat 1</code>: 统计虚拟内存的情况(参数1表示每1秒输出一次，下同)。需检查:
+<ul>
+<li><code>r</code>: CPU上正在执行和等待的进程数量，相比平均负载来说，它不包含I/O</li>
+<li><code>free</code>: 空闲内存大小</li>
+<li><code>si/so</code>: 页换入和换出</li>
+<li><code>us</code>: 用户态时间, <code>sy</code>: 内核态时间, <code>id</code>: 空闲I/O, <code>wa</code>: 等待I/O, <code>st</code>: 被窃取时间 (均为所有CPU的平均值)</li>
+</ul>
+</li>
+<li><code>mpstat -P ALL 1</code>: 详细列出每个CPU的统计指标</li>
+<li><code>pidstat 1</code>: 按照每个进程展示CPU的使用情况，其中<code>%CPU</code>是对所有CPU相加的和</li>
+<li><code>iostat -xz 1</code>: 显示存储设备I/O指标，检查指标：
+<ul>
+<li><code>r/s</code>, <code>w/s</code>, <code>rkB/s</code>, <code>wkB/s</code>: 每秒向设备发出的读写次数和读写字节数，描述了业务负载</li>
+<li><code>await</code>: I/O的平均相应时间</li>
+<li><code>avgqu-sz</code>: 设备请求队列的平均长度</li>
+<li><code>%util</code>: 设备使用率</li>
+</ul>
+</li>
+<li><code>free -m </code>: 以MB为单位检查内存情况</li>
+<li><code>sar -n TCP,ETCP 1</code>: 使用<code>sar</code>查看TCP指标和TCP错误信息。检查指标:
+<ul>
+<li><code>active/s</code>: 每秒本地发起的TCP连接数量</li>
+<li><code>passive/s</code>: 每秒远端发起的TCP连接数量</li>
+<li><code>retrans/s</code>: 每秒TCP重传的数量</li>
+</ul>
+</li>
+</ul>
+<h2 id="bcc工具"><strong>BCC工具</strong></h2>
+<ul>
+<li><code>execsnoop</code>: 追踪<code>exec(2)</code>系统调用，为每个新创建的进程打印一条信息。可以监测到传统周期执行监控工具发现不了的存活周期短的进程</li>
+<li><code>opensnoop</code>: 追踪<code>open(2)</code>(及其变体)系统调用</li>
+<li><code>ext4slower</code>: 追踪ext4文件系统常见操作，并可以把超过某个阈值的操作打印出来</li>
+<li><code>biolatency</code>: 追踪磁盘I/O延迟(从向设备发出请求到请求完成的时间)，以直方图显示</li>
+<li><code>biosnoop</code>: 打印每一次磁盘I/O请求</li>
+<li><code>cachestat</code>: 打印文件系统缓存信息，每秒打印一次</li>
+<li><code>tcpconnect</code>/<code>tcpaccept</code>: 每次主动/被动建立TCP连接时打印信息</li>
+<li><code>tcpretrans</code>: 每次TCP重传时打印信息</li>
+<li><code>runqlat</code>: 统计线程等待CPU运行的时间，以直方图显示</li>
+<li><code>profile</code>: 周期性对调用栈采样，将消重后的调用栈连同出现次数一同打印</li>
+</ul>
+<h1 id="bcc"><strong>BCC</strong></h1>
+<h2 id="funccount"><strong><code>funccount</code></strong></h2>
+<p><code>funccount(8)</code>对事件(函数调用)进行计数</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">funccount [option] envname
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>envname语法如下：</p>
+<ul>
+<li><em>name/p:name</em> 对内核函数<em>name</em>()插桩</li>
+<li><em>lib:name/p:lib:name</em> 对用户态lib中函数<em>name</em>()进行插桩</li>
+<li><em>path:name</em> 对<em>path</em>路径下文件中的函数<em>name</em>()插桩</li>
+<li><em>t:system:name</em> 对<em>system:name</em>内核跟踪点插桩</li>
+<li><em>u:lib:name</em> 对lib库中名为<em>name</em>的USDT探针插桩
+例子</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">funccount -i <span class="m">1</span> <span class="s1">&#39;c:pthread_mutex_lock&#39;</span> <span class="c1"># 查看喊出每秒调用次数</span>
+</span></span><span class="line"><span class="cl">funccount <span class="s1">&#39;t:syscalls:sys_enter_*&#39;</span> <span class="c1"># 查看执行最频繁的系统调用</span>
+</span></span><span class="line"><span class="cl">funccount <span class="s1">&#39;go:os.*&#39;</span> <span class="c1"># 对libgo中全部的so.*调用进行计数</span>
+</span></span><span class="line"><span class="cl">funccount -i <span class="m">1</span> <span class="s1">&#39;t:sched:sched_process_fork&#39;</span> <span class="c1"># 查看每秒创建新进程的数量</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="stackcount"><strong><code>stackcount</code></strong></h2>
+<p><code>stackcount(8)</code>对某事件的函数调用栈计数</p>
+<h2 id="trace"><strong><code>trace</code></strong></h2>
+<p><code>trace(8)</code>是一个多用途工具，用于跟踪事件源，它会对每个事件产生一行输出，因此不适合高频事件。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">trace [option] probe [probe ...]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>probe语法如下：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">eventname(signature) (boolean filter) &#34;fmt&#34;, arguments
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>eventname和<code>funccount(8)</code>中的类似，并添加了对返回值的支持
+例子</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">trace <span class="s1">&#39;c:open (arg2 === 42) &#34;%s %d&#34;, arg1, arg2&#39;</span>
+</span></span><span class="line"><span class="cl">trace <span class="s1">&#39;r::do_sys_open &#34;ret: %d&#34;, retval&#39;</span> <span class="c1"># 跟踪内核函数do_sys_open()并打印返回值</span>
+</span></span><span class="line"><span class="cl">trace <span class="s1">&#39;do_nanosleep(struct hrtimer_sleeper *t) &#34;task: %x&#34;, t-&gt;task&#39;</span> <span class="c1"># 跟踪并打印t-&gt;task地址</span>
+</span></span><span class="line"><span class="cl">trace -I <span class="s1">&#39;net/sock.h&#39;</span> <span class="s1">&#39;updv6_sendmsg(struct sock *sk) (sk-&gt;sk_dport == 13568)&#39;</span> <span class="c1"># 跟踪updv6_sendmsg()且目标端口为13568,使用-I添加头文件</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="argdist"><strong><code>argdist</code></strong></h2>
+<p><code>argdist(8)</code>用于分析函数调用参数</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">argdist {-C|-H} [option] probe
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>-C</code>: 频率统计; <code>-H</code>: 以2的幂次输出直方图
+probe语法：</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">eventname(signature)[:type[,type ...]:expr[,expr...][:filter][#label]]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>type</code>为被展示值的类型，<code>expr</code>为要汇总的统计表达式，<code>$retval</code>为返回值，<code>$latency</code>为从进入到返回的时长(ms)，<code>$entry(param)</code>为在探针进入时<code>param</code>的值，<code>label</code>用于添加标签文本。例子：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">argdist -H <span class="s1">&#39;r::__tcp_select_window():int:$retval&#39;</span> <span class="c1"># 对__tcp_select_window()函数的返回值输出直方图</span>
+</span></span><span class="line"><span class="cl">argdist -p <span class="m">1005</span> -H <span class="s1">&#39;r:c:read()&#39;</span> <span class="c1"># 以直方图形式对PID 1005进程的用户态调用lib的read()函数的返回值</span>
+</span></span><span class="line"><span class="cl">argdist -C <span class="s1">&#39;p::tcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t size):u32:size&#39;</span> <span class="c1"># 对tcp_sendmsg()的参数size进行统计</span>
+</span></span><span class="line"><span class="cl">argdist -C <span class="s1">&#39;r::__vf_read():u32:$PID:$latency &gt; 1000&#39;</span> <span class="c1"># 打印延迟大于0.1ms的进程读操作</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="bpftrace"><strong>bpftrace</strong></h1>
+<p><a href="https://github.com/iovisor/bpftrace">github repo</a></p>
+<p>注意部分脚本在官方仓库中没有，可以从这里下载 <a href="https://github.com/Netflix-Skunkworks/bpftoolkit">bpftoolkit</a></p>
+<h2 id="bpf编程"><strong>bpf编程</strong></h2>
+<p><strong>执行程序</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">bpftrace -e program
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>bpftrace程序由一系列探针表对应动作组成</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">probes { actions }
+</span></span><span class="line"><span class="cl">probe1, probe2, ... { actions }
+</span></span><span class="line"><span class="cl">probe /filter/ { actions } 
+</span></span><span class="line"><span class="cl">...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>探针格式</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">type:id1[:id2[...]]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">kprobe:vfs_read // 对内核函数插桩时只需函数名
+</span></span><span class="line"><span class="cl">uprobe:/bin/shell:readline // 对用户态函数进行插桩时需要二进制路径和函数名
+</span></span><span class="line"><span class="cl">kprobe:vfs_* // 通配符探针
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">/* 过滤器 */
+</span></span><span class="line"><span class="cl">/pid == 12/
+</span></span><span class="line"><span class="cl">/pid &gt; 100 &amp;&amp; pid &lt; 1000/
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>探针类型</strong></p>
+<ul>
+<li>tracepoint: 对内核静态跟踪点进行插桩, tracepoint_name包括以冒号隔开的类型和事件名</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">tracepoint:tracepoint_name
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">tracepoint:syscalls:sys_enter_read
+</span></span><span class="line"><span class="cl">tracepoint:net:netif_rx
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>usdt: 对用户静态探针插桩。可用<code>bpftrace -l</code>列出可用探针</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">usdt:binary_path:probe_name
+</span></span><span class="line"><span class="cl">usdt:library_path:probe_name
+</span></span><span class="line"><span class="cl">usdt:binary_path:probe_namespace:probe_name
+</span></span><span class="line"><span class="cl">usdt:library_path:probe_namespace:probe_name
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">usdt:/usr/local/cpytohn/python:function__entry
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>kprobe/kretprobe: 内核动态插桩</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">kprobe:function_name
+</span></span><span class="line"><span class="cl">kretprobe:function_name
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>uprobe/uretprobe：用户态动态插桩</li>
+<li>software/handware: 软件事件和硬件事件，由于发生评论可能很高，使用count表示每发生count次事件才触发一次探针。
+<ul>
+<li>软件事件：
+<img src="/imgs/software-events.jpg" alt=""></li>
+<li>硬件事件：
+<img src="/imgs/handware-events.jpg" alt=""></li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">software:event_name[:count]
+</span></span><span class="line"><span class="cl">handware:event_name[:count]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>profile/inerval: 基于定时器的事件</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">profile:hz/s/ms/us:rate
+</span></span><span class="line"><span class="cl">interval:s/ms:rate
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>变量</strong></p>
+<p>有三种类型的变量</p>
+<ul>
+<li>内置变量，一般作为只读信息源</li>
+</ul>
+<p>如<code>pid</code>, <code>tid</code>, <code>cpu</code>(CPU ID), <code>comm</code>(进程名字), <code>nsecs</code>, <code>curtask</code>(当前进程task_struct结构体地址), <code>kstack</code>/<code>ustack</code>(内核/用户态调用栈信息，以多行字符串展现), <code>func</code>(被跟踪函数的名字), <code>$1, ... $N</code>(命令行传递给bpf程序的参数)</p>
+<ul>
+<li>临时变量，以<code>$</code>为前缀</li>
+<li>映射表变量，以<code>@</code>为前缀，使用BPF映射表来存储对象，可作为全局存储传递数据</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">probe1 {@a = 1;}
+</span></span><span class="line"><span class="cl">probe2 {$x = @a;}
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">/* 可以提供单个或多个元素组成的key, 将映射表当哈希表使用 */
+</span></span><span class="line"><span class="cl">@start[tid] = nsecs;
+</span></span><span class="line"><span class="cl">@path[pid, $fd] = str(arg0);
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>函数</strong></p>
+<ul>
+<li>通用函数: <code>printf</code>, <code>time(char *fmt)</code>, <code>join(char *strs)</code>(打印字符串), <code>kstack(int limit)/ustack(int limit)</code>(返回一个深度最大为limit的调用栈), <code>ksym(void *p)/usym(void *p)</code>(以字符串形式返回地址处的符号), <code>kaddr(char *name)/uaddr(char *name)</code>(将符号翻译为地址), <code>system(char *fmt, [...])</code>(执shell命令), <code>reg(char *name)</code>(获取指定寄存器的值)</li>
+<li>映射表操作函数: <code>count()</code>, <code>sum()/min()/max()/avg()</code>, <code>stats()</code>(返回时间次数、平均值和总和), <code>hist()</code>(打印2的幂次直方图), <code>lhist()</code>(打印线性直方图), <code>delete(@m[key])</code>(删除映射表中键值对), <code>clear(@m)</code>(清空映射表)</li>
+</ul>
+<p><strong>控制流</strong></p>
+<ul>
+<li>过滤器</li>
+<li>三目运算符</li>
+<li>if-else语句</li>
+</ul>
+<p><strong>循环</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">unroll (count) { actions; }
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>count最大为20且不能为变量</p>
+<p>bpftrace脚本的例子参见官方仓库 <a href="https://github.com/iovisor/bpftrace/tree/master/tools">[1]</a>, <a href="https://github.com/brendangregg/bpf-perf-tools-book">[2]</a></p>
+<h1 id="cpu内核"><strong>CPU/内核</strong></h1>
+<h2 id="分析策略"><strong>分析策略</strong></h2>
+<ul>
+<li>确保待分析对象处于运行状态，检查系统整体CPU利用率(<code>mapstat(1)</code>)，检查是否有CPU处于下限状态</li>
+<li>确认系统负载受限于CPU
+<ul>
+<li>所有CPU负载高还是某个CPU负载高</li>
+<li>检查运行队列的延迟(<code>BCC runqlat(1)</code>)</li>
+</ul>
+</li>
+<li>先量化整个系统的CPU使用量百分比，然后按进程、CPU模式、CPU ID来分解
+<ul>
+<li>如果系统时间占比高，可按照进程和系统调用类型来统计系统调用的频率和数量，同时检查系统参数来识别可以优化的地方(<code>perf(1)</code>, <code>BCC syssstat(8)</code>, bpftrace单行程序)</li>
+</ul>
+</li>
+<li>使用profiler采样调用栈信息，用火焰图展示</li>
+<li>针对某个任务定制工具获取相关上下文信息</li>
+<li>测量硬中断的资源消耗，这些信息对于基于定时器的分析器不可见(如<code>BCC hardirqs(1)</code>)</li>
+<li>利用PMC来观测每周期CPU指令执行量，利用<code>BCC llcstat</code>分析缓存低命中率等</li>
+</ul>
+<h2 id="传统工具"><strong>传统工具</strong></h2>
+<p><code>upitme</code>, <code>top</code>, <code>mpstat</code>, <code>perf</code>, <code>Ftrace</code></p>
+<h2 id="bpf工具"><strong>BPF工具</strong></h2>
+<h3 id="profile"><strong><code>profile</code></strong></h3>
+<p><code>profile(8)</code>定时采样调用栈信息并汇报调用栈出现频率。其频率统计在内核态完成。而其他内核态分析工具如<code>perf(1)</code>将采样信息发送到内核态后进行处理才得出统计信息。<code>profile(8)</code>避免了采样过程中对文件系统和磁盘I/O的消耗，更加高效。</p>
+<p>常用选项：<code>-f</code>: 以折叠方式输出, , <code>-F FREQUENCY</code>: 指定采样频率, <code>-p PID</code>: 仅输出给定进程, <code>-u</code>: 仅包含用户态线程, <code>-k</code>: 仅包含内核态线程, <code>-U</code>: 仅包含用户态调用栈信息, <code>-K</code>: 仅包含内核态调用栈信息。</p>
+<p>下面是使用执行<a href="https://github.com/datacharmer/test_db">employees测试表</a>验证脚本的火焰图</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">profile-bpfcc -p $(pgrep mysqld) -f 45 &gt; profile.out.mysqld-test.txt
+</span></span><span class="line"><span class="cl">./projects/FlameGraph/flamegraph.pl --width=1500 &lt; profile.out.mysqld-test.txt &gt; out.mysqld.svg
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/imgs/profile-flamegraph-1.jpg" alt=""></p>
+<h3 id="offcputime"><strong><code>offcputime</code></strong></h3>
+<p><code>offcputime(8)</code>用于统计线程阻塞和脱离CPU运行的时间，同时输出调用信息。其和<code>profile(8)</code>工具结合起来覆盖了线程的全部生命周期。输出格式和<code>profile(8)</code>相同。由于输出信息较多，可打成火焰图进行分析。</p>
+<p><code>offcoutime(8)</code>通过跟踪上下文切换时间完成统计，同时记录调用栈信息。由于上下文切换事件在内核中发生频繁。故其额外消耗较大，更适合短期运行。</p>
+<p>常用选项如下：<code>-f</code>: 以折叠方式输出, <code>-p PID</code>: 仅输出给定进程, <code>-u</code>: 仅包含用户态线程, <code>-k</code>: 仅包含内核态线程, <code>-U</code>: 仅包含用户态调用栈信息, <code>-K</code>: 仅包含内核态调用栈信息, <code>--state STATE</code>: 筛选特定状态的线程(如2表示<code>TASK_UNINTERRUPTIBLE</code>)</p>
+<p>以下为导入employees测试表过程的offcputime火焰图</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">offcputime-bpfcc -p <span class="k">$(</span>pgrep mysqld<span class="k">)</span> -f <span class="m">60</span> &gt; offcputime.out.mysql-load.txt
+</span></span><span class="line"><span class="cl">./projects/FlameGraph/flamegraph.pl --width<span class="o">=</span><span class="m">1500</span> --color<span class="o">=</span>io -bgcolor<span class="o">=</span>blue &lt; offcputime.out.mysql-load.txt &gt; out.offcputime.mysqld-load.svg
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/imgs/offcputime-flamegraph-load.jpg" alt="">
+<img src="/imgs/offcputmie-flamegragh-load-2.jpg" alt="">
+搜索高亮
+<img src="/imgs/offcputime-flamegraph-load-highlight.jpg" alt=""></p>
+<p>使用折叠文件格式时可以先使用<code>grep(1)</code>过滤出关心的线程再生成火焰图</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">grep futex out.offcputime-1.txt | ./projects/FlameGraph/flamegraph.pl --hash --bgcolor=blue &gt; out.offcputime.svg
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="mlockmheld"><strong><code>mlock/mheld</code></strong></h3>
+<p><code>mlock(8)</code>和<code>mheld(8)</code>以直方图形式跟踪内核互斥锁的延迟和持有时间，并输出内核态堆栈。<code>mlock(8)</code>可用来定位锁争用问题，<code>mheld(8)</code>可以显示那个代码路径长时间尺有锁。由于mutex没有跟踪点，<code>mlock(8)/mheld(8)</code>跟踪了<code>mutex_lock()</code>, <code>mutex_lock_interruptible()</code>, <code>mutex_trylock()</code>内核函数，由于这些函数调用频繁，故开销较大。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># ./mlock.bt
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">@lock_latency_ns[0xffff89d0f2c00c80, 
+</span></span><span class="line"><span class="cl">    kretprobe_trampoline+0
+</span></span><span class="line"><span class="cl">    read_events+341
+</span></span><span class="line"><span class="cl">    do_io_getevents+118
+</span></span><span class="line"><span class="cl">    __x64_sys_io_getevents+95
+</span></span><span class="line"><span class="cl">    do_syscall_64+92
+</span></span><span class="line"><span class="cl">, ib_io_rd-2]: 
+</span></span><span class="line"><span class="cl">[1K, 2K)               1 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+</span></span><span class="line"><span class="cl">[2K, 4K)               0 |                                                    |
+</span></span><span class="line"><span class="cl">[4K, 8K)               0 |                                                    |
+</span></span><span class="line"><span class="cl">[8K, 16K)              1 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># ./mheld.bt
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">@held_time_ns[0xffff89d1c2564ec0, 
+</span></span><span class="line"><span class="cl">    mutex_unlock+1
+</span></span><span class="line"><span class="cl">    seq_read+253
+</span></span><span class="line"><span class="cl">    vfs_read+160
+</span></span><span class="line"><span class="cl">    ksys_read+103
+</span></span><span class="line"><span class="cl">    __x64_sys_read+26
+</span></span><span class="line"><span class="cl">, ps]: 
+</span></span><span class="line"><span class="cl">[256, 512)             1 |                                                    |
+</span></span><span class="line"><span class="cl">[512, 1K)              0 |                                                    |
+</span></span><span class="line"><span class="cl">[1K, 2K)               2 |                                                    |
+</span></span><span class="line"><span class="cl">[2K, 4K)             184 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@          |
+</span></span><span class="line"><span class="cl">[4K, 8K)             223 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+</span></span><span class="line"><span class="cl">[8K, 16K)              7 |@                                                   |
+</span></span><span class="line"><span class="cl">[16K, 32K)             4 |                                                    |
+</span></span><span class="line"><span class="cl">[32K, 64K)            25 |@@@@@                                               |
+</span></span><span class="line"><span class="cl">[64K, 128K)            0 |                                                    |
+</span></span><span class="line"><span class="cl">[128K, 256K)           1 |                                                    |
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>自旋锁没有跟踪点，可以通过<code>BCC funcount(8)</code>进行跟踪</p>
+<h3 id="其他工具"><strong>其他工具</strong></h3>
+<ul>
+<li><code>wakeuptime(8)</code>可展示执行调度器唤醒线程的调用栈以及目标被阻塞的时间</li>
+<li><code>offwaketime(8)</code>结合了<code>offcputime(8)</code>和<code>wakeuptime(8)</code></li>
+<li><code>numamove(8)</code>用于跟踪类型为NUMA misplaced的内存页面迁移。</li>
+<li><code>syscount(8)</code>用于统计系统调用的次数</li>
+<li><code>argdist(8)</code>可用于读取参数的直方图信息，<code>tplist(8)</code>可查询各个参数的信息</li>
+<li><code>kmem(8)</code>按调用栈显示内核内存分配的统计信息</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># tplist-bpfcc -v syscalls:sys_enter_read
+</span></span><span class="line"><span class="cl">syscalls:sys_enter_read
+</span></span><span class="line"><span class="cl">    int __syscall_nr;
+</span></span><span class="line"><span class="cl">    unsigned int fd;
+</span></span><span class="line"><span class="cl">    char * buf;
+</span></span><span class="line"><span class="cl">    size_t count; 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"># argdist-bpfcc -H &#39;t:syscalls:sys_enter_read():int:args-&gt;count&#39;
+</span></span><span class="line"><span class="cl">     args-&gt;count         : count     distribution
+</span></span><span class="line"><span class="cl">         0 -&gt; 1          : 7        |                                        |
+</span></span><span class="line"><span class="cl">         2 -&gt; 3          : 0        |                                        |
+</span></span><span class="line"><span class="cl">         4 -&gt; 7          : 3        |                                        |
+</span></span><span class="line"><span class="cl">         8 -&gt; 15         : 0        |                                        |
+</span></span><span class="line"><span class="cl">        16 -&gt; 31         : 1        |                                        |
+</span></span><span class="line"><span class="cl">        32 -&gt; 63         : 0        |                                        |
+</span></span><span class="line"><span class="cl">        64 -&gt; 127        : 1        |                                        |
+</span></span><span class="line"><span class="cl">       128 -&gt; 255        : 15       |*                                       |
+</span></span><span class="line"><span class="cl">       256 -&gt; 511        : 0        |                                        |
+</span></span><span class="line"><span class="cl">       512 -&gt; 1023       : 30       |***                                     |
+</span></span><span class="line"><span class="cl">      1024 -&gt; 2047       : 57       |*****                                   |
+</span></span><span class="line"><span class="cl">      2048 -&gt; 4095       : 398      |****************************************|
+</span></span><span class="line"><span class="cl">      4096 -&gt; 8191       : 3        |                                        |
+</span></span><span class="line"><span class="cl">      8192 -&gt; 16383      : 2        |                                        |
+</span></span><span class="line"><span class="cl">     16384 -&gt; 32767      : 8        |                                        |
+</span></span><span class="line"><span class="cl">     32768 -&gt; 65535      : 0        |                                        |
+</span></span><span class="line"><span class="cl">     65536 -&gt; 131071     : 119      |***********                             |
+</span></span><span class="line"><span class="cl">    131072 -&gt; 262143     : 208      |********************                    |
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="内存"><strong>内存</strong></h1>
+<h2 id="bpf工具-1"><strong>BPF工具</strong></h2>
+<ul>
+<li><code>memleak(8)</code>展示长时间不被释放的内存</li>
+<li><code>mmapsnoop(8)</code>跟踪全系统的<code>mmap(2)</code>系统调用并打印映射的详细信息</li>
+<li><code>faults(8)</code>跟踪缺页错误和调用栈信息</li>
+<li><code>drsnoop(8)</code>跟踪内存释放过程中的直接回收部分，显示对应的延迟</li>
+</ul>
+<h1 id="文件系统"><strong>文件系统</strong></h1>
+<h2 id="分析策略-1"><strong>分析策略</strong></h2>
+<ul>
+<li>识别系统中挂载的文件系统(<code>df(1)</code>, <code>mount(8)</code>)</li>
+<li>检查挂载的文件系统的容量，某些文件系统在接近100%容量时会有性能下降的情况</li>
+<li>产生一个固定的负载进行分析(<code>fio(1)</code>)</li>
+<li>使用<code>opensnoop(8)</code>观察打开的文件，使用<code>filelife(8)</code>来查找是否存在短期文件问题</li>
+<li>查找非常慢的文件系统操作，按进程和文件名详细观察(<code>ext4slower(8)</code>, <code>btrfsslower(8)</code>, <code>zfsslower(8)</code>)，或使用性能损耗偏高的通用工具(<code>fileslower(8)</code>)</li>
+<li>检查文件系统的延迟分布(<code>ext4dist(8)</code>, <code>btrfsdist(8)</code>, <code>zfsdist(8)</code>)，这有可能会显示导致性能问题的延迟成双峰分布或离群情况</li>
+<li>检查一段时间内也缓存的命中率(<code>cachestat(8)</code>)</li>
+<li>使用<code>vfsstat(8)</code>来比较逻辑I/O和物理I/O的区别</li>
+</ul>
+<h2 id="bpf工具-2"><strong>BPF工具</strong></h2>
+<h3 id="其他工具-1"><strong>其他工具</strong></h3>
+<ul>
+<li><code>fmapfault(8)</code>跟踪内存映射文件的缺页错误，按进程名和文件名统计</li>
+<li><code>filelife(8)</code>是一个BCC和bpftrace工具，用来展示短期文件的声明周期</li>
+<li><code>fileslower(8)</code>用于显示延迟超过某个阈值的同步模式的读取和写入操作</li>
+<li><code>cachestat(8)</code>展示也缓存命中率信息</li>
+<li><code>bufgrow(8)</code>用于查看缓冲区的内部情况，输出哪个进程导致了也缓冲区的增长，以KB为单位</li>
+<li><code>readahead(8)</code>用于跟踪文件系统自动预取的情况，以直方图显示</li>
+</ul>
+<h1 id="网络"><strong>网络</strong></h1>
+<h2 id="分析策略-2"><strong>分析策略</strong></h2>
+<ul>
+<li>对负载定性分析，找出低效之处
+<ul>
+<li>使用基于计数器的工具理解基本的网络统计信息：网络包速率和吞吐量，对于TCP，查看TCP连接率和TCP重传率(<code>ss(8)</code>, <code>nstat(8)</code>, <code>netstat(10)</code>, <code>sar(1)</code>)</li>
+<li>通过跟踪新TCP连接的建立和时长来定性分析负载(<code>tcplife(8)</code>)</li>
+</ul>
+</li>
+<li>检查各个接口的限制
+<ul>
+<li>检查是否到达了网络接口吞吐量的上限(<code>sar(1)</code>, <code>nicstat(1)</code>中的接口使用率)</li>
+</ul>
+</li>
+<li>检查不同的延迟源
+<ul>
+<li>跟踪TCP重传和其他不寻常的TCP事件(<code>tcpretrans(8)</code>, <code>tcpdrop(8)</code>,和<code>skb:kfree_skb</code>跟踪点)</li>
+<li>测量DNS延迟(<code>gethostlatency(8)</code>)</li>
+<li>测量连接延迟、首字节延迟、软件栈各层之间的延迟等。注意网路延迟测试在不同负载情况下可能由于网络中的缓存鹏膨胀问题而有大幅变化(排队过量导致的延迟)。应在有负载的情况下和空闲网络中分别测量延迟进行比较</li>
+</ul>
+</li>
+<li>使用实验分析方法
+<ul>
+<li>使用负载生成工具探索主机之间网络吞吐量的上限，同时检查在已知负载的情况下发生的网路事件</li>
+</ul>
+</li>
+<li>使用自定义工具
+<ul>
+<li>使用高频CPU性能分析工具抓取内核调用栈信息，以量化CPU资源在网络协议和驱动程序之间的使用情况</li>
+<li>使用跟踪点和kprobes来探索网络协议栈的内部情况</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">bobh</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2023-05-03
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      
+      <nav class="post-nav">
+        <a class="prev" href="/post/links/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">友链</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/linux-network-rx/">
+            <span class="next-text nav-default">Linux内核网络收包流程</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:bh2444151092@outlook.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/bobhan1" class="iconfont icon-github" title="github"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019 - 
+    2023<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

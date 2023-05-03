@@ -49,7 +49,7 @@
 <meta itemprop="name" content="Modern CMake快速入门——作为构建系统">
 <meta itemprop="description" content="本文介绍了一些CMake构建系统的基本知识"><meta itemprop="datePublished" content="2022-05-01T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2022-05-01T00:00:00+00:00" />
-<meta itemprop="wordCount" content="4077">
+<meta itemprop="wordCount" content="4098">
 <meta itemprop="keywords" content="CMake," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="Modern CMake快速入门——作为构建系统"/>
 <meta name="twitter:description" content="本文介绍了一些CMake构建系统的基本知识"/>
@@ -134,7 +134,7 @@
       <div class="post-meta">
         <span class="post-time"> 2022-05-01 </span>
         
-          <span class="more-meta"> 约 4077 字 </span>
+          <span class="more-meta"> 约 4098 字 </span>
           <span class="more-meta"> 预计阅读 9 分钟 </span>
         
       </div>
@@ -868,17 +868,35 @@ archive)</li>
 </div><h1 id="安装与打包"><strong>安装与打包</strong></h1>
 <h2 id="导出targets至另一个项目"><strong>导出targets至另一个项目</strong></h2>
 <p><code>install()</code>命令将导入一个targets list。</p>
-<p><code>export()</code>命令将targets导出到一个<code>.cmake</code>文件中，这样，另一个项目可以通过<code>include()</code>命令将该<code>.cmake</code>文件包括来导入targets。注意，这种方式导出的targets使用绝对路径定位。</p>
+<p><code>export()</code>命令将targets导出到一个<code>.cmake</code>文件中，这样，另一个项目可以通过<code>include()</code>命令将该<code>.cmake</code>文件包括来导入targets。需要注意这种方式导出的targets使用硬编码的绝对路径进行定位。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
 </span><span class="lnt">2
 </span><span class="lnt">3
+</span><span class="lnt">4
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">export</span><span class="p">(</span><span class="s">TARGETS</span> <span class="s">[target1</span> <span class="s">[target2</span> <span class="s">[...]]]</span> 
-</span></span><span class="line"><span class="cl"> <span class="s">[NAMESPACE</span> <span class="s">&lt;namespace&gt;]</span> <span class="s">[APPEND]</span> <span class="s">FILE</span> <span class="s">&lt;path&gt;</span>
+</span></span><span class="line"><span class="cl"> <span class="s">[NAMESPACE</span> <span class="s">&lt;namespace&gt;]</span> 
+</span></span><span class="line"><span class="cl"> <span class="s">[APPEND]</span> <span class="s">FILE</span> <span class="s">&lt;path&gt;</span>
 </span></span><span class="line"><span class="cl"> <span class="s">[EXPORT_LINK_INTERFACE_LIBRARIES]</span><span class="p">)</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-cmake" data-lang="cmake"><span class="line"><span class="cl"><span class="nb">set</span><span class="p">(</span><span class="s">EXPORT_DIR</span> <span class="s2">&#34;${CMAKE_CURRENT_BINARY_DIR}/cmake&#34;</span><span class="p">)</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="nb">export</span><span class="p">(</span><span class="s">TARGETS</span> <span class="s">calc</span>
+</span></span><span class="line"><span class="cl"> <span class="s">FILE</span> <span class="s2">&#34;${EXPORT_DIR}/CalcTargets.cmake&#34;</span>
+</span></span><span class="line"><span class="cl"> <span class="s">NAMESPACE</span> <span class="s">Calc::</span>
+</span></span><span class="line"><span class="cl"><span class="p">)</span><span class="err">
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="安装项目">安装项目</h2>

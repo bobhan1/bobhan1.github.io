@@ -49,7 +49,7 @@
 <meta itemprop="name" content="数据库/分布式系统资源合集">
 <meta itemprop="description" content="虚拟共识，Delos通过对不同的共识协议作进一步抽象，在复制状态机WAL日志和数据库之间增加一层虚拟日志层，使得上层应用不感知具体的共识协议"><meta itemprop="datePublished" content="2020-12-01T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2020-12-01T00:00:00+00:00" />
-<meta itemprop="wordCount" content="337">
+<meta itemprop="wordCount" content="459">
 <meta itemprop="keywords" content="数据库,分布式系统," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="数据库/分布式系统资源合集"/>
 <meta name="twitter:description" content="虚拟共识，Delos通过对不同的共识协议作进一步抽象，在复制状态机WAL日志和数据库之间增加一层虚拟日志层，使得上层应用不感知具体的共识协议"/>
@@ -134,7 +134,7 @@
       <div class="post-meta">
         <span class="post-time"> 2020-12-01 </span>
         
-          <span class="more-meta"> 约 337 字 </span>
+          <span class="more-meta"> 约 459 字 </span>
           <span class="more-meta"> 预计阅读 1 分钟 </span>
         
       </div>
@@ -147,33 +147,53 @@
   </div>
 </div>
     <div class="post-content">
-      <p><strong>虚拟共识</strong>，Delos通过对不同的共识协议作进一步抽象，在复制状态机WAL日志和数据库之间增加一层虚拟日志层，使得上层应用不感知具体的共识协议的实现，从而支持多种共识协议共存，共识协议热替换等功能</p>
+      <ul>
+<li><strong>虚拟共识</strong>，Delos通过对不同的共识协议作进一步抽象，在复制状态机WAL日志和数据库之间增加一层虚拟日志层，使得上层应用不感知具体的共识协议的实现，从而支持多种共识协议共存，共识协议热替换等功能
 <ul>
 <li><a href="https://www.usenix.org/system/files/osdi20-balakrishnan.pdf">Virtual Consensus in Delos</a> <a href="https://zhuanlan.zhihu.com/p/357033784">论文解读</a></li>
 </ul>
-<p><strong>Log-Structured</strong>, 一个分层复制状态机的协议，它规定了层与层之间的接口与交互方式。通过这个协议，我们可以将业务罗即拆分为多个engine，再通过堆叠的方式构建应用，从而提高了组件的复用性和应用的可拓展性。</p>
+</li>
+<li><strong>Log-Structured</strong>, 一个分层复制状态机的协议，它规定了层与层之间的接口与交互方式。通过这个协议，我们可以将业务罗即拆分为多个engine，再通过堆叠的方式构建应用，从而提高了组件的复用性和应用的可拓展性。
 <ul>
 <li><a href="">READING GROUP. LOG-STRUCTURED PROTOCOLS IN DELOS</a> <a href="http://charap.co/reading-group-log-structured-protocols-in-delos/">论文解读</a></li>
 </ul>
-<p><strong>Amazon Aurora</strong>, 一个通过将MySQL数据库中的redolog抽离为独立的存储服务从而提高系统吞吐量的云原生数据库</p>
+</li>
+<li><strong>Amazon Aurora</strong>, 一个通过将MySQL数据库中的redolog抽离为独立的存储服务从而提高系统吞吐量的云原生数据库
 <ul>
 <li><a href="https://pdos.csail.mit.edu/6.824/papers/aurora.pdf">Amazon Aurora: Design Considerations for High Throughput Cloud-Native Relational Databases</a>  [<a href="https://www.jianshu.com/p/dd6aa53c3af5">翻译</a>]</li>
 <li><a href="https://pages.cs.wisc.edu/~yxy/cs839-s20/papers/aurora-sigmod-18.pdf">Amazon Aurora: On avoiding distributed consensus for I/Os, commits, and membership changes</a></li>
 </ul>
-<p><strong>Dynamo</strong></p>
+</li>
+<li><strong>Dynamo</strong>
 <ul>
 <li><a href="https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf">Dynamo: Amazon’s Highly Available Key-value Store</a></li>
 </ul>
-<p><strong>Spanner</strong></p>
+</li>
+<li><strong>Spanner</strong>
 <ul>
 <li><a href="https://www.usenix.org/system/files/conference/osdi12/osdi12-final-16.pdf">Spanner: Google’s Globally-Distributed Database</a></li>
 <li><a href="">Spanner: Becoming a SQL System</a></li>
 </ul>
-<p><strong>F1</strong></p>
+</li>
+<li><strong>F1</strong>
 <ul>
 <li><a href="https://courses.cs.washington.edu/courses/cse550/21au/papers/CSE550.F1.pdf">F1: A Distributed SQL Database That Scales</a> <a href="https://15799.courses.cs.cmu.edu/fall2013/static/slides/f1.pdf">CMU ppt</a></li>
 <li><a href="">Online, Asynchronous Schema Change in F1</a></li>
 <li><a href="https://storage.googleapis.com/pub-tools-public-publication-data/pdf/fa380016eccb33ac5e92c84f7b5eec136e73d3f1.pdf">F1 Query: Declarative Querying at Scale</a></li>
+</ul>
+</li>
+<li>执行引擎/Pipeline调度
+<ul>
+<li><a href="https://zhuanlan.zhihu.com/p/573181686">技术内幕 | StarRocks Pipeline 执行框架（上）</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/575526096">技术内幕 | StarRocks Pipeline 执行框架（下）</a></li>
+<li><a href="https://io-meter.com/2020/01/04/olap-distributed/">OLAP 任务的并发执行与调度</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/545776764">ClickHouse之Pipeline执行引擎(持续更新)</a></li>
+<li><a href="https://presentations.clickhouse.com/meetup24/5.%20Clickhouse%20query%20execution%20pipeline%20changes/#clickhouse-query-execution-pipeline">ClickHouse Query Execution Pipeline</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/528514990">Push还是Pull，这是个问题么？</a></li>
+<li><a href="https://15721.courses.cs.cmu.edu/spring2023/papers/07-scheduling/p743-leis.pdf">Morsel-Driven Parallelism: A NUMA-Aware Query Evaluation Framework for the Many-Core Age</a></li>
+<li><a href="https://15721.courses.cs.cmu.edu/spring2023/papers/07-scheduling/wagner-sigmod21.pdf">Self-Tuning Query Scheduling for Analytical Workloads</a></li>
+</ul>
+</li>
 </ul>
 
     </div>
