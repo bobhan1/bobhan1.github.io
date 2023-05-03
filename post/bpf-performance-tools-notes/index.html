@@ -49,7 +49,7 @@
 <meta itemprop="name" content="BPF Performance Tools 笔记">
 <meta itemprop="description" content=""><meta itemprop="datePublished" content="2023-05-03T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2023-05-03T00:00:00+00:00" />
-<meta itemprop="wordCount" content="6123">
+<meta itemprop="wordCount" content="6368">
 <meta itemprop="keywords" content="eBPF,性能分析,Linux内核," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="BPF Performance Tools 笔记"/>
 <meta name="twitter:description" content=""/>
@@ -134,7 +134,7 @@
       <div class="post-meta">
         <span class="post-time"> 2023-05-03 </span>
         
-          <span class="more-meta"> 约 6123 字 </span>
+          <span class="more-meta"> 约 6368 字 </span>
           <span class="more-meta"> 预计阅读 13 分钟 </span>
         
       </div>
@@ -155,6 +155,7 @@
     </li>
     <li><a href="#bcc"><strong>BCC</strong></a>
       <ul>
+        <li><a href="#简介">简介</a></li>
         <li><a href="#funccount"><strong><code>funccount</code></strong></a></li>
         <li><a href="#stackcount"><strong><code>stackcount</code></strong></a></li>
         <li><a href="#trace"><strong><code>trace</code></strong></a></li>
@@ -163,6 +164,7 @@
     </li>
     <li><a href="#bpftrace"><strong>bpftrace</strong></a>
       <ul>
+        <li><a href="#简介-1"><strong>简介</strong></a></li>
         <li><a href="#bpf编程"><strong>bpf编程</strong></a></li>
       </ul>
     </li>
@@ -200,6 +202,7 @@
         <li><a href="#分析策略-2"><strong>分析策略</strong></a></li>
       </ul>
     </li>
+    <li><a href="#可视化其他工具"><strong>可视化/其他工具</strong></a></li>
   </ul>
 </nav>
   </div>
@@ -295,6 +298,9 @@
 <li><code>profile</code>: 周期性对调用栈采样，将消重后的调用栈连同出现次数一同打印</li>
 </ul>
 <h1 id="bcc"><strong>BCC</strong></h1>
+<h2 id="简介">简介</h2>
+<p>BCC(BPF Compiler Collection)是最早用于开发BPF跟踪程序的高级框架，它提供了一个编写内核BPF程序的C语言环境，同时还提供了其他高级语言的接口。它是libbpf和libbcc的前身，这两个库使用BPF程序对事件进行观测。</p>
+<p><img src="/imgs/bcc-internals.jpg" alt=""></p>
 <h2 id="funccount"><strong><code>funccount</code></strong></h2>
 <p><code>funccount(8)</code>对事件(函数调用)进行计数</p>
 <div class="highlight"><div class="chroma">
@@ -403,8 +409,11 @@ probe语法：</li>
 </span></span></code></pre></td></tr></table>
 </div>
 </div><h1 id="bpftrace"><strong>bpftrace</strong></h1>
-<p><a href="https://github.com/iovisor/bpftrace">github repo</a></p>
-<p>注意部分脚本在官方仓库中没有，可以从这里下载 <a href="https://github.com/Netflix-Skunkworks/bpftoolkit">bpftoolkit</a></p>
+<h2 id="简介-1"><strong>简介</strong></h2>
+<p>bpftrace是另一个前端，它提供了一个高级编程语言环境，可以用来轻松地创建Linux追踪程序。bpftrace使用libbpf和libbcc完成对函数的插桩、程序的加载以及使用USDT。它使用LLVM将程序编译成BPF字节码。</p>
+<p><img src="/imgs/bpftrace-internals.jpg" alt=""></p>
+<p>注意部分脚本在<a href="https://github.com/iovisor/bpftrace">官方仓库</a>中没有，可以从这里下载 <a href="https://github.com/Netflix-Skunkworks/bpftoolkit">bpftoolkit</a></p>
+<p><strong>文档</strong>: <a href="https://github.com/iovisor/bpftrace/blob/master/docs/reference_guide.md">reference_guide</a></p>
 <h2 id="bpf编程"><strong>bpf编程</strong></h2>
 <p><strong>执行程序</strong></p>
 <div class="highlight"><div class="chroma">
@@ -755,7 +764,6 @@ probe语法：</li>
 <li><code>numamove(8)</code>用于跟踪类型为NUMA misplaced的内存页面迁移。</li>
 <li><code>syscount(8)</code>用于统计系统调用的次数</li>
 <li><code>argdist(8)</code>可用于读取参数的直方图信息，<code>tplist(8)</code>可查询各个参数的信息</li>
-<li><code>kmem(8)</code>按调用栈显示内核内存分配的统计信息</li>
 </ul>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
@@ -817,7 +825,10 @@ probe语法：</li>
 </span></span><span class="line"><span class="cl">    131072 -&gt; 262143     : 208      |********************                    |
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h1 id="内存"><strong>内存</strong></h1>
+</div><ul>
+<li><code>kmem(8)</code>按调用栈显示内核内存分配的统计信息</li>
+</ul>
+<h1 id="内存"><strong>内存</strong></h1>
 <h2 id="bpf工具-1"><strong>BPF工具</strong></h2>
 <ul>
 <li><code>memleak(8)</code>展示长时间不被释放的内存</li>
@@ -879,6 +890,14 @@ probe语法：</li>
 <li>使用跟踪点和kprobes来探索网络协议栈的内部情况</li>
 </ul>
 </li>
+</ul>
+<h1 id="可视化其他工具"><strong>可视化/其他工具</strong></h1>
+<ul>
+<li><strong>PCP+Grafana</strong></li>
+<li><strong>Cloudflare eBPF Exporter+Prometheus+Grafana</strong>:</li>
+<li><strong>kubctl-trace</strong></li>
+<li><strong>Cilium</strong></li>
+<li><strong>Sysdig</strong></li>
 </ul>
 
     </div>
