@@ -49,7 +49,7 @@
 <meta itemprop="name" content="BPF Performance Tools 笔记">
 <meta itemprop="description" content=""><meta itemprop="datePublished" content="2023-05-03T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2023-05-03T00:00:00+00:00" />
-<meta itemprop="wordCount" content="6368">
+<meta itemprop="wordCount" content="7009">
 <meta itemprop="keywords" content="eBPF,性能分析,Linux内核," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="BPF Performance Tools 笔记"/>
 <meta name="twitter:description" content=""/>
@@ -134,8 +134,8 @@
       <div class="post-meta">
         <span class="post-time"> 2023-05-03 </span>
         
-          <span class="more-meta"> 约 6368 字 </span>
-          <span class="more-meta"> 预计阅读 13 分钟 </span>
+          <span class="more-meta"> 约 7009 字 </span>
+          <span class="more-meta"> 预计阅读 14 分钟 </span>
         
       </div>
     </header>
@@ -190,11 +190,12 @@
     <li><a href="#文件系统"><strong>文件系统</strong></a>
       <ul>
         <li><a href="#分析策略-1"><strong>分析策略</strong></a></li>
-        <li><a href="#bpf工具-2"><strong>BPF工具</strong></a>
-          <ul>
-            <li><a href="#其他工具-1"><strong>其他工具</strong></a></li>
-          </ul>
-        </li>
+        <li><a href="#bpf工具-2"><strong>BPF工具</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#磁盘"><strong>磁盘</strong></a>
+      <ul>
+        <li><a href="#bpf工具-3"><strong>BPF工具</strong></a></li>
       </ul>
     </li>
     <li><a href="#网络"><strong>网络</strong></a>
@@ -301,6 +302,7 @@
 <h2 id="简介">简介</h2>
 <p>BCC(BPF Compiler Collection)是最早用于开发BPF跟踪程序的高级框架，它提供了一个编写内核BPF程序的C语言环境，同时还提供了其他高级语言的接口。它是libbpf和libbcc的前身，这两个库使用BPF程序对事件进行观测。</p>
 <p><img src="/imgs/bcc-internals.jpg" alt=""></p>
+<p><strong>内核要求</strong>: 推荐使用Linux 4.9以上的内核版本，需开启以下内核配置选项<code>CONFIG_BPF=y, CONFIG_BPF_SYSCALL=y, CONFIG_BPF_EVENTS=y, CONFIG_BPF_JIT=y, CONFIG_EBPF_JIT=y</code>。</p>
 <h2 id="funccount"><strong><code>funccount</code></strong></h2>
 <p><code>funccount(8)</code>对事件(函数调用)进行计数</p>
 <div class="highlight"><div class="chroma">
@@ -413,6 +415,7 @@ probe语法：</li>
 <p>bpftrace是另一个前端，它提供了一个高级编程语言环境，可以用来轻松地创建Linux追踪程序。bpftrace使用libbpf和libbcc完成对函数的插桩、程序的加载以及使用USDT。它使用LLVM将程序编译成BPF字节码。</p>
 <p><img src="/imgs/bpftrace-internals.jpg" alt=""></p>
 <p>注意部分脚本在<a href="https://github.com/iovisor/bpftrace">官方仓库</a>中没有，可以从这里下载 <a href="https://github.com/Netflix-Skunkworks/bpftoolkit">bpftoolkit</a></p>
+<p><strong>内核要求</strong>: 推荐使用Linux 4.9以上的内核版本，需开启以下内核配置选项<code>CONFIG_BPF=y, CONFIG_BPF_SYSCALL=y, CONFIG_BPF_EVENTS=y, CONFIG_BPF_JIT=y, CONFIG_EBPF_JIT=y</code>。</p>
 <p><strong>文档</strong>: <a href="https://github.com/iovisor/bpftrace/blob/master/docs/reference_guide.md">reference_guide</a></p>
 <h2 id="bpf编程"><strong>bpf编程</strong></h2>
 <p><strong>执行程序</strong></p>
@@ -759,6 +762,10 @@ probe语法：</li>
 </div><p>自旋锁没有跟踪点，可以通过<code>BCC funcount(8)</code>进行跟踪</p>
 <h3 id="其他工具"><strong>其他工具</strong></h3>
 <ul>
+<li><code>runqlat(8)</code>用于分析CPU调度器延迟，统计每个线程等待CPU的耗时，输出直方图</li>
+<li><code>runqlen(8)</code>通过采样CPU运行队列长度，统计有多少个线程在等待执行，输出直方图。<code>-C</code>选项按CPU输出结果</li>
+<li><code>runqslower(8)</code>列出运行队列中超过阈值的线程名字</li>
+<li><code>cpudist(8)</code>统计每次线程唤醒后在CPU上执行时长，输出直方图</li>
 <li><code>wakeuptime(8)</code>可展示执行调度器唤醒线程的调用栈以及目标被阻塞的时间</li>
 <li><code>offwaketime(8)</code>结合了<code>offcputime(8)</code>和<code>wakeuptime(8)</code></li>
 <li><code>numamove(8)</code>用于跟踪类型为NUMA misplaced的内存页面迁移。</li>
@@ -849,7 +856,7 @@ probe语法：</li>
 <li>使用<code>vfsstat(8)</code>来比较逻辑I/O和物理I/O的区别</li>
 </ul>
 <h2 id="bpf工具-2"><strong>BPF工具</strong></h2>
-<h3 id="其他工具-1"><strong>其他工具</strong></h3>
+<!-- ### **其他工具** -->
 <ul>
 <li><code>fmapfault(8)</code>跟踪内存映射文件的缺页错误，按进程名和文件名统计</li>
 <li><code>filelife(8)</code>是一个BCC和bpftrace工具，用来展示短期文件的声明周期</li>
@@ -858,7 +865,82 @@ probe语法：</li>
 <li><code>bufgrow(8)</code>用于查看缓冲区的内部情况，输出哪个进程导致了也缓冲区的增长，以KB为单位</li>
 <li><code>readahead(8)</code>用于跟踪文件系统自动预取的情况，以直方图显示</li>
 </ul>
-<h1 id="网络"><strong>网络</strong></h1>
+<h1 id="磁盘"><strong>磁盘</strong></h1>
+<h2 id="bpf工具-3"><strong>BPF工具</strong></h2>
+<ul>
+<li><code>biolatency(8)</code>以直方图方式统计块I/O设备的延迟信息，设备延迟指从向设备发出请求到请求完成的时间，包括在操作系统内排队的信息。<code>-F</code>选项按不同的I/O标识输出直方图，<code>-D</code>选项按磁盘输出直方图</li>
+<li><code>bitesize(8)</code>按进程统计磁盘I/O请求直方图</li>
+<li><code>biosnoop(8)</code>针对每个磁盘I/O打印一条信息。</li>
+<li><code>biopattenr(8)</code>可以识别I/O模式(随机/顺序)</li>
+<li><code>biostacks(8)</code>可以跟踪完整的I/O延迟(从进入操作系统队列到完成设备I/O请求)，同时显示初始化该I/O请求的调用栈信息，并打印延迟直方图</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl"># ./biostacks.bt
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">@usecs[
+</span></span><span class="line"><span class="cl">    blk_account_io_start+1
+</span></span><span class="line"><span class="cl">    __submit_bio+485
+</span></span><span class="line"><span class="cl">    submit_bio_noacct+615
+</span></span><span class="line"><span class="cl">    submit_bio+80
+</span></span><span class="line"><span class="cl">    ext4_mpage_readpages+618
+</span></span><span class="line"><span class="cl">    ext4_readahead+55
+</span></span><span class="line"><span class="cl">    read_pages+149
+</span></span><span class="line"><span class="cl">    page_cache_ra_unbounded+353
+</span></span><span class="line"><span class="cl">    do_page_cache_ra+61
+</span></span><span class="line"><span class="cl">    ondemand_readahead+311
+</span></span><span class="line"><span class="cl">    page_cache_sync_ra+207
+</span></span><span class="line"><span class="cl">    filemap_get_pages+220
+</span></span><span class="line"><span class="cl">    filemap_read+190
+</span></span><span class="line"><span class="cl">    generic_file_read_iter+229
+</span></span><span class="line"><span class="cl">    ext4_file_read_iter+91
+</span></span><span class="line"><span class="cl">    new_sync_read+272
+</span></span><span class="line"><span class="cl">    vfs_read+258
+</span></span><span class="line"><span class="cl">    ksys_read+103
+</span></span><span class="line"><span class="cl">    __x64_sys_read+26
+</span></span><span class="line"><span class="cl">    do_syscall_64+92
+</span></span><span class="line"><span class="cl">    entry_SYSCALL_64_after_hwframe+97
+</span></span><span class="line"><span class="cl">]: 
+</span></span><span class="line"><span class="cl">[2K, 4K)              77 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+</span></span><span class="line"><span class="cl">[4K, 8K)              65 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@         |
+</span></span><span class="line"><span class="cl">[8K, 16K)             14 |@@@@@@@@@                                           |
+</span></span><span class="line"><span class="cl">[16K, 32K)             2 |@                                                   |
+</span></span><span class="line"><span class="cl">[32K, 64K)             2 |@                                                   |
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="网络"><strong>网络</strong></h1>
 <h2 id="分析策略-2"><strong>分析策略</strong></h2>
 <ul>
 <li>对负载定性分析，找出低效之处
