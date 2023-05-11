@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>字典编码在Apache Doris中的应用 - bobh&#39;s blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="bobh" /><meta name="description" content="本文介绍了字典编码在Apache Doris中的应用，包括存储结构，写路径上的处理和读路径上的处理" /><meta name="keywords" content="Hugo, blog, even" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.96.0 with theme even" />
+
+
+<link rel="canonical" href="http://localhost:1313/post/doris-dict-encoding/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.2a71e62d7ea35a3a3f92c3c16c456852aaec63713de5cd5dbadb28e7480fd599.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="字典编码在Apache Doris中的应用" />
+<meta property="og:description" content="本文介绍了字典编码在Apache Doris中的应用，包括存储结构，写路径上的处理和读路径上的处理" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="http://localhost:1313/post/doris-dict-encoding/" /><meta property="article:section" content="post" />
+<meta property="article:published_time" content="2023-05-11T00:00:00+00:00" />
+<meta property="article:modified_time" content="2023-05-11T00:00:00+00:00" />
+
+<meta itemprop="name" content="字典编码在Apache Doris中的应用">
+<meta itemprop="description" content="本文介绍了字典编码在Apache Doris中的应用，包括存储结构，写路径上的处理和读路径上的处理"><meta itemprop="datePublished" content="2023-05-11T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2023-05-11T00:00:00+00:00" />
+<meta itemprop="wordCount" content="5830">
+<meta itemprop="keywords" content="Apache Doris,字典编码," /><meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="字典编码在Apache Doris中的应用"/>
+<meta name="twitter:description" content="本文介绍了字典编码在Apache Doris中的应用，包括存储结构，写路径上的处理和读路径上的处理"/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">bobh&#39;s blog</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">首页</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">归档</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">标签</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">分类</li>
+      </a><a href="/post/links/">
+        <li class="mobile-menu-item">友链</li>
+      </a>
+  </ul>
+
+  
+
+
+</nav>
+
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">bobh&#39;s blog</a>
+</div>
+
+
+
+
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">首页</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">归档</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">标签</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">分类</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/links/">友链</a>
+      </li>
+  </ul>
+</nav>
+
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">字典编码在Apache Doris中的应用</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2023-05-11 </span>
+        
+          <span class="more-meta"> 约 5830 字 </span>
+          <span class="more-meta"> 预计阅读 12 分钟 </span>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">文章目录</h2>
+  <div class="post-toc-content always-active">
+    <nav id="TableOfContents">
+  <ul>
+    <li><a href="#字典编码简介"><strong>字典编码简介</strong></a></li>
+    <li><a href="#apache-doris中字典编码的相关存储结构"><strong>Apache Doris中字典编码的相关存储结构</strong></a>
+      <ul>
+        <li><a href="#在存储文件中的位置"><strong>在存储文件中的位置</strong></a></li>
+        <li><a href="#字典编码存储结构"><strong>字典编码存储结构</strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#编码流程"><strong>编码流程</strong></a>
+      <ul>
+        <li><a href="#写路径"><strong>写路径</strong></a></li>
+        <li><a href="#scalarcolumnwriter"><strong><code>ScalarColumnWriter</code></strong></a></li>
+        <li><a href="#binarydictpagebuilder"><strong><code>BinaryDictPageBuilder</code></strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#解码流程"><strong>解码流程</strong></a>
+      <ul>
+        <li><a href="#读初始化"><strong>读初始化</strong></a></li>
+        <li><a href="#读路径"><strong>读路径</strong></a></li>
+        <li><a href="#filecolumniterator"><strong><code>FileColumnIterator</code></strong></a></li>
+        <li><a href="#binarydictpagedecoder"><strong><code>BinaryDictPageDecoder</code></strong></a></li>
+      </ul>
+    </li>
+    <li><a href="#参考资料"><strong>参考资料</strong></a></li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <h1 id="字典编码简介"><strong>字典编码简介</strong></h1>
+<p>字典编码是指将某一列数据的值替换成一些编码后的值，在进行存储和处理时转而使用这些编码值，同时额外维护一个从编码值到原始值的映射。理想情况下，字典编码应该能够进行快速编解码，并且能够提升数据处理的速度。</p>
+<p>在实现字典编码时，有几个值得考虑的问题：</p>
+<ul>
+<li>编码值的长度：
+<ul>
+<li>固定长度</li>
+<li>根据要编码值的值域大小动态变化</li>
+</ul>
+</li>
+<li>字典的构建时机：
+<ul>
+<li>一次性构建：对于一批数据，对其构建字典后该字典不再改变，后续的新数据必须构建新的字典</li>
+<li>增量构建：将新的数据合并到原始字典中</li>
+</ul>
+</li>
+<li>字典的粒度：
+<ul>
+<li>块级：对一个表的一部分维持字典</li>
+<li>表级：对一张表维持字典</li>
+<li>多表级：对多张表或整个库维持字典</li>
+</ul>
+</li>
+<li>偏序关系：码字的偏序关系是否需要和原始值的偏序关系一致</li>
+<li>编码和解码的时机：在数据从导入到内存到进行处理的流程当中的什么时候进行编码/解码操作</li>
+</ul>
+<h1 id="apache-doris中字典编码的相关存储结构"><strong>Apache Doris中字典编码的相关存储结构</strong></h1>
+<h2 id="在存储文件中的位置"><strong>在存储文件中的位置</strong></h2>
+<p>我们首先来看字典编码相关数据结构在存储文件中的位置。目前doris使用segment_v2结构存储数据，一个<code>Segment</code>主要包括数据区，索引区和<code>SegmentFooterPB</code>三部分，其中表数据存储和索引数据在其<code>TabletSchemaSPtr</code>中，而<code>SegmentFooterPB</code>负责存储该segment的一些元数据。在<code>SegmentFooterPB</code>中有一个类型为<code>ColumnMetaPB</code>的<code>Columns</code>字段用于存储table schema。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-proto" data-lang="proto"><span class="line"><span class="cl"><span class="kd">message</span> <span class="nc">ColumnMetaPB</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="c1">// column id in table schema
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">optional</span> <span class="kt">uint32</span> <span class="n">column_id</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="c1">// unique column id
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">optional</span> <span class="kt">uint32</span> <span class="n">unique_id</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="c1">// this field is FieldType&#39;s value
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">optional</span> <span class="kt">int32</span> <span class="n">type</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="c1">// var length for string type
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">optional</span> <span class="kt">int32</span> <span class="n">length</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="k">optional</span> <span class="n">EncodingTypePB</span> <span class="n">encoding</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="c1">// compress type for column
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">optional</span> <span class="n">CompressionTypePB</span> <span class="n">compression</span> <span class="o">=</span> <span class="mi">6</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="c1">// if this column can be nullable
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">optional</span> <span class="kt">bool</span> <span class="n">is_nullable</span> <span class="o">=</span> <span class="mi">7</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="c1">// metadata about all the column indexes
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">repeated</span> <span class="n">ColumnIndexMetaPB</span> <span class="n">indexes</span> <span class="o">=</span> <span class="mi">8</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="c1">// pointer to dictionary page when using DICT_ENCODING
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">optional</span> <span class="n">PagePointerPB</span> <span class="n">dict_page</span> <span class="o">=</span> <span class="mi">9</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="k">repeated</span> <span class="n">ColumnMetaPB</span> <span class="n">children_columns</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="c1">// required by array/struct/map reader to create child reader.
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>    <span class="k">optional</span> <span class="kt">uint64</span> <span class="n">num_rows</span> <span class="o">=</span> <span class="mi">11</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="k">repeated</span> <span class="kt">string</span> <span class="n">children_column_names</span> <span class="o">=</span> <span class="mi">12</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="p">}</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>可以看到<code>ColumnMetaPB</code>中有一个类型为<code>EncodingTypePB</code>的字段<code>encoding</code>，有一个类型为<code>PagePointerPB</code>的字段<code>dict_page</code>存储字典页的指针。<code>encoding</code>用于存储当前segment的编码类型，继续看<code>EncodingTypePB</code>的定义我们可以看到目前doris支持的编码种类，和字典编码相关的有<code>DICT_ENCODING</code>和<code>PLAIN_ENCODING</code>。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-proto" data-lang="proto"><span class="line"><span class="cl"><span class="kd">enum</span> <span class="n">EncodingTypePB</span> <span class="p">{</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="n">UNKNOWN_ENCODING</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="n">DEFAULT_ENCODING</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="n">PLAIN_ENCODING</span> <span class="o">=</span> <span class="mi">2</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="n">PREFIX_ENCODING</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="n">RLE</span> <span class="o">=</span> <span class="mi">4</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="n">DICT_ENCODING</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="n">BIT_SHUFFLE</span> <span class="o">=</span> <span class="mi">6</span><span class="p">;</span><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span>    <span class="n">FOR_ENCODING</span> <span class="o">=</span> <span class="mi">7</span><span class="p">;</span> <span class="c1">// Frame-Of-Reference
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="p">}</span><span class="err">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="字典编码存储结构"><strong>字典编码存储结构</strong></h2>
+<p>在Apache Doris中，使用字典编码的数据页的存储会用到两种模式</p>
+<ul>
+<li><code>PLAIN_ENCODING</code>模式：页面布局为header+embedded BinaryPlainPage，即将数据项在页头依次顺序排放，各个数据的offsets从页末尾开始依次逆序排放。</li>
+<li><code>DICT_ENCODING</code>模式：布局为header+embedded codeword page，即数据页中存放(压缩后的)码字。此时编码信息存放在<code>dict_page</code>中，目前<code>dict_page</code>只支持按BinaryPlainPage格式存放。</li>
+</ul>
+<p>这里字典编码的编码信息最多只会存放在一个页中，当编码信息页的大小超过<code>option_-&gt;dict_page_size</code>后，之后添加的数据页会自动从<code>DICT_ENCODING</code>模式fall back到<code>PLAIN_ENCODING</code>模式，且之前已经编码过的数据页不受影响。</p>
+<p>Doris所有类型支持的编码方式在<code>EncodingInfoResolver</code>进行了注册，我可以看到其中可以使用字典编码的类型有<code>OLAP_FIELD_TYPE_CHAR</code>, <code>OLAP_FIELD_TYPE_VARCHAR</code>, <code>OLAP_FIELD_TYPE_STRING</code>, <code>OLAP_FIELD_TYPE_JSONB</code>。</p>
+<h1 id="编码流程"><strong>编码流程</strong></h1>
+<h2 id="写路径"><strong>写路径</strong></h2>
+<p>我们从<code>DeltaWriter</code>开始，通过考察一个<code>WriteRequest</code>的写路径来看在什么地方会应用字典编码的编码过程。</p>
+<ul>
+<li>对每个<code>WriteRequest</code>(一个<code>WriteRequest</code>会写入到一个<code>Tablet</code>，一个<code>Tablet</code>就是一个表的物理储存结构)会创建一个对应的<code>DeltaWriter</code>完成写入</li>
+<li>通过调用<code>DeltaWriter</code>的<code>append()/write()</code>方法不断写入增量数据，完成一个<code>Tablet</code>的写入。</li>
+<li><code>DeltaWriter</code>首先先写入到内存中的<code>MemTable</code>(使用<code>SkipList</code>存储数据)中，写满后，则提交一个<code>MemtableFlushTask</code>异步任务到线程池，这个异步任务负责将<code>Memtable</code>写入成为磁盘上的当前数据变更对应的<code>Rowset</code>中的一个<code>Segment</code>，然后重置当前的<code>MemTable</code>处理后续的写入。</li>
+</ul>
+<p>其中<code>MemtableFlushTask</code>异步任务的调用链如下：</p>
+<ul>
+<li><code>MemtableFlushTask::run()</code>-&gt;<code>FlushToken::_flush_memtable()</code>-&gt;<code>Memtable::flush()</code>-&gt;<code>MemTable::_do_flush()</code>：通过<code>MemTable::_collect_vskiplist_results()</code>将跳表中的数据收集到<code>_output_mutable_block</code>中再转为<code>Block</code>(包含了一次磁盘写入的数据和元数据)以供后续写入</li>
+<li>-&gt;<code>BetaRowsetWriter::flush_single_memtable()</code>：创建<code>SegmentWriter</code>，并添加刚刚构造的<code>Block</code>。<code>SegmentWriter</code>继续分别通过<code>ShortKeyIndexBuilder</code>, <code>PrimaryKeyIndexBuilder</code>构造并写入对应的索引数据, 通过<code>ColumnWriter</code>写入列数据</li>
+<li>不同类型的<code>ColumnWriter</code>(<code>ScalarColumnWriter</code>/<code>StructColumnWriter</code>/<code>ArrayColumnWriter</code>/<code>MapColumnWriter</code>)通过各种<code>Builder</code>生成并写入列数据和对应的各类索引数据(<code>BloomFilterIndex</code>/<code>BitMapIndex</code>/<code>ZoneMapIndex</code>/<code>InvertedIndex</code>/<code>OrdinalIndex</code>)</li>
+<li>上述各类<code>xxxBuilder</code>最终通过<code>PageIO::write_page()/compress_and_write_page()</code>-&gt;<code>FileWriter::appendv()</code>将数据写入到不同类型的存储介质(local file/s3/hdfs等)上</li>
+</ul>
+<p>我们所关心的字典编码会在<code>ScalarColumnWriter</code>下的<code>BinaryDictPageBuilder</code>进行处理。</p>
+<h2 id="scalarcolumnwriter"><strong><code>ScalarColumnWriter</code></strong></h2>
+<p>在<code>ScalarColumnWriter::init()</code>函数中会获取使用的压缩算法和使用的编码类型，并通过编码类型获取相应的<code>xxxPageBuilder</code>。对于<code>DICT_ENCODING</code>类型，会获取到<code>BinaryDictPageBuilder</code>。</p>
+<p>上游通过<code>ScalarColumnWriter::append_data()</code>向<code>ScalarColumnWriter</code>输入数据，<code>ScalarColumnWriter</code>会将上游输入的数据组织成<code>ScalarColumnWriter::Page</code>构成的链表最后再一次性地写入。其中，一个<code>Page</code>包括数据部分和footer部分。其中数据可能部分有以下三种情况：</p>
+<ul>
+<li>包含一个<code>OwnedSlice</code>且数据页已压缩</li>
+<li>包含一个<code>OwnedSlice</code>，数据页未压缩且没有nullmap</li>
+<li>包含一个<code>OwnedSlice</code>，数据页未压缩且包含一个nullmap页</li>
+</ul>
+<p>在<code>ScalarColumnWriter::append_data()</code>-&gt;<code>ScalarColumnWriter::append_data_in_current_page()</code>中会将写入继续下发到下游的<code>xxxPageBuilder</code>中，这其中就包括<code>BinaryDictPageBuilder</code>。而当某个数据页写满后(<code>_page_builder-&gt;is_page_full()</code>)，会取出对应的数据页更新ZoneMap和BloomFilter的信息，并构造相应的nullmap页(如果该列nullable)，然后构造一个新的<code>Page</code>同时设置其footer部分，然后尝试对其进行压缩，最终将该<code>Page</code>加入到链表中。</p>
+<p>上游最终通过调用<code>ScalarColumnWriter::write_data()</code>中将上述<code>Page</code>链表中的数据全部写入到存储介质。对于需要字典编码的，会通过<code>_page_builder-&gt;get_dictionary_page()</code>获取到字典编码信息页，设置其footer部分后压缩并写入到存储介质，最后更新其<code>ColomnMetaPB</code>的<code>dict_page</code>字段。</p>
+<h2 id="binarydictpagebuilder"><strong><code>BinaryDictPageBuilder</code></strong></h2>
+<p><code>BinaryDictPageBuilder</code>通过内存中的<code>phmap::flat_hash_map</code>来维持字典值到字典id的映射，并通过下游的<code>_data_page_builder</code>和<code>_dict_builder</code>来构建和输出数据页和字典编码信息页。</p>
+<ul>
+<li><code>_data_page_builder</code>: 类型为<code>BitshufflePageBuilder</code>，负责构建和输出由数据编码后的编码值组成的页，其会对存储的编码值使用压缩算法进一步压缩。</li>
+<li><code>_dict_builder</code>: 类型为<code>BinaryPlainPageBuilder</code>，负责构建和输出保存字典应映射信息的页，即<code>ColumnMetaPB</code>中<code>dict_page</code>字段所指向的页。</li>
+</ul>
+<p><code>BinaryDictPageBuilder</code>的编码方式为将任意长度的字节序列映射为一个<code>uint32_t</code>，编码值从0开始依次递增，0表示空串的编码，1是第一个有效编码值。</p>
+<p>字典编码的实际编码过程发生在<code>ScalarColumnWriter::append_data_in_current_page()</code>-&gt;<code>BinaryDictPageBuilder::add()</code>中，对于每个输入的数据块，若为空，则返回<code>_empty_code</code>；否则如果该值存储在与哈希表中则直接返回相应的编码值；否则，将该值加入到哈希表中并赋予新的编码值，同时将该新的编码映射加入到<code>_dict_builder</code>中。最后通过<code>_data_page_builder</code>将编码值写入到数据页中。</p>
+<h1 id="解码流程"><strong>解码流程</strong></h1>
+<h2 id="读初始化"><strong>读初始化</strong></h2>
+<ul>
+<li><code>NewOlapScanner::init()</code>-&gt;<code>Tablet::capture_rs_readers()</code>-&gt;<code>BetaRowset::create_reader()</code>: <code>NewOlapScanner</code>初始化<code>Tablet</code>对象，之后根据需要的版本信息找到对应的<code>Rowset</code>并创建<code>RowsetReader</code>，然后初始化<code>TabletReader</code>的读参数，包括查询条件，遍历范围等。</li>
+<li><code>NewOlapScanner::open()</code>-&gt;<code>BlockReader::init()/VerticalBlockReader::init()</code>:
+<ul>
+<li>根据读参数初始化初始化查询条件，各种filters等</li>
+<li>初始化<code>RowsetReader</code>并添加到<code>VCollectIterator</code>中</li>
+<li>根据数据表数据模型的不同(<code>Aggregate</code>/<code>Unique</code>/<code>Duplicate</code>)设置数据读取函数(<code>_direct_next_block</code>/<code>_unique_key_next_block</code>/<code>_agg_key_next_block</code>)</li>
+</ul>
+</li>
+<li><code>BetaRowsetReader::init()</code>:
+<ul>
+<li>-&gt;<code>BetaRowsetReader::get_segment_iterators()</code>:
+<ul>
+<li>初始化<code>key_ranges</code>，<code>delete_handler</code>等</li>
+<li>-&gt;<code>SegmentLoader::load_segment()</code>: 将<code>Rowset</code>下的<code>Segment</code>导入到内存中并创建对应的迭代器<code>SegmentIterator</code></li>
+</ul>
+</li>
+<li>将多个<code>SegmentIterator</code>合并为一个<code>new_merge_iterator/new_union_iterator</code>并对其进行初始化</li>
+</ul>
+</li>
+</ul>
+<h2 id="读路径"><strong>读路径</strong></h2>
+<p>接下来我们来看和字典解码相关的读路径。</p>
+<ul>
+<li><code>BlockReader/next_block_with_aggregation::next_block_with_aggregation()</code>: 调用实际注册的读取函数，都通过<code>VCollectIterator::next()</code>读一行数据，然后根据数据模型不同进行处理</li>
+<li><code>VCollectIterator::next()</code>: 从其管理的<code>RowsetIterator</code>中读出一行</li>
+<li><code>BetaRowsetReader::next_block()</code>-&gt;<code>RowwiseIterator::next_batch()</code>-&gt;<code>SegmentIterator::next_batch()</code>-&gt;<code>SegmentIterator::_next_batch_internal()</code>:
+<ul>
+<li>-&gt;<code>SegmentIterator::_init()</code>: 初始化<code>BitmapIndexIterator/InvertedIndexIterator</code>等</li>
+<li>-&gt;<code>SegmentIterator::_read_columns_by_index()</code>:
+<ul>
+<li>通过<code>BitmapRangeIterator::next_range()</code>得出当前读取的行号范围</li>
+<li>先读出有predict的列的上述范围的数据，然后再进行精确过滤。再读取无条件的列中的数据。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>上述过程中<code>SegmentIterator</code>会通过<code>SegmentIterator::_seek_columns()</code>移动指针，通过<code>SegmentIterator::next_batch()</code>获取数据，而这些方法会调用对应类型<code>ColumnIterator</code>的<code>_read_data_page()</code>方法取读取页数据</li>
+<li><code>ColumnIterator::_read_data_page()</code>-&gt;<code>ColumnReader::read_page()</code>-&gt;<code>PageIO::read_and_decompress_page()</code>: 最终完从存储介质上的读取并Parse出对应的页数据</li>
+</ul>
+<h2 id="filecolumniterator"><strong><code>FileColumnIterator</code></strong></h2>
+<p>字典信息页的读取发生在<code>FileColumnIterator::_read_data_page()</code>中，为了优化内存使用，字典信息页会在第一次被使用时才被读取到内存中。</p>
+<p>上层对<code>FileColumnIterator</code>的各种<code>seek_xxx()/next_batch()/read()</code>读调用都需要通过<code>FileColumnIterator::_read_data_page()</code>进行页的读取，它继而使用对应的<code>ColumnReader</code>读取页数据并Parse到内存中。对于字典编码的页面，如果此时字典信息页还没有读入到内存中，则会读取字典信息页然后使用<code>BinaryPlainPageDecoder</code>对其进行解码，并将字典的值存放到一个<code>StringRef</code>数组中用于后续解码，由于字典码值从0开始且依次递增，所以直接通过数组下标访问就可以得到码值对应的原始值。之后它通过<code>BinaryDictPageDecoder::set_dict_decoder()</code>将该数组传递到该页的<code>BinaryDictPageDecoder</code>中。</p>
+<h2 id="binarydictpagedecoder"><strong><code>BinaryDictPageDecoder</code></strong></h2>
+<p><code>BinaryDictPageDecoder</code>负责对编码类型为<code>DICT_ENCODING</code>和<code>PLAIN_ENCODING</code>的数据页进行解码。</p>
+<ul>
+<li>对于编码类型为<code>DICT_ENCODING</code>的数据页，使用<code>BitShufflePageDecoder</code>对页数据进行解压缩，通过<code>BinaryPlainPageDecoder</code>对字典信息页进行解码</li>
+<li>对于编码类型为<code>PLAIN_ENCODING</code>的数据页，使用<code>BinaryPlainPageDecoder</code>根据页尾的offsets取出页中的数据。</li>
+</ul>
+<p>上层读取数据时，<code>BinaryDictPageDecoder</code>通过<code>_data_page_decoder</code>从数据页中读取数据，并通过<code>Column::insert_many_dict_data()</code>将数据与字典<code>dict</code>提供给上层，不同的类型的<code>Column</code>再根据需要特化实际的处理过程。</p>
+<h1 id="参考资料"><strong>参考资料</strong></h1>
+<ul>
+<li><a href="https://15721.courses.cs.cmu.edu/spring2023/slides/05-compression.pdf">Data Compression</a></li>
+<li><a href="https://blog.csdn.net/m0_54252387/article/details/125694779">【Doris】Doris存储层设计介绍1——存储结构设计解析
+</a></li>
+<li><a href="https://blog.csdn.net/m0_54252387/article/details/125694803">【Doris】存储层设计介绍2——写入流程、删除流程分析
+</a></li>
+<li><a href="https://blog.csdn.net/m0_54252387/article/details/125694838">【Doris】存储层设计介绍3——读取流程、Compaction流程分析
+</a></li>
+<li><a href="https://blog.51cto.com/u_15076204/4362894">Apache Doris 学习笔记: 字符串编码与解码</a></li>
+<li><a href="https://github.com/apache/doris/pull/2547">[Segment V2] Support lazy materialization read</a></li>
+</ul>
+
+    </div>
+
+    <div class="post-copyright">
+  <p class="copyright-item">
+    <span class="item-title">文章作者</span>
+    <span class="item-content">bobh</span>
+  </p>
+  <p class="copyright-item">
+    <span class="item-title">上次更新</span>
+    <span class="item-content">
+        2023-05-11
+        
+    </span>
+  </p>
+  
+  
+</div>
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/Apache-Doris/">Apache Doris</a>
+          <a href="/tags/%E5%AD%97%E5%85%B8%E7%BC%96%E7%A0%81/">字典编码</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/links/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">友链</span>
+            <span class="prev-text nav-mobile">上一篇</span>
+          </a>
+        <a class="next" href="/post/bpf-performance-tools-notes/">
+            <span class="next-text nav-default">BPF Performance Tools 笔记</span>
+            <span class="next-text nav-mobile">下一篇</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+  
+
+  
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:bh2444151092@outlook.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://github.com/bobhan1" class="iconfont icon-github" title="github"></a>
+  <a href="http://localhost:1313/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    由 <a class="hexo-link" href="https://gohugo.io">Hugo</a> 强力驱动
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    主题 - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2019 - 
+    2023<span class="heart"><i class="iconfont icon-heart"></i></span><span>bobh</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.64437849d125a2d603b3e71d6de5225d641a32d17168a58106e0b61852079683.js"></script>
+  <script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$','$'], ['\\(','\\)']],
+        tags: 'ams',
+        }
+    };
+  </script>
+  <script async src="https://cdn.jsdelivr.net/npm/mathjax@3.0.5/es5/tex-mml-chtml.js" integrity="sha256-HGLuEfFcsUJGhvB8cQ8nr0gai9EucOOaIxFw7qxmd+w=" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

@@ -18,10 +18,10 @@
     
     <item>
       <title>字典编码在Apache Doris中的应用</title>
-      <link>http://localhost:1313/post/doris-dict/</link>
+      <link>http://localhost:1313/post/doris-dict-encoding/</link>
       <pubDate>Thu, 11 May 2023 00:00:00 +0000</pubDate>
       
-      <guid>http://localhost:1313/post/doris-dict/</guid>
+      <guid>http://localhost:1313/post/doris-dict-encoding/</guid>
       <description>本文介绍了字典编码在Apache Doris中的应用，包括存储结构，写路径上的处理和读路径上的处理</description>
     </item>
     
