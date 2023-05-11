@@ -6,7 +6,25 @@
     <description>Recent content in Tags on bobh&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 03 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 11 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Apache Doris</title>
+      <link>http://localhost:1313/tags/Apache-Doris/</link>
+      <pubDate>Thu, 11 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/tags/Apache-Doris/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>字典编码</title>
+      <link>http://localhost:1313/tags/%E5%AD%97%E5%85%B8%E7%BC%96%E7%A0%81/</link>
+      <pubDate>Thu, 11 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/tags/%E5%AD%97%E5%85%B8%E7%BC%96%E7%A0%81/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>eBPF</title>
       <link>http://localhost:1313/tags/eBPF/</link>

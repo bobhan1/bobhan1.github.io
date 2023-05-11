@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Apache Doris on bobh&#39;s blog</title>
+    <link>http://localhost:1313/tags/Apache-Doris/</link>
+    <description>Recent content in Apache Doris on bobh&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Thu, 11 May 2023 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/tags/Apache-Doris/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>字典编码在Apache Doris中的应用</title>
+      <link>http://localhost:1313/post/doris-dict/</link>
+      <pubDate>Thu, 11 May 2023 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/post/doris-dict/</guid>
+      <description>本文介绍了字典编码在Apache Doris中的应用，包括存储结构，写路径上的处理和读路径上的处理</description>
+    </item>
+    
+  </channel>
+</rss>

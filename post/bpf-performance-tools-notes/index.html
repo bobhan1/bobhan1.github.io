@@ -49,7 +49,7 @@
 <meta itemprop="name" content="BPF Performance Tools 笔记">
 <meta itemprop="description" content=""><meta itemprop="datePublished" content="2023-05-03T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2023-05-03T00:00:00+00:00" />
-<meta itemprop="wordCount" content="7009">
+<meta itemprop="wordCount" content="7071">
 <meta itemprop="keywords" content="eBPF,性能分析,Linux内核," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="BPF Performance Tools 笔记"/>
 <meta name="twitter:description" content=""/>
@@ -134,8 +134,8 @@
       <div class="post-meta">
         <span class="post-time"> 2023-05-03 </span>
         
-          <span class="more-meta"> 约 7009 字 </span>
-          <span class="more-meta"> 预计阅读 14 分钟 </span>
+          <span class="more-meta"> 约 7071 字 </span>
+          <span class="more-meta"> 预计阅读 15 分钟 </span>
         
       </div>
     </header>
@@ -858,6 +858,7 @@ probe语法：</li>
 <h2 id="bpf工具-2"><strong>BPF工具</strong></h2>
 <!-- ### **其他工具** -->
 <ul>
+<li><code>syscount(8)</code>用于跟踪系统调用，<code>-x</code>只追踪失败的系统调用(返回值&lt;0)，<code>-e ERRNO</code>指定错误码，<code>-p</code>指定进程</li>
 <li><code>fmapfault(8)</code>跟踪内存映射文件的缺页错误，按进程名和文件名统计</li>
 <li><code>filelife(8)</code>是一个BCC和bpftrace工具，用来展示短期文件的声明周期</li>
 <li><code>fileslower(8)</code>用于显示延迟超过某个阈值的同步模式的读取和写入操作</li>
@@ -1006,9 +1007,9 @@ probe语法：</li>
           <a href="/tags/Linux%E5%86%85%E6%A0%B8/">Linux内核</a>
           </div>
       <nav class="post-nav">
-        <a class="prev" href="/post/links/">
+        <a class="prev" href="/post/doris-dict/">
             <i class="iconfont icon-left"></i>
-            <span class="prev-text nav-default">友链</span>
+            <span class="prev-text nav-default">字典编码在Apache Doris中的应用</span>
             <span class="prev-text nav-mobile">上一篇</span>
           </a>
         <a class="next" href="/post/linux-network-rx/">
