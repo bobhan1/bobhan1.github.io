@@ -49,7 +49,7 @@
 <meta itemprop="name" content="字典编码在Apache Doris中的应用">
 <meta itemprop="description" content="本文介绍了字典编码在Apache Doris中的应用，包括存储结构，写路径上的处理和读路径上的处理"><meta itemprop="datePublished" content="2023-05-11T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2023-05-11T00:00:00+00:00" />
-<meta itemprop="wordCount" content="5830">
+<meta itemprop="wordCount" content="5918">
 <meta itemprop="keywords" content="Apache Doris,字典编码," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="字典编码在Apache Doris中的应用"/>
 <meta name="twitter:description" content="本文介绍了字典编码在Apache Doris中的应用，包括存储结构，写路径上的处理和读路径上的处理"/>
@@ -134,7 +134,7 @@
       <div class="post-meta">
         <span class="post-time"> 2023-05-11 </span>
         
-          <span class="more-meta"> 约 5830 字 </span>
+          <span class="more-meta"> 约 5918 字 </span>
           <span class="more-meta"> 预计阅读 12 分钟 </span>
         
       </div>
@@ -201,7 +201,7 @@
 </ul>
 <h1 id="apache-doris中字典编码的相关存储结构"><strong>Apache Doris中字典编码的相关存储结构</strong></h1>
 <h2 id="在存储文件中的位置"><strong>在存储文件中的位置</strong></h2>
-<p>我们首先来看字典编码相关数据结构在存储文件中的位置。目前doris使用segment_v2结构存储数据，一个<code>Segment</code>主要包括数据区，索引区和<code>SegmentFooterPB</code>三部分，其中表数据存储和索引数据在其<code>TabletSchemaSPtr</code>中，而<code>SegmentFooterPB</code>负责存储该segment的一些元数据。在<code>SegmentFooterPB</code>中有一个类型为<code>ColumnMetaPB</code>的<code>Columns</code>字段用于存储table schema。</p>
+<p>我们首先来看字典编码相关数据结构在存储文件中的位置。目前doris使用segment_v2结构存储数据，一个<code>Segment</code>主要包括数据区，索引区和Footer三部分，其中Footer部分负责存储该segment的一些元数据，其结构由<code>SegmentFooterPB.proto</code>所描述。在<code>SegmentFooterPB</code>中有一个类型为<code>ColumnMetaPB</code>的<code>Columns</code>字段用于存储table schema。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -287,8 +287,8 @@
 <li><code>PLAIN_ENCODING</code>模式：页面布局为header+embedded BinaryPlainPage，即将数据项在页头依次顺序排放，各个数据的offsets从页末尾开始依次逆序排放。</li>
 <li><code>DICT_ENCODING</code>模式：布局为header+embedded codeword page，即数据页中存放(压缩后的)码字。此时编码信息存放在<code>dict_page</code>中，目前<code>dict_page</code>只支持按BinaryPlainPage格式存放。</li>
 </ul>
-<p>这里字典编码的编码信息最多只会存放在一个页中，当编码信息页的大小超过<code>option_-&gt;dict_page_size</code>后，之后添加的数据页会自动从<code>DICT_ENCODING</code>模式fall back到<code>PLAIN_ENCODING</code>模式，且之前已经编码过的数据页不受影响。</p>
-<p>Doris所有类型支持的编码方式在<code>EncodingInfoResolver</code>进行了注册，我可以看到其中可以使用字典编码的类型有<code>OLAP_FIELD_TYPE_CHAR</code>, <code>OLAP_FIELD_TYPE_VARCHAR</code>, <code>OLAP_FIELD_TYPE_STRING</code>, <code>OLAP_FIELD_TYPE_JSONB</code>。</p>
+<p>这里字典编码的编码信息最多只会存放在一个页中，当编码信息页的大小超过一个阈值后，之后添加的数据页会自动从<code>DICT_ENCODING</code>模式fall back到<code>PLAIN_ENCODING</code>模式，且之前已经编码过的数据页不受影响。这个字典信息页大小的阈值由<code>PageBuilderOptions</code>中的<code>dict_page_size</code>字段所决定，目前其值为固定的大小<code>1024 * 1024</code>即1M。</p>
+<p>Doris所有类型支持的编码方式在<code>EncodingInfoResolver</code>进行了注册，我可以看到其中可以使用字典编码的类型有<code>OLAP_FIELD_TYPE_CHAR</code>, <code>OLAP_FIELD_TYPE_VARCHAR</code>, <code>OLAP_FIELD_TYPE_STRING</code>, <code>OLAP_FIELD_TYPE_JSONB</code>。并且在不开启<code>optimize_value_seek</code>选项的情况下，这些类型的字段默认使用字典编码进行存储。</p>
 <h1 id="编码流程"><strong>编码流程</strong></h1>
 <h2 id="写路径"><strong>写路径</strong></h2>
 <p>我们从<code>DeltaWriter</code>开始，通过考察一个<code>WriteRequest</code>的写路径来看在什么地方会应用字典编码的编码过程。</p>
