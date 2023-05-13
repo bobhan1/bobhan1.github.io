@@ -49,7 +49,7 @@
 <meta itemprop="name" content="字典编码在Apache Doris中的应用">
 <meta itemprop="description" content="本文介绍了字典编码在Apache Doris中的应用，包括存储结构，写路径上的处理和读路径上的处理"><meta itemprop="datePublished" content="2023-05-11T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2023-05-11T00:00:00+00:00" />
-<meta itemprop="wordCount" content="5918">
+<meta itemprop="wordCount" content="6578">
 <meta itemprop="keywords" content="Apache Doris,字典编码," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="字典编码在Apache Doris中的应用"/>
 <meta name="twitter:description" content="本文介绍了字典编码在Apache Doris中的应用，包括存储结构，写路径上的处理和读路径上的处理"/>
@@ -134,8 +134,8 @@
       <div class="post-meta">
         <span class="post-time"> 2023-05-11 </span>
         
-          <span class="more-meta"> 约 5918 字 </span>
-          <span class="more-meta"> 预计阅读 12 分钟 </span>
+          <span class="more-meta"> 约 6578 字 </span>
+          <span class="more-meta"> 预计阅读 14 分钟 </span>
         
       </div>
     </header>
@@ -165,6 +165,7 @@
         <li><a href="#读路径"><strong>读路径</strong></a></li>
         <li><a href="#filecolumniterator"><strong><code>FileColumnIterator</code></strong></a></li>
         <li><a href="#binarydictpagedecoder"><strong><code>BinaryDictPageDecoder</code></strong></a></li>
+        <li><a href="#查询执行过程中的处理"><strong>查询执行过程中的处理</strong></a></li>
       </ul>
     </li>
     <li><a href="#参考资料"><strong>参考资料</strong></a></li>
@@ -306,7 +307,8 @@
 </ul>
 <p>我们所关心的字典编码会在<code>ScalarColumnWriter</code>下的<code>BinaryDictPageBuilder</code>进行处理。</p>
 <h2 id="scalarcolumnwriter"><strong><code>ScalarColumnWriter</code></strong></h2>
-<p>在<code>ScalarColumnWriter::init()</code>函数中会获取使用的压缩算法和使用的编码类型，并通过编码类型获取相应的<code>xxxPageBuilder</code>。对于<code>DICT_ENCODING</code>类型，会获取到<code>BinaryDictPageBuilder</code>。</p>
+<p>在<code>ScalarColumnWriter::init()</code>函数中会获取使用的压缩算法和使用的编码类型，并通过编码类型获取相应的<code>xxxPageBuilder</code>进行数据页的构建。当使用<code>DICT_ENCODING</code>编码类型时，这会获取到<code>BinaryDictPageBuilder</code>。</p>
+<p>由于各种索引(<code>BloomFilterIndex</code>/<code>BitMapIndex</code>/<code>ZoneMapIndex</code>/<code>InvertedIndex</code>/<code>OrdinalIndex</code>)的目的是根据查询来缩小最终进行scan的范围，所以这些索引当中依然存储的是关于原始值的相关信息。</p>
 <p>上游通过<code>ScalarColumnWriter::append_data()</code>向<code>ScalarColumnWriter</code>输入数据，<code>ScalarColumnWriter</code>会将上游输入的数据组织成<code>ScalarColumnWriter::Page</code>构成的链表最后再一次性地写入。其中，一个<code>Page</code>包括数据部分和footer部分。其中数据可能部分有以下三种情况：</p>
 <ul>
 <li>包含一个<code>OwnedSlice</code>且数据页已压缩</li>
@@ -375,6 +377,8 @@
 <li>对于编码类型为<code>PLAIN_ENCODING</code>的数据页，使用<code>BinaryPlainPageDecoder</code>根据页尾的offsets取出页中的数据。</li>
 </ul>
 <p>上层读取数据时，<code>BinaryDictPageDecoder</code>通过<code>_data_page_decoder</code>从数据页中读取数据，并通过<code>Column::insert_many_dict_data()</code>将数据与字典<code>dict</code>提供给上层，不同的类型的<code>Column</code>再根据需要特化实际的处理过程。</p>
+<h2 id="查询执行过程中的处理"><strong>查询执行过程中的处理</strong></h2>
+<p>上面说到<code>BinaryDictPageDecoder</code>值负责提供码值和字典，上层会根据需要进行特化。例如对于<code>ColumnString</code>来说，其会在<code>ColumnString::insert_many_dict_data()</code>中完成解码的过程，即根据每个位置的码字拷贝出对应的字符串并修改<code>offsets</code>数组。显然，这种方式并充分发挥字典编码的优势，特别是对于string类型的列而言，其在一个查询中主要是作为聚合键的一部分，或者在条件中进行等值比较，在这种情况下，使用直接码值进行处理显然要比直接处理原值更高效。所以Doris针对低基数的string列使用了<code>ColumnDictioinary</code>来进行优化。它会在<code>ColumnDictionary::insert_many_dict_data()</code>中直接拷贝码值并保存字典。之后，对于等值比较，它将等值比较中的常量转化为字典中对应的码值。对于range类型的条件过滤，它会首先将字典的码值变换为可以反应原始值偏序关系的码值，然后在应用range predicate时就可以直接比较对应的码值。对于不完全使用字典编码的，即含有plain encoding编码类型的页的，</p>
 <h1 id="参考资料"><strong>参考资料</strong></h1>
 <ul>
 <li><a href="https://15721.courses.cs.cmu.edu/spring2023/slides/05-compression.pdf">Data Compression</a></li>
@@ -386,6 +390,7 @@
 </a></li>
 <li><a href="https://blog.51cto.com/u_15076204/4362894">Apache Doris 学习笔记: 字符串编码与解码</a></li>
 <li><a href="https://github.com/apache/doris/pull/2547">[Segment V2] Support lazy materialization read</a></li>
+<li><a href="https://github.com/apache/doris/pull/19221">[bugfix](low cardinality) cached code is wrong will result wrong query result when many null pages</a></li>
 </ul>
 
     </div>
