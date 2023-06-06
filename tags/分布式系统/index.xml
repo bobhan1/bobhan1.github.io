@@ -22,7 +22,7 @@
       <pubDate>Tue, 01 Dec 2020 00:00:00 +0000</pubDate>
       
       <guid>http://localhost:1313/post/DB-distributed-system/</guid>
-      <description>虚拟共识，Delos通过对不同的共识协议作进一步抽象，在复制状态机WAL日志和数据库之间增加一层虚拟日志层，使得上层应用不感知具体的共识协议</description>
+      <description>Confereence/Talks/Meetings PGCon - 可以在每一年的Events中下载演讲Slides Papers 虚拟共识，Delos通过对不同的共识协议作进一步抽象，在复制状态机WAL日志和数据库</description>
     </item>
     
   </channel>
