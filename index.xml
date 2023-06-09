@@ -265,7 +265,7 @@
       <pubDate>Tue, 01 Dec 2020 00:00:00 +0000</pubDate>
       
       <guid>http://localhost:1313/post/archive/</guid>
-      <description>一篇验证prefetch指令提升CPU效率的文章。 memory prefetch浅析 一篇详细介绍Y-combinator的博文 The Y Combinator (Slight Return) Fastest C++ way to convert float to string</description>
+      <description>memory prefetch浅析 - 一篇验证prefetch指令提升CPU效率的文章。 The Y Combinator (Slight Return) - 一篇详细介绍Y-combinator的博文 Fastest C++ way to convert float</description>
     </item>
     
   </channel>
