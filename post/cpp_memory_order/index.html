@@ -49,7 +49,7 @@
 <meta itemprop="name" content="C&#43;&#43; execution model and memory order">
 <meta itemprop="description" content="本文介绍了C&#43;&#43;抽象机与C&#43;&#43;中memory order的相关知识"><meta itemprop="datePublished" content="2022-03-27T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2022-03-27T00:00:00+00:00" />
-<meta itemprop="wordCount" content="3867">
+<meta itemprop="wordCount" content="4195">
 <meta itemprop="keywords" content="C&#43;&#43;,memory order,多线程," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="C&#43;&#43; execution model and memory order"/>
 <meta name="twitter:description" content="本文介绍了C&#43;&#43;抽象机与C&#43;&#43;中memory order的相关知识"/>
@@ -138,8 +138,8 @@
       <div class="post-meta">
         <span class="post-time"> 2022-03-27 </span>
         
-          <span class="more-meta"> 约 3867 字 </span>
-          <span class="more-meta"> 预计阅读 8 分钟 </span>
+          <span class="more-meta"> 约 4195 字 </span>
+          <span class="more-meta"> 预计阅读 9 分钟 </span>
         
       </div>
     </header>
@@ -168,13 +168,20 @@
     <li><a href="#memory-order"><strong>memory order</strong></a>
       <ul>
         <li><a href="#ordering-constraints"><strong>ordering constraints</strong></a></li>
-        <li><a href="#acquire-release语义"><strong>acquire-release语义</strong></a></li>
-        <li><a href="#传递性"><strong>传递性</strong></a></li>
-        <li><a href="#释放序列"><strong>释放序列</strong></a></li>
+        <li><a href="#sequential-consistency"><strong>Sequential Consistency</strong></a></li>
+        <li><a href="#acquire-release语义"><strong>acquire-release语义</strong></a>
+          <ul>
+            <li><a href="#传递性"><strong>传递性</strong></a></li>
+            <li><a href="#释放序列"><strong>释放序列</strong></a></li>
+          </ul>
+        </li>
         <li><a href="#关于stdmemory_order_consume"><strong>关于<code>std::memory_order_consume</code></strong></a></li>
-        <li><a href="#fences"><strong>Fences</strong></a></li>
-        <li><a href="#thread-fence"><strong>thread fence</strong></a></li>
-        <li><a href="#signal-fence"><strong>signal fence</strong></a></li>
+        <li><a href="#fences"><strong>Fences</strong></a>
+          <ul>
+            <li><a href="#thread-fence"><strong>thread fence</strong></a></li>
+            <li><a href="#signal-fence"><strong>signal fence</strong></a></li>
+          </ul>
+        </li>
         <li><a href="#原子操作对实际生成的cpu指令序列的影响"><strong>原子操作对实际生成的CPU指令序列的影响</strong></a></li>
       </ul>
     </li>
@@ -376,11 +383,13 @@
 <li>Acquire-release:<code>memory_order_consume</code>, <code>memory_order_acquire</code>, <code>memory_order_release</code>, and <code>memory_order_acq_rel</code></li>
 <li>Relaxed: <code>memory_order_relaxed</code></li>
 </ul>
+<h2 id="sequential-consistency"><strong>Sequential Consistency</strong></h2>
+<p>顺序一致性保证了在所有线程上的操作都遵循一个“全局时钟”。</p>
 <h2 id="acquire-release语义"><strong>acquire-release语义</strong></h2>
-<p>有acquire-release语义的不同线程之间并不存在全局的同步，同步只发生在同一个原子变量的的原子操作上，具体来说，一个线程中对一个原子变量的写操作会和另一个线程中对同一个原子变量的读操作发生同步。acquire-release语义基于一个基本思想：在同一个原子变量上同步的一个release操作和一个acquire操作建立了一个顺序约束，即所有读写操作不能被重排到release操作之后，同时读写操作不能被重拍到acquire操作之前。</p>
+<p>而在acquire-release语义中，不同线程之间并不存在全局的同步，同步只发生在同一个原子变量的的原子操作上，具体来说，一个线程中对一个原子变量的写操作会和另一个线程中对同一个原子变量的读操作发生同步。acquire-release语义基于一个基本思想：在同一个原子变量上同步的一个release操作和一个acquire操作建立了一个顺序约束，即所有读写操作不能被重排到release操作之后，同时读写操作不能被重排到acquire操作之前。</p>
 <img src="\imgs\release_semantic.png" style="zoom: 80%;" />
 <img src="\imgs\acquire_semantic.png" style="zoom:80%;" />
-<h2 id="传递性"><strong>传递性</strong></h2>
+<h3 id="传递性"><strong>传递性</strong></h3>
 <p>之前我们说过，在同一个原子变量上同步的一个release操作和一个acquire操作建立了一个顺序约束，这样一来，如果不同线程操作的是同一个原子变量，我们便可以利用这种机制来进行不同线程间的同步。但如果要同步的线程之间没有共享的原子变量呢？我们可以利用acquire-release的传递性来借助另一个线程进行同步，我们来看一个例子（省略了分别用三个线程执行这三个函数的代码）。</p>
 <img src="\imgs\transitivity.png" style="zoom:80%;" />
 <p>在上面的代码中，</p>
@@ -392,7 +401,7 @@
 <p>注意： 我们必须将<code>dataPrduced.load(std::memory_order_acquire)</code>放在<code>while</code>循环中来确保acquire操作确实发生在release操作之后，即保证synchronizes-with的条件为真，才能使得这种传递性生效。</p>
 </blockquote>
 <p>最终他们一起保证了<code>myShaerdWoke[1]=2</code>和<code>mySharedWork={1,0,3}</code>之间是happens-before的关系。</p>
-<h2 id="释放序列"><strong>释放序列</strong></h2>
+<h3 id="释放序列"><strong>释放序列</strong></h3>
 <p>标准中的描述：</p>
 <blockquote>
 <p>A release sequence headed by a release operation A on an atomic object M is a maximal contiguous sub-sequence of side effects in the modification order of M, where the first operation is A, and every subsequent operation * is performed by the same thread that performed A, or * is an atomic read-modify-write operation.</p>
@@ -488,17 +497,33 @@
 <li><code>std::atomic_thread_fence</code>：用于同步不同线程间对相同内存的访问</li>
 <li><code>std::atomic_signal_fence</code>：用于同步一个线程上的signal handler和其他代码</li>
 </ul>
-<p>内存屏障可以使得一些特定顺序地读写操作在重排时不会传过屏障。</p>
-<h2 id="thread-fence"><strong>thread fence</strong></h2>
-<p>有三种类型的屏障：<code>std::atomic_thread_fence()/std::atomic_thread_fence(std::memory_order_acq_rel)</code>、<code>std::atomic_thread_fence(std::memory_order_acquire)</code>、<code>std::atomic_thread_fence(std::memory_order_release)</code>。当他们作用在两个操作(读读、读写、写读、写写)之间时，分别有如下效果。</p>
+<p>内存屏障可以使得一些特定顺序地读写操作在重排时不会穿过屏障。</p>
+<h3 id="thread-fence"><strong>thread fence</strong></h3>
+<p>有三种类型的屏障：</p>
+<ul>
+<li><code>std::atomic_thread_fence()/std::atomic_thread_fence(std::memory_order_acq_rel)</code></li>
+<li><code>std::atomic_thread_fence(std::memory_order_acquire)</code></li>
+<li><code>std::atomic_thread_fence(std::memory_order_release)</code>。</li>
+</ul>
+<p>当他们作用在两个操作(读读、读写、写读、写写四种情况)之间时，分别有如下效果。</p>
 <img src="\imgs\full_fence.png" style="zoom: 67%;" />
+<p>acquire fence使得在acquire fence之前的读操作不会和在acquire fence之后的读、写操作重排。</p>
 <img src="\imgs\acquire_fence.png" style="zoom:67%;" />
+<p>release fence使得在release fence之后的写操作不会和在release fence之前的读、写操作重排。</p>
 <img src="\imgs\release_fence.png" style="zoom:67%;" />
 <p>下面是一个使用线程间内存屏障的例子：</p>
 <img src="\imgs\acquire_release_fence.png" style="zoom:67%;" />
 <p>在这个例子中，acquire-release fence组织了所有原子和非原子操作在被重排时穿过内存屏障，<code>consumer()</code>当中的<code>while</code>循环使得acquire fence synchronizes-with <code>producer()</code>中的release fence，最终使得release fence之前所有非原子操作和relaxed的原子操作产生效果对acquire fence之后的代码都是可见的。</p>
-<p>需要注意的是，使用这种内存屏障比在原子操作上使用对应内存序的原子操作开销更大。</p>
-<h2 id="signal-fence"><strong>signal fence</strong></h2>
+<h4 id="和通过原子变量进行同步的比较"><strong>和通过原子变量进行同步的比较</strong></h4>
+<ul>
+<li>fence有比原子操作更强的顺序保证。对一个原子变量的acquire操作只保证了在它之后的读、写操作不会被重排到它之前。而acquire fence在此基础上还保证了在acquire fence之前的读不会被重排到fence之后。这使得我们可以在acquire fence后可以只用relaxed来读原子变量。</li>
+<li>fence比在原子操作上使用对应内存序的原子操作开销更大。</li>
+</ul>
+<p>此外，从上面的例子可以看到，在使用fence时，我们仍然需要额外的原子变量来保证acquire fence在release fence之后。事实上，标准也是这样进行描述的：</p>
+<blockquote>
+<p><strong>[33.5.11 Fences]</strong> A release fence A synchronizes with an acquire fence B if there exist atomic operations X and Y, both operating on some atomic object M, such that A is sequenced before X, X modifies M, Y is sequenced before B, and Y reads the value written by X or a value written by any side effect in the hypothetical release sequence X would head if it were a release operation.</p>
+</blockquote>
+<h3 id="signal-fence"><strong>signal fence</strong></h3>
 <p><a href="https://en.cppreference.com/w/cpp/atomic/atomic_signal_fence"><code>std::atomic_signal_fence</code></a>能够在一个线程和在相同线程上执行的signal_handler之间对非原子和realxed类型的原子变量的访问建立同步关系。下面是一个例子。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
