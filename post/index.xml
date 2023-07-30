@@ -256,7 +256,7 @@
       <pubDate>Tue, 01 Dec 2020 00:00:00 +0000</pubDate>
       
       <guid>http://localhost:1313/post/DB-distributed-system/</guid>
-      <description>Confereence/Talks/Meetings PGCon - 可以在每一年的Events中下载演讲Slides Papers 虚拟共识，Delos通过对不同的共识协议作进一步抽象，在复制状态机WAL日志和数据库</description>
+      <description>Confereence/Talks/Meetings PGCon - 可以在每一年的Events中下载演讲Slides Courses CMU15721 CMU15445 Papers Amazon Aurora, 一个通过将MySQL数据库中的redolog抽离为独立的存储服务从而提高系</description>
     </item>
     
     <item>

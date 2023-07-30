@@ -16,7 +16,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
 
 
-<meta name="author" content="bobh" /><meta name="description" content="Confereence/Talks/Meetings PGCon - 可以在每一年的Events中下载演讲Slides Papers 虚拟共识，Delos通过对不同的共识协议作进一步抽象，在复制状态机WAL日志和数据库" /><meta name="keywords" content="Hugo, blog, even" />
+<meta name="author" content="bobh" /><meta name="description" content="Confereence/Talks/Meetings PGCon - 可以在每一年的Events中下载演讲Slides Courses CMU15721 CMU15445 Papers Amazon Aurora, 一个通过将MySQL数据库中的redolog抽离为独立的存储服务从而提高系" /><meta name="keywords" content="Hugo, blog, even" />
 
 
 
@@ -40,19 +40,19 @@
 
 
 <meta property="og:title" content="数据库/分布式系统资源合集" />
-<meta property="og:description" content="Confereence/Talks/Meetings PGCon - 可以在每一年的Events中下载演讲Slides Papers 虚拟共识，Delos通过对不同的共识协议作进一步抽象，在复制状态机WAL日志和数据库" />
+<meta property="og:description" content="Confereence/Talks/Meetings PGCon - 可以在每一年的Events中下载演讲Slides Courses CMU15721 CMU15445 Papers Amazon Aurora, 一个通过将MySQL数据库中的redolog抽离为独立的存储服务从而提高系" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="http://localhost:1313/post/DB-distributed-system/" /><meta property="article:section" content="post" />
 <meta property="article:published_time" content="2020-12-01T00:00:00+00:00" />
 <meta property="article:modified_time" content="2020-12-01T00:00:00+00:00" />
 
 <meta itemprop="name" content="数据库/分布式系统资源合集">
-<meta itemprop="description" content="Confereence/Talks/Meetings PGCon - 可以在每一年的Events中下载演讲Slides Papers 虚拟共识，Delos通过对不同的共识协议作进一步抽象，在复制状态机WAL日志和数据库"><meta itemprop="datePublished" content="2020-12-01T00:00:00+00:00" />
+<meta itemprop="description" content="Confereence/Talks/Meetings PGCon - 可以在每一年的Events中下载演讲Slides Courses CMU15721 CMU15445 Papers Amazon Aurora, 一个通过将MySQL数据库中的redolog抽离为独立的存储服务从而提高系"><meta itemprop="datePublished" content="2020-12-01T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2020-12-01T00:00:00+00:00" />
-<meta itemprop="wordCount" content="487">
+<meta itemprop="wordCount" content="628">
 <meta itemprop="keywords" content="数据库,分布式系统," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="数据库/分布式系统资源合集"/>
-<meta name="twitter:description" content="Confereence/Talks/Meetings PGCon - 可以在每一年的Events中下载演讲Slides Papers 虚拟共识，Delos通过对不同的共识协议作进一步抽象，在复制状态机WAL日志和数据库"/>
+<meta name="twitter:description" content="Confereence/Talks/Meetings PGCon - 可以在每一年的Events中下载演讲Slides Courses CMU15721 CMU15445 Papers Amazon Aurora, 一个通过将MySQL数据库中的redolog抽离为独立的存储服务从而提高系"/>
 
 <!--[if lte IE 9]>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
@@ -138,8 +138,8 @@
       <div class="post-meta">
         <span class="post-time"> 2020-12-01 </span>
         
-          <span class="more-meta"> 约 487 字 </span>
-          <span class="more-meta"> 预计阅读 1 分钟 </span>
+          <span class="more-meta"> 约 628 字 </span>
+          <span class="more-meta"> 预计阅读 2 分钟 </span>
         
       </div>
     </header>
@@ -152,6 +152,7 @@
     <li>
       <ul>
         <li><a href="#confereencetalksmeetings"><strong>Confereence/Talks/Meetings</strong></a></li>
+        <li><a href="#courses"><strong>Courses</strong></a></li>
         <li><a href="#papers"><strong>Papers</strong></a></li>
       </ul>
     </li>
@@ -164,29 +165,20 @@
 <ul>
 <li><a href="https://www.pgcon.org/">PGCon</a> - 可以在每一年的Events中下载演讲Slides</li>
 </ul>
+<h2 id="courses"><strong>Courses</strong></h2>
+<ul>
+<li><a href="https://15721.courses.cs.cmu.edu/spring2023/">CMU15721</a></li>
+<li><a href="https://15445.courses.cs.cmu.edu/spring2023/">CMU15445</a></li>
+</ul>
 <h2 id="papers"><strong>Papers</strong></h2>
 <ul>
-<li><strong>虚拟共识</strong>，Delos通过对不同的共识协议作进一步抽象，在复制状态机WAL日志和数据库之间增加一层虚拟日志层，使得上层应用不感知具体的共识协议的实现，从而支持多种共识协议共存，共识协议热替换等功能
-<ul>
-<li><a href="https://www.usenix.org/system/files/osdi20-balakrishnan.pdf">Virtual Consensus in Delos</a> <a href="https://zhuanlan.zhihu.com/p/357033784">论文解读</a></li>
-</ul>
-</li>
-<li><strong>Log-Structured</strong>, 一个分层复制状态机的协议，它规定了层与层之间的接口与交互方式。通过这个协议，我们可以将业务罗即拆分为多个engine，再通过堆叠的方式构建应用，从而提高了组件的复用性和应用的可拓展性。
-<ul>
-<li><a href="">READING GROUP. LOG-STRUCTURED PROTOCOLS IN DELOS</a> <a href="http://charap.co/reading-group-log-structured-protocols-in-delos/">论文解读</a></li>
-</ul>
-</li>
 <li><strong>Amazon Aurora</strong>, 一个通过将MySQL数据库中的redolog抽离为独立的存储服务从而提高系统吞吐量的云原生数据库
 <ul>
 <li><a href="https://pdos.csail.mit.edu/6.824/papers/aurora.pdf">Amazon Aurora: Design Considerations for High Throughput Cloud-Native Relational Databases</a>  [<a href="https://www.jianshu.com/p/dd6aa53c3af5">翻译</a>]</li>
 <li><a href="https://pages.cs.wisc.edu/~yxy/cs839-s20/papers/aurora-sigmod-18.pdf">Amazon Aurora: On avoiding distributed consensus for I/Os, commits, and membership changes</a></li>
 </ul>
 </li>
-<li><strong>Dynamo</strong>
-<ul>
-<li><a href="https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf">Dynamo: Amazon’s Highly Available Key-value Store</a></li>
-</ul>
-</li>
+<li><strong>Dynamo</strong> - <a href="https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf">Dynamo: Amazon’s Highly Available Key-value Store</a></li>
 <li><strong>Spanner</strong>
 <ul>
 <li><a href="https://www.usenix.org/system/files/conference/osdi12/osdi12-final-16.pdf">Spanner: Google’s Globally-Distributed Database</a></li>
@@ -210,6 +202,30 @@
 <li><a href="https://zhuanlan.zhihu.com/p/528514990">Push还是Pull，这是个问题么？</a></li>
 <li><a href="https://15721.courses.cs.cmu.edu/spring2023/papers/07-scheduling/p743-leis.pdf">Morsel-Driven Parallelism: A NUMA-Aware Query Evaluation Framework for the Many-Core Age</a></li>
 <li><a href="https://15721.courses.cs.cmu.edu/spring2023/papers/07-scheduling/wagner-sigmod21.pdf">Self-Tuning Query Scheduling for Analytical Workloads</a></li>
+</ul>
+</li>
+<li><strong>Turbine</strong> - <a href="https://conferences.computer.org/icde/2020/pdfs/ICDE2020-5acyuqhpJ6L9P042wmjY1p/290300b591/290300b591.pdf">Turbine: Facebook’s Service Management Platform for Stream Processing</a></li>
+<li><strong>Hologres</strong> - <a href="https://kai-zeng.github.io/papers/hologres.pdf">Alibaba Hologres: A Cloud-Native Service for Hybrid Serving/Analytical Processing</a></li>
+<li><strong>Snowflake</strong> - <a href="https://15721.courses.cs.cmu.edu/spring2023/papers/21-snowflake/p215-dageville-snowflake.pdf">The Snowflake Elastic Data Warehouse</a></li>
+<li><strong>DuckDB</strong>
+<ul>
+<li><a href="https://15721.courses.cs.cmu.edu/spring2023/papers/22-duckdb/2019-duckdbdemo.pdf">DuckDB: an Embeddable Analytical Database</a></li>
+<li><a href="https://15721.courses.cs.cmu.edu/spring2023/papers/22-duckdb/p23-raasveldt-cidr20.pdf">Data Management for Data Science Towards Embedded Analytics</a></li>
+</ul>
+</li>
+<li><strong>Velox</strong> - <a href="https://15721.courses.cs.cmu.edu/spring2023/papers/23-velox/p3372-pedreira.pdf">Velox: Meta’s Unified Execution Engine</a></li>
+<li><strong>Photon</strong> - <a href="https://people.eecs.berkeley.edu/~matei/papers/2022/sigmod_photon.pdf">Photon: A Fast Query Engine for Lakehouse Systems</a> <a href="https://zhuanlan.zhihu.com/p/511400714">[解读]</a></li>
+<li><strong>PolarFS</strong> - <a href="https://www.vldb.org/pvldb/vol11/p1849-cao.pdf">PolarFS: An Ultra-low Latency and Failure Resilient Distributed File System for Shared Storage Cloud Database</a> <a href="https://zhuanlan.zhihu.com/p/476700099">[解读]</a></li>
+<li><strong>OceanBasee</strong> - <a href="https://www.vldb.org/pvldb/vol15/p3385-xu.pdf">OceanBase: A 707 Million tpmC Distributed Relational Database System</a></li>
+<li><strong>ByteHTAP</strong> - <a href="https://www.vldb.org/pvldb/vol15/p3411-chen.pdf">ByteHTAP: ByteDance’s HTAP System with High Data Freshness and Strong Data Consistency</a> <a href="https://shenzhu.github.io/bytehtap/">[解读]</a></li>
+<li><strong>虚拟共识</strong>，Delos通过对不同的共识协议作进一步抽象，在复制状态机WAL日志和数据库之间增加一层虚拟日志层，使得上层应用不感知具体的共识协议的实现，从而支持多种共识协议共存，共识协议热替换等功能
+<ul>
+<li><a href="https://www.usenix.org/system/files/osdi20-balakrishnan.pdf">Virtual Consensus in Delos</a> <a href="https://zhuanlan.zhihu.com/p/357033784">论文解读</a></li>
+</ul>
+</li>
+<li><strong>Log-Structured</strong>, 一个分层复制状态机的协议，它规定了层与层之间的接口与交互方式。通过这个协议，我们可以将业务罗即拆分为多个engine，再通过堆叠的方式构建应用，从而提高了组件的复用性和应用的可拓展性。
+<ul>
+<li><a href="">READING GROUP. LOG-STRUCTURED PROTOCOLS IN DELOS</a> <a href="http://charap.co/reading-group-log-structured-protocols-in-delos/">论文解读</a></li>
 </ul>
 </li>
 </ul>
