@@ -49,7 +49,7 @@
 <meta itemprop="name" content="数据库/分布式系统资源合集">
 <meta itemprop="description" content="Confereence/Talks/Meetings PGCon - 可以在每一年的Events中下载演讲Slides Courses CMU15721 CMU15445 Papers Amazon Aurora, 一个通过将MySQL数据库中的redolog抽离为独立的存储服务从而提高系"><meta itemprop="datePublished" content="2020-12-01T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2020-12-01T00:00:00+00:00" />
-<meta itemprop="wordCount" content="628">
+<meta itemprop="wordCount" content="674">
 <meta itemprop="keywords" content="数据库,分布式系统," /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="数据库/分布式系统资源合集"/>
 <meta name="twitter:description" content="Confereence/Talks/Meetings PGCon - 可以在每一年的Events中下载演讲Slides Courses CMU15721 CMU15445 Papers Amazon Aurora, 一个通过将MySQL数据库中的redolog抽离为独立的存储服务从而提高系"/>
@@ -138,7 +138,7 @@
       <div class="post-meta">
         <span class="post-time"> 2020-12-01 </span>
         
-          <span class="more-meta"> 约 628 字 </span>
+          <span class="more-meta"> 约 674 字 </span>
           <span class="more-meta"> 预计阅读 2 分钟 </span>
         
       </div>
@@ -226,6 +226,12 @@
 <li><strong>Log-Structured</strong>, 一个分层复制状态机的协议，它规定了层与层之间的接口与交互方式。通过这个协议，我们可以将业务罗即拆分为多个engine，再通过堆叠的方式构建应用，从而提高了组件的复用性和应用的可拓展性。
 <ul>
 <li><a href="">READING GROUP. LOG-STRUCTURED PROTOCOLS IN DELOS</a> <a href="http://charap.co/reading-group-log-structured-protocols-in-delos/">论文解读</a></li>
+</ul>
+</li>
+<li><strong>Apache Kudu</strong> - <a href="https://kudu.apache.org/kudu.pdf">Kudu: Storage for Fast Analytics on Fast Data</a></li>
+<li><strong>FoundationDB</strong> - <a href="https://www.foundationdb.org/files/fdb-paper.pdf">FoundationDB: A Distributed Unbundled Transactional Key Value Store</a>
+<ul>
+<li>其中控制面使用<a href="https://groups.csail.mit.edu/tds/papers/Chockler/podc-02.pdf">Active Disk Paxos</a>来达到高可用</li>
 </ul>
 </li>
 </ul>
