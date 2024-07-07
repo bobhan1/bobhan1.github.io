@@ -49,7 +49,7 @@
 <meta itemprop="name" content="资源链接合集">
 <meta itemprop="description" content="memory prefetch浅析 - 一篇验证prefetch指令提升CPU效率的文章。 The Y Combinator (Slight Return) - 一篇详细介绍Y-combinator的博文 Fastest C&#43;&#43; way to convert float"><meta itemprop="datePublished" content="2020-12-01T00:00:00+00:00" />
 <meta itemprop="dateModified" content="2020-12-01T00:00:00+00:00" />
-<meta itemprop="wordCount" content="719">
+<meta itemprop="wordCount" content="793">
 <meta itemprop="keywords" content="" /><meta name="twitter:card" content="summary"/>
 <meta name="twitter:title" content="资源链接合集"/>
 <meta name="twitter:description" content="memory prefetch浅析 - 一篇验证prefetch指令提升CPU效率的文章。 The Y Combinator (Slight Return) - 一篇详细介绍Y-combinator的博文 Fastest C&#43;&#43; way to convert float"/>
@@ -138,7 +138,7 @@
       <div class="post-meta">
         <span class="post-time"> 2020-12-01 </span>
         
-          <span class="more-meta"> 约 719 字 </span>
+          <span class="more-meta"> 约 793 字 </span>
           <span class="more-meta"> 预计阅读 2 分钟 </span>
         
       </div>
@@ -215,8 +215,16 @@
 <li><a href="https://www.man7.org/training/download/shlib_dynlinker_slides.pdf">Shared Libraries: The Dynamic Linker</a>: shared libraries相关知识，更详细的介绍在作者的书Linux programming interface 41,42章</li>
 </ul>
 </li>
+<li><a href="https://blog.csdn.net/npy_lp/category_9411979.html">ELF相关</a></li>
+<li><a href="https://refspecs.linuxfoundation.org/">Linux Foundation Referenced Specifications</a></li>
 <li><a href="https://developer.aliyun.com/article/791498">Elasticsearch 内存占用分析及 page cache 监控</a></li>
-<li><a href="https://research.swtch.com/mm">Memory Models</a></li>
+<li><a href="https://research.swtch.com/mm">Memory Models</a>
+<ul>
+<li><a href="https://research.swtch.com/hwmm">Hardware Memory Models</a> <a href="https://mysteriouspreserve.com/blog/2023/04/19/Hardware-Memory-Model-zh/">中文翻译</a></li>
+<li><a href="https://research.swtch.com/plmm">Programming Language Memory Models</a> <a href="https://mysteriouspreserve.com/blog/2023/04/19/Programing-Memory-Models/">中文翻译</a></li>
+</ul>
+</li>
+<li><a href="https://preshing.com/20120625/memory-ordering-at-compile-time/">Memory Ordering at Compile Time</a></li>
 <li><a href="https://wg21.link/p0124">Linux-Kernel Memory Model</a></li>
 <li><a href="https://www.springer.com/series/16903/books">Synthesis Lectures on Data Management</a>
 <ul>
@@ -224,7 +232,11 @@
 </ul>
 </li>
 <li><a href="https://www.springer.com/series/16916/books">Synthesis Lectures on Computer Architecture</a></li>
-<li><a href="https://www.intel.com/content/www/us/en/docs/vtune-profiler/cookbook/2024-0/overview.html">Intel® VTune™ Profiler Performance Analysis Cookbook</a></li>
+<li><a href="https://www.intel.com/content/www/us/en/docs/vtune-profiler/cookbook/2024-0/overview.html">Intel® VTune™ Profiler Performance Analysis Cookbook</a>
+<ul>
+<li><a href="https://static.googleusercontent.com/media/research.google.com/zh-CN//pubs/archive/44271.pdf">Profiling a warehouse-scale computer</a></li>
+</ul>
+</li>
 <li><a href="https://www.lightofdawn.org/wiki/wiki.cgi/NewAppsOnOldGlibc">Running new applications on old glibc</a>
 <ul>
 <li><a href="https://www.akkadia.org/drepper/symbol-versioning">ELF Symbol Versioning</a></li>
@@ -232,17 +244,24 @@
 </li>
 <li><a href="https://docs.oracle.com/en/operating-systems/solaris/oracle-solaris/11.4/linkers-libraries/">Oracle Solaris 11.4 Linkers and Libraries Guide</a></li>
 <li><a href="https://crosstool-ng.github.io/docs/toolchain-construction/">How a toolchain is constructed</a></li>
+<li><a href="https://wiki.osdev.org/OS_Specific_Toolchain">OS Specific Toolchain</a></li>
+<li><a href="https://preshing.com/20141119/how-to-build-a-gcc-cross-compiler/">How to Build a GCC Cross-Compiler</a></li>
+<li><a href="https://adonis0147.github.io/post/portable-gcc-toolchain/">Build a Portable GCC Toolchain</a></li>
 <li><a href="https://dare.uva.nl/search?identifier=5ccbb60a-38b8-4eeb-858a-e7735dd37487">Balancing vectorized query execution with bandwidth-optimized storage</a></li>
+<li><a href="https://stackoverflow.com/questions/72126606/should-the-cache-padding-size-of-x86-64-be-128-bytes">Should the cache padding size of x86-64 be 128 bytes?</a></li>
 <li>向量化
 <ul>
 <li><a href="https://clickhouse.com/blog/cpu-dispatch-in-clickhouse">CPU Dispatch in ClickHouse</a></li>
 <li><a href="https://cn.pingcap.com/blog/automatic-vectorization-acceleration-for-compiler-in-tiflash/">TiFlash 面向编译器的自动向量化加速</a></li>
 <li><a href="https://www.intel.com/content/www/us/en/developer/articles/technical/vectorization-essential.html">Vectorization Essentials</a></li>
 <li><a href="https://www.intel.com/content/www/us/en/developer/articles/technical/common-vectorization-tips.html?wapkw=Vectorization">Common Vectorization Tips</a></li>
+<li><a href="https://www.intel.com/content/dam/develop/external/us/en/documents/31848-compilerautovectorizationguide.pdf">(Auto)Vectorization tutorial</a></li>
 <li><a href="https://llvm.org/docs/Vectorizers.html">Auto-Vectorization in LLVM</a></li>
 <li><a href="https://gcc.gnu.org/projects/tree-ssa/vectorization.html">Auto-vectorization in GCC</a></li>
 </ul>
 </li>
+<li><a href="https://labs.iximiuz.com/tutorials">labs.iximiuz</a></li>
+<li><a href="https://linux-blog.anracom.com/2017/10/30/fun-with-veth-devices-linux-bridges-and-vlans-in-unnamed-linux-network-namespaces-i/">Fun with veth-devices, Linux bridges and VLANs in unnamed Linux network namespaces – I</a></li>
 </ul>
 
     </div>
